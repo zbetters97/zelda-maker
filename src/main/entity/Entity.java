@@ -23,7 +23,8 @@ public class Entity {
         CHARGING(true, true),
         SPINNING(false, false),
         ROLLING(false, true),
-        GUARDING(true, false);
+        GUARDING(true, false),
+        DIGGING(false, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
@@ -52,6 +53,7 @@ public class Entity {
 
     /* MOVEMENT VALUES */
     public GamePanel.Direction direction = DOWN;
+    public Action action;
     public int speed = 1;
     protected int defaultSpeed;
     protected boolean moving = false;
@@ -70,6 +72,7 @@ public class Entity {
     public int health;
     public int maxHealth;
     protected int attack;
+    public Entity currentItem;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
     protected boolean knockback;
@@ -89,7 +92,8 @@ public class Entity {
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
 
     /* SPRITE ATTRIBUTES */
-    protected BufferedImage image, up1, up2,  down1, down2, left1, left2, right1, right2;
+    public BufferedImage image;
+    protected BufferedImage up1, up2,  down1, down2, left1, left2, right1, right2;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
 
@@ -97,6 +101,7 @@ public class Entity {
     protected int entity_type;
     protected final int type_npc = 0;
     protected final int type_enemy = 1;
+    protected final int type_item = 2;
 
     /**
      * CONSTRUCTOR
@@ -305,6 +310,16 @@ public class Entity {
         else {
             return direction;
         }
+    }
+
+    /**
+     * USE
+     * Initiates using the Entity
+     * @param user The Entity performing the use
+     * @return Returns true if usable
+     */
+    public boolean use(Entity user) {
+        return true;
     }
 
     /**

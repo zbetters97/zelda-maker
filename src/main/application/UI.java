@@ -2,6 +2,7 @@ package application;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +14,11 @@ public class UI {
     private final GamePanel gp;
     private Graphics2D g2;
     private Font PK_DS;
+
+    // UI COLORS
+    private final Color itm_brown_1 = new Color(168, 127, 89);
+    private final Color itm_brown_2 = new Color(217, 180, 122);
+    private final Color itm_green = new Color(95, 190, 80);
 
     /* SPRITES */
     private BufferedImage heart_0, heart_1, heart_2, heart_3, heart_4;
@@ -75,6 +81,7 @@ public class UI {
      */
     private void drawHUD() {
         drawPlayerHealth();
+        drawPlayerItem();
         drawChargeBar();
         drawDebug();
     }
@@ -119,6 +126,49 @@ public class UI {
             // Move right for next heart
             x += spacing;
         }
+    }
+
+    /**
+     * DRAW PLAYER ITEM
+     * Draws the current player's item in the top-right corner of the screen
+     * Called by drawHUD()
+     */
+    private void drawPlayerItem() {
+        int x = gp.tileSize * 14 - 15;
+        int y = gp.tileSize / 2 - 15;
+        int width = gp.tileSize + 30;
+        int height = gp.tileSize + 30;
+
+        // DRAW ITEM CIRCLE
+        g2.setColor(itm_brown_1);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(itm_green);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(x, y, width, height);
+
+        if (gp.player.currentItem != null) {
+            x += 10;
+            y += 10;
+            g2.drawImage(gp.player.currentItem.image, x, y, gp.tileSize + 10, gp.tileSize + 10, null);
+        }
+
+        // DRAW ITEM BUTTON
+        x = gp.tileSize * 13 + 28;
+        y = gp.tileSize + 12;
+        width = 35;
+        height = 35;
+        g2.setColor(itm_green);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
+        String text = KeyEvent.getKeyText(gp.keyH.btn_X);
+        x = getXForCenteredTextOnWidth(text, width, x);
+        y += 28;
+        g2.drawString(text, x, y);
+
+        g2.setStroke(new BasicStroke(1));
     }
 
     /**
@@ -204,6 +254,20 @@ public class UI {
         g2.setColor(Color.RED);
         g2.drawRect(gp.player.screenX + gp.player.hitbox.x, gp.player.screenY + gp.player.hitbox.y,
                 gp.player.hitbox.width, gp.player.hitbox.height);
+    }
+
+    /**
+     * GET X FOR TEXT CENTERED
+     * @param text Text being used
+     * @param width Width of element to center text on
+     * @param x Starting point of X
+     * @return Middle point X
+     */
+    private int getXForCenteredTextOnWidth(String text, int width, int x) {
+        FontMetrics fm = g2.getFontMetrics();
+        int stringWidth = fm.stringWidth(text);
+        int centeredX = (width - stringWidth) / 2;
+        return centeredX + x;
     }
 
     /**

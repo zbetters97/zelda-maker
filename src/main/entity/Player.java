@@ -1,10 +1,10 @@
 package entity;
 
 import application.GamePanel;
+import entity.item.ITM_Shovel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
 
@@ -14,7 +14,6 @@ public class Player extends Entity {
     public int screenX, screenY;
 
     /* GENERAL ATTRIBUTES */
-    private Action action = Action.IDLE;
     private int spinCharge = 0;
     public int charge = 0;
 
@@ -24,7 +23,9 @@ public class Player extends Entity {
 
     /* ANIMATION HANDLERS */
     private int coolDownCounter = 0;
-    private int attackNum = 1, attackCounter = 0;
+    private int
+            attackNum = 1, attackCounter = 0,
+            digNum = 1, digCounter = 0;
 
     /* SPRITE IMAGES */
     private BufferedImage
@@ -38,7 +39,10 @@ public class Player extends Entity {
             rollLeft1, rollLeft2, rollLeft3, rollLeft4, rollRight1, rollRight2, rollRight3, rollRight4,
 
             guardUp1, guardUp2, guardDown1, guardDown2,
-            guardLeft1, guardLeft2, guardRight1, guardRight2;
+            guardLeft1, guardLeft2, guardRight1, guardRight2,
+
+            digUp1, digUp2, digDown1, digDown2,
+            digLeft1, digLeft2, digRight1, digRight2;
 
     /**
      * CONSTRUCTOR
@@ -91,6 +95,7 @@ public class Player extends Entity {
         getSpinImages();
         getRollImages();
         getGuardImages();
+        getDigImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -148,6 +153,16 @@ public class Player extends Entity {
         guardRight1 = setupImage("/player/boy_guard_right_1");
         guardRight2 = setupImage("/player/boy_guard_right_2");
     }
+    private void getDigImages() {
+        digUp1 = setupImage("/player/boy_dig_up_1");
+        digUp2 = setupImage("/player/boy_dig_up_2");
+        digDown1 = setupImage("/player/boy_dig_down_1");
+        digDown2 = setupImage("/player/boy_dig_down_2");
+        digLeft1 = setupImage("/player/boy_dig_left_1");
+        digLeft2 = setupImage("/player/boy_dig_left_2");
+        digRight1 = setupImage("/player/boy_dig_right_1");
+        digRight2 = setupImage("/player/boy_dig_right_2");
+    }
 
     /**
      * SET DEFAULT VALUES
@@ -156,6 +171,8 @@ public class Player extends Entity {
     public void setDefaultValues() {
         setDefaultAnimationValues();
         setDefaultPosition();
+
+        currentItem = new ITM_Shovel(gp);
     }
 
     /**
@@ -165,6 +182,7 @@ public class Player extends Entity {
         speed = 3;
         defaultSpeed = speed;
         animationSpeed = 10;
+        action = Action.IDLE;
     }
 
     /**
@@ -259,6 +277,9 @@ public class Player extends Entity {
             spriteNum = 1;
             spriteCounter = 0;
         }
+        else if (gp.keyH.xPressed) {
+            useItem();
+        }
     }
 
     /**
@@ -295,6 +316,29 @@ public class Player extends Entity {
     }
 
     /**
+     * USE ITEM
+     * Initiates the item use function
+     * Called by handleActionInput()
+     */
+    public void useItem() {
+
+        // HAS ITEM EQUIPPED
+        if (currentItem != null) {
+            switch (currentItem.name) {
+                case ITM_Shovel.itmName:
+                    gp.keyH.xPressed = false;
+                    gp.keyH.bPressed = false;
+                    currentItem.use(this);
+                    break;
+            }
+        }
+        // NO ITEM EQUIPPED
+        else {
+            gp.keyH.xPressed = false;
+        }
+    }
+
+    /**
      * UPDATE ACTION
      * Calls the action method based on current player action
      * Called by update()
@@ -306,6 +350,7 @@ public class Player extends Entity {
             case SPINNING -> spinning();
             case ROLLING -> rolling();
             case GUARDING -> guarding();
+            case DIGGING -> digging();
         }
     }
 
@@ -712,6 +757,27 @@ public class Player extends Entity {
     }
 
     /**
+     * DIGGING
+     * Runs digging animation and logic
+     * Called by startAction() when player action is DIGGING
+     */
+    private void digging() {
+        digCounter++;
+
+        if (12 >= digCounter) {
+            digNum = 1;
+        }
+        else if (24 > digCounter) {
+            digNum = 2;
+        }
+        else if (digCounter > 24) {
+            digNum = 1;
+            digCounter = 0;
+            action = Action.IDLE;
+        }
+    }
+
+    /**
      * MANAGE VALUES
      * Resets or reassigns player attributes
      * Called by update() at the end
@@ -752,6 +818,7 @@ public class Player extends Entity {
             case SPINNING ->  getSpinSprite();
             case ROLLING -> getRollingSprite();
             case GUARDING -> getGuardSprite();
+            case DIGGING -> getDiggingSprite();
         };
 
         if (invincible) {
@@ -1001,5 +1068,26 @@ public class Player extends Entity {
         }
 
         return guardSprite;
+    }
+    private BufferedImage getDiggingSprite() {
+        BufferedImage digSprite;
+
+        if (digNum == 1) {
+            digSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> digUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> digDown1;
+                case LEFT -> digLeft1;
+                case RIGHT -> digRight1;
+            };
+        } else {
+            digSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> digUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> digDown2;
+                case LEFT -> digLeft2;
+                case RIGHT -> digRight2;
+            };
+        }
+
+        return digSprite;
     }
 }
