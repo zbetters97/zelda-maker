@@ -1,12 +1,12 @@
 package entity;
 
 import application.GamePanel;
+import entity.projectile.Projectile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -17,14 +17,15 @@ public class Entity {
      * ACTION enum
      * List of predefined actions an Entity can perform
      */
-    protected enum Action {
+    public enum Action {
         IDLE(true, true),
         ATTACKING(false, false),
-        CHARGING(true, true),
+        SPINCHARGING(true, true),
         SPINNING(false, false),
         ROLLING(false, true),
         GUARDING(true, false),
-        DIGGING(false, false);
+        DIGGING(false, false),
+        AIMING(true, true);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
@@ -34,11 +35,10 @@ public class Entity {
             this.allowsTranslation = allowsTranslation;
         }
 
-        protected boolean allowsFacing() {
+        public boolean allowsFacing() {
             return allowsFacing;
         }
-
-        protected boolean allowsTranslation() {
+        public boolean allowsTranslation() {
             return allowsTranslation;
         }
     }
@@ -50,6 +50,7 @@ public class Entity {
     protected int worldXStart, worldYStart;
     protected int tempScreenX, tempScreenY;
     public String name;
+    public int type;
 
     /* MOVEMENT VALUES */
     public GamePanel.Direction direction = DOWN;
@@ -71,7 +72,8 @@ public class Entity {
     public boolean alive = true;
     public int health;
     public int maxHealth;
-    protected int attack;
+    public int attack;
+    public int defaultAttack;
     public Entity currentItem;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
@@ -91,6 +93,14 @@ public class Entity {
     protected int hitboxDefaultHeight = hitbox.height;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
 
+    /* INVENTORY VALUES */
+    public int arrows = 0;
+
+    /* PROJECTILE VALUES */
+    public Projectile projectile;
+    public Entity user;
+    public int charge = 0;
+
     /* SPRITE ATTRIBUTES */
     public BufferedImage image;
     protected BufferedImage up1, up2,  down1, down2, left1, left2, right1, right2;
@@ -102,6 +112,9 @@ public class Entity {
     protected final int type_npc = 0;
     protected final int type_enemy = 1;
     protected final int type_item = 2;
+
+    /* OBJECT TYPES */
+    public final int type_projectile = 3;
 
     /**
      * CONSTRUCTOR
@@ -319,6 +332,16 @@ public class Entity {
      * @return Returns true if usable
      */
     public boolean use(Entity user) {
+        return true;
+    }
+
+    /**
+     * SET CHARGE
+     * Charges the entity
+     * @param user The entity using the item
+     * @return True if charging, false if not
+     */
+    public boolean setCharge(Entity user) {
         return true;
     }
 

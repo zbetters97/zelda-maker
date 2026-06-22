@@ -1,6 +1,7 @@
 package entity;
 
 import application.GamePanel;
+import entity.item.ITM_Bow;
 import entity.item.ITM_Shovel;
 
 import java.awt.*;
@@ -13,19 +14,17 @@ public class Player extends Entity {
     /* POSITIONING */
     public int screenX, screenY;
 
-    /* GENERAL ATTRIBUTES */
-    private int spinCharge = 0;
-    public int charge = 0;
-
     /* MOVEMENT ATTRIBUTES */
     private boolean lockedOn;
     private GamePanel.Direction lockonDirection;
 
     /* ANIMATION HANDLERS */
+    private int spinCharge = 0;
     private int coolDownCounter = 0;
     private int
             attackNum = 1, attackCounter = 0,
-            digNum = 1, digCounter = 0;
+            digNum = 1, digCounter = 0,
+            aimNum = 1;
 
     /* SPRITE IMAGES */
     private BufferedImage
@@ -42,7 +41,10 @@ public class Player extends Entity {
             guardLeft1, guardLeft2, guardRight1, guardRight2,
 
             digUp1, digUp2, digDown1, digDown2,
-            digLeft1, digLeft2, digRight1, digRight2;
+            digLeft1, digLeft2, digRight1, digRight2,
+
+            aimUp1, aimUp2, aimDown1, aimDown2,
+            aimLeft1, aimLeft2, aimRight1, aimRight2;
 
     /**
      * CONSTRUCTOR
@@ -96,6 +98,7 @@ public class Player extends Entity {
         getRollImages();
         getGuardImages();
         getDigImages();
+        getAimImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -163,6 +166,16 @@ public class Player extends Entity {
         digRight1 = setupImage("/player/boy_dig_right_1");
         digRight2 = setupImage("/player/boy_dig_right_2");
     }
+    private void getAimImages() {
+        aimUp1 = setupImage("/player/boy_aim_up_1");
+        aimUp2 = setupImage("/player/boy_aim_up_2");
+        aimDown1 = setupImage("/player/boy_aim_down_1");
+        aimDown2 = setupImage("/player/boy_aim_down_2");
+        aimLeft1 = setupImage("/player/boy_aim_left_1");
+        aimLeft2 = setupImage("/player/boy_aim_left_2");
+        aimRight1 = setupImage("/player/boy_aim_right_1");
+        aimRight2 = setupImage("/player/boy_aim_right_2");
+    }
 
     /**
      * SET DEFAULT VALUES
@@ -172,7 +185,8 @@ public class Player extends Entity {
         setDefaultAnimationValues();
         setDefaultPosition();
 
-        currentItem = new ITM_Shovel(gp);
+        arrows = 50;
+        currentItem = new ITM_Bow(gp);
     }
 
     /**
@@ -325,11 +339,16 @@ public class Player extends Entity {
         // HAS ITEM EQUIPPED
         if (currentItem != null) {
             switch (currentItem.name) {
-                case ITM_Shovel.itmName:
+                case ITM_Shovel.itmName -> {
                     gp.keyH.xPressed = false;
                     gp.keyH.bPressed = false;
                     currentItem.use(this);
-                    break;
+                }
+                case ITM_Bow.itmName -> {
+                   lockedOn = true;
+                   lockonDirection = direction;
+                   currentItem.setCharge(this);
+                }
             }
         }
         // NO ITEM EQUIPPED
@@ -346,11 +365,12 @@ public class Player extends Entity {
     private void updateAction() {
         switch (action) {
             case ATTACKING -> attacking();
-            case CHARGING -> charging();
+            case SPINCHARGING -> spinCharging();
             case SPINNING -> spinning();
             case ROLLING -> rolling();
             case GUARDING -> guarding();
             case DIGGING -> digging();
+            case AIMING -> aiming();
         }
     }
 
@@ -374,9 +394,7 @@ public class Player extends Entity {
      * Called by handleMovementInput() when an arrow key is pressed
      */
     protected void updateDirection() {
-        if (action.allowsFacing()) {
-            updateFacing();
-        }
+       updateFacing();
 
        if (!action.allowsTranslation()) {
            moving = false;
@@ -477,7 +495,7 @@ public class Player extends Entity {
 
             // Spin charge ready for spin attack
             if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
-                action = Action.CHARGING;
+                action = Action.SPINCHARGING;
                 lockedOn = true;
                 lockonDirection = direction;
             }
@@ -532,20 +550,20 @@ public class Player extends Entity {
      * Charges spin attack while holding B
      * Called by getAction() when action == CHARGING
      */
-    private void charging() {
+    private void spinCharging() {
 
         // Player holding B to charge
         if (gp.keyH.bPressed) {
-            if (charge < 120) {
-                charge += 2;
+            if (spinCharge < 120) {
+                spinCharge += 2;
             }
             speed = 2;
         }
         // Charge is ready, start spin and reset values
-        else if (charge >= 120) {
+        else if (spinCharge >= 120) {
             updateSpinDirection();
 
-            charge = 0;
+            spinCharge = 0;
             lockedOn = false;
             attackNum = 1;
             spriteNum = 0;
@@ -554,7 +572,7 @@ public class Player extends Entity {
         }
         // Player released B, charge not ready, reset to idle
         else {
-            charge = 0;
+            spinCharge = 0;
             attackNum = 1;
             attackCounter = 0;
             lockedOn = false;
@@ -778,6 +796,29 @@ public class Player extends Entity {
     }
 
     /**
+     * AIMING
+     * Runs aiming animation and logic
+     * Called by startAction() when player action is AIMING
+     */
+    private void aiming() {
+
+        if (6 >= charge) {
+            aimNum = 1;
+        }
+        else {
+            aimNum = 2;
+        }
+
+        if (gp.keyH.xPressed) {
+            currentItem.setCharge(this);
+        }
+        else {
+            currentItem.use(this);
+            lockedOn = false;
+        }
+    }
+
+    /**
      * MANAGE VALUES
      * Resets or reassigns player attributes
      * Called by update() at the end
@@ -814,11 +855,12 @@ public class Player extends Entity {
         // Match sprite to action
         image = switch (action) {
             case IDLE -> getIdleSprite();
-            case ATTACKING, CHARGING -> getAttackSprite();
+            case ATTACKING, SPINCHARGING -> getAttackSprite();
             case SPINNING ->  getSpinSprite();
             case ROLLING -> getRollingSprite();
             case GUARDING -> getGuardSprite();
-            case DIGGING -> getDiggingSprite();
+            case DIGGING -> getDigSprite();
+            case AIMING -> getAimSprite();
         };
 
         if (invincible) {
@@ -1069,7 +1111,7 @@ public class Player extends Entity {
 
         return guardSprite;
     }
-    private BufferedImage getDiggingSprite() {
+    private BufferedImage getDigSprite() {
         BufferedImage digSprite;
 
         if (digNum == 1) {
@@ -1089,5 +1131,26 @@ public class Player extends Entity {
         }
 
         return digSprite;
+    }
+    private BufferedImage getAimSprite() {
+        BufferedImage aimSprite;
+
+        if (aimNum == 1) {
+            aimSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> aimUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> aimDown1;
+                case LEFT -> aimLeft1;
+                case RIGHT -> aimRight1;
+            };
+        } else {
+            aimSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> aimUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> aimDown2;
+                case LEFT -> aimLeft2;
+                case RIGHT -> aimRight2;
+            };
+        }
+
+        return aimSprite;
     }
 }
