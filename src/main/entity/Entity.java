@@ -25,7 +25,8 @@ public class Entity {
         ROLLING(false, true),
         GUARDING(true, false),
         DIGGING(false, false),
-        AIMING(true, true);
+        AIMING(true, true),
+        THROWING(false, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
@@ -325,24 +326,23 @@ public class Entity {
         }
     }
 
-    /**
-     * USE
-     * Initiates using the Entity
-     * @param user The Entity performing the use
-     * @return Returns true if usable
-     */
-    public boolean use(Entity user) {
-        return true;
+    protected void attack() {
+
     }
 
     /**
-     * SET CHARGE
-     * Charges the entity
-     * @param user The entity using the item
-     * @return True if charging, false if not
+     * USE
+     * Initiates using the Entity
      */
-    public boolean setCharge(Entity user) {
-        return true;
+    protected void use() { }
+
+    protected void addProjectile(Projectile projectile) {
+        for (int i = 0; i < gp.projectile[0].length; i++) {
+            if (gp.projectile[gp.currentMap][i] == null) {
+                gp.projectile[gp.currentMap][i] = projectile;
+                break;
+            }
+        }
     }
 
     /**

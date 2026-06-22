@@ -19,13 +19,14 @@ public class Projectile extends Entity {
         this.user = user;
     }
 
-    public void addProjectile(Projectile projectile) {
-
-        for (int i = 0; i < gp.projectile[0].length; i++) {
-            if (gp.projectile[gp.currentMap][i] == null) {
-                gp.projectile[gp.currentMap][i] = projectile;
-                break;
-            }
+    protected void move() {
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> worldY -= speed;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY += speed;
+            case LEFT -> worldX -= speed;
+            case RIGHT -> worldX += speed;
         }
     }
+
+    protected void resetValues() { }
 }

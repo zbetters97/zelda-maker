@@ -14,10 +14,13 @@ public class PRJ_Arrow extends Projectile {
 
         type = type_projectile;
         name = prjName;
+
         defaultSpeed = 3;
         speed = defaultSpeed;
+
         defaultAttack = 1;
         attack = defaultAttack;
+
         maxHealth = 120;
         health = maxHealth;
         alive = false;
@@ -45,9 +48,7 @@ public class PRJ_Arrow extends Projectile {
 
             Entity enemy = getEnemy(this);
             if (enemy != null && enemy != user) {
-                // gp.player.damageEnemy(enemy, this, attack, knockbackPower);
 
-                // CONTINUE MOVING IF AT FULL POWER
                 if (speed == 12) {
                     collisionOn = false;
                     alive = true;
@@ -70,16 +71,13 @@ public class PRJ_Arrow extends Projectile {
         gp.cChecker.checkEntity(this, gp.npc);
 
         if (!canPickup) {
-            switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> worldY -= speed;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> worldY += speed;
-                case LEFT -> worldX -= speed;
-                case RIGHT -> worldX += speed;
-            }
+            move();
         }
 
         if (collisionOn && alive) {
             canPickup = true;
+            speed = 0;
+            attack = 0;
         }
 
         health--;
@@ -89,8 +87,8 @@ public class PRJ_Arrow extends Projectile {
     }
 
     public void resetValues() {
+        alive = false;
         attack = 2;
         speed = 6;
-        alive = false;
     }
 }

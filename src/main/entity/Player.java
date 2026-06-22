@@ -1,6 +1,7 @@
 package entity;
 
 import application.GamePanel;
+import entity.item.ITM_Boomerang;
 import entity.item.ITM_Bow;
 import entity.item.ITM_Shovel;
 
@@ -19,12 +20,11 @@ public class Player extends Entity {
     private GamePanel.Direction lockonDirection;
 
     /* ANIMATION HANDLERS */
-    private int spinCharge = 0;
     private int coolDownCounter = 0;
     private int
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
-            aimNum = 1;
+            aimNum = 1, throwNum = 1, throwCounter = 0;
 
     /* SPRITE IMAGES */
     private BufferedImage
@@ -44,7 +44,10 @@ public class Player extends Entity {
             digLeft1, digLeft2, digRight1, digRight2,
 
             aimUp1, aimUp2, aimDown1, aimDown2,
-            aimLeft1, aimLeft2, aimRight1, aimRight2;
+            aimLeft1, aimLeft2, aimRight1, aimRight2,
+    
+            throwUp1, throwUp2, throwDown1, throwDown2,
+            throwLeft1, throwLeft2, throwRight1, throwRight2;
 
     /**
      * CONSTRUCTOR
@@ -99,6 +102,7 @@ public class Player extends Entity {
         getGuardImages();
         getDigImages();
         getAimImages();
+        getThrowImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -176,6 +180,16 @@ public class Player extends Entity {
         aimRight1 = setupImage("/player/boy_aim_right_1");
         aimRight2 = setupImage("/player/boy_aim_right_2");
     }
+    public void getThrowImages() {
+        throwUp1 = setupImage("/player/boy_throw_up_1");
+        throwUp2 = setupImage("/player/boy_throw_up_2");
+        throwDown1 = setupImage("/player/boy_throw_down_1");
+        throwDown2 = setupImage("/player/boy_throw_down_2");
+        throwLeft1 = setupImage("/player/boy_throw_left_1");
+        throwLeft2 = setupImage("/player/boy_throw_left_2");
+        throwRight1 = setupImage("/player/boy_throw_right_1");
+        throwRight2 = setupImage("/player/boy_throw_right_2");
+    }
 
     /**
      * SET DEFAULT VALUES
@@ -186,7 +200,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        currentItem = new ITM_Bow(gp);
+        currentItem = new ITM_Boomerang(gp, this);
     }
 
     /**
@@ -339,15 +353,13 @@ public class Player extends Entity {
         // HAS ITEM EQUIPPED
         if (currentItem != null) {
             switch (currentItem.name) {
-                case ITM_Shovel.itmName -> {
-                    gp.keyH.xPressed = false;
-                    gp.keyH.bPressed = false;
-                    currentItem.use(this);
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName -> {
+                    currentItem.use();
                 }
                 case ITM_Bow.itmName -> {
                    lockedOn = true;
                    lockonDirection = direction;
-                   currentItem.setCharge(this);
+                   currentItem.use();
                 }
             }
         }
@@ -364,13 +376,14 @@ public class Player extends Entity {
      */
     private void updateAction() {
         switch (action) {
-            case ATTACKING -> attacking();
+            case ATTACKING -> attack();
             case SPINCHARGING -> spinCharging();
             case SPINNING -> spinning();
             case ROLLING -> rolling();
             case GUARDING -> guarding();
             case DIGGING -> digging();
             case AIMING -> aiming();
+            case THROWING -> throwing();
         }
     }
 
@@ -467,16 +480,16 @@ public class Player extends Entity {
     /**
      * ATTACKING
      * Handles logic for swinging sword
-     * Called by update() when attacking is true
+     * Called by updateAction() when action is ATTACKING
      */
-    private void attacking() {
+    protected void attack() {
 
         // Increase spin charge if player holds B button
         if (gp.keyH.bPressed) {
-            spinCharge++;
+            charge++;
         }
         else {
-            spinCharge = 0;
+            charge = 0;
         }
 
         attackCounter++;
@@ -494,14 +507,14 @@ public class Player extends Entity {
             action = Action.IDLE;
 
             // Spin charge ready for spin attack
-            if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
+            if (charge > swingSpeed3 && gp.keyH.bPressed) {
                 action = Action.SPINCHARGING;
                 lockedOn = true;
                 lockonDirection = direction;
             }
 
             attackCounter = 0;
-            spinCharge = 0;
+            charge = 0;
         }
     }
 
@@ -554,16 +567,16 @@ public class Player extends Entity {
 
         // Player holding B to charge
         if (gp.keyH.bPressed) {
-            if (spinCharge < 120) {
-                spinCharge += 2;
+            if (charge < 120) {
+                charge += 2;
             }
             speed = 2;
         }
         // Charge is ready, start spin and reset values
-        else if (spinCharge >= 120) {
+        else if (charge >= 120) {
             updateSpinDirection();
 
-            spinCharge = 0;
+            charge = 0;
             lockedOn = false;
             attackNum = 1;
             spriteNum = 0;
@@ -572,7 +585,7 @@ public class Player extends Entity {
         }
         // Player released B, charge not ready, reset to idle
         else {
-            spinCharge = 0;
+            charge = 0;
             attackNum = 1;
             attackCounter = 0;
             lockedOn = false;
@@ -810,11 +823,29 @@ public class Player extends Entity {
         }
 
         if (gp.keyH.xPressed) {
-            currentItem.setCharge(this);
+            currentItem.use();
         }
         else {
-            currentItem.use(this);
+            currentItem.attack();
             lockedOn = false;
+        }
+    }
+
+    private void throwing() {
+
+        throwCounter++;
+
+        if (6 >= throwCounter) {
+            throwNum = 1;
+        }
+        else {
+            throwNum = 2;
+        }
+
+        if (throwCounter > 28) {
+            action = Action.IDLE;
+            throwNum = 1;
+            throwCounter = 0;
         }
     }
 
@@ -861,6 +892,7 @@ public class Player extends Entity {
             case GUARDING -> getGuardSprite();
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
+            case THROWING -> getThrowSprite();
         };
 
         if (invincible) {
@@ -1152,5 +1184,26 @@ public class Player extends Entity {
         }
 
         return aimSprite;
+    }
+    private BufferedImage getThrowSprite() {
+        BufferedImage throwSprite;
+
+        if (throwNum == 1) {
+            throwSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> throwUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> throwDown1;
+                case LEFT -> throwLeft1;
+                case RIGHT -> throwRight1;
+            };
+        } else {
+            throwSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> throwUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> throwDown2;
+                case LEFT -> throwLeft2;
+                case RIGHT -> throwRight2;
+            };
+        }
+
+        return throwSprite;
     }
 }

@@ -8,34 +8,29 @@ public class ITM_Bow extends Entity {
 
     public static final String itmName = "Hylian Bow";
 
-    public ITM_Bow(GamePanel gp) {
+    public ITM_Bow(GamePanel gp, Entity user) {
         super(gp);
 
         type = type_item;
         name = itmName;
+        this.user = user;
     }
 
     public void getImages() {
         image = down1 = setupImage("/items/itm_bow");
     }
 
-    public boolean setCharge(Entity user) {
+    protected void use() {
         if (user.arrows > 0) {
-
             if (user.charge < 120) {
                 user.charge++;
             }
 
             user.action = Action.AIMING;
-
-            return true;
-        }
-        else {
-            return false;
         }
     }
 
-    public boolean use(Entity user) {
+    protected void attack() {
 
         if (user.arrows > 0) {
             projectile = new PRJ_Arrow(gp);
@@ -54,7 +49,7 @@ public class ITM_Bow extends Entity {
             }
 
             projectile.set(user.worldX, user.worldY, user.direction, true, user);
-            projectile.addProjectile(projectile);
+            addProjectile(projectile);
 
             if (user.arrows > 0) {
                 user.arrows--;
@@ -63,7 +58,5 @@ public class ITM_Bow extends Entity {
             user.action = Action.IDLE;
             user.charge = 0;
         }
-
-        return true;
     }
 }
