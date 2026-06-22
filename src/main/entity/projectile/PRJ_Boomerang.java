@@ -37,6 +37,21 @@ public class PRJ_Boomerang extends Projectile {
 
     public void update() {
 
+        checkCollision();
+
+        if (returning) {
+            returnToUser();
+        }
+        else {
+            move();
+            health--;
+        }
+
+        cycleSprites();
+        checkDeath();
+    }
+
+    protected void checkCollision() {
         collisionOn = false;
         gp.cChecker.checkTile(this);
         gp.cChecker.checkEntity(this, gp.enemy);
@@ -46,49 +61,50 @@ public class PRJ_Boomerang extends Projectile {
         if (health <= 0 || npcIndex != -1 || collisionOn) {
             returning = true;
         }
+    }
 
-        if (returning) {
-            switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> {
-                    if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
-                        worldY += 5;
-                    }
-                    else {
-                        alive = false;
-                    }
+
+    private void returnToUser() {
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
+                    worldY += 5;
                 }
-                case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    if (worldY - gp.tileSize / 2 >= gp.player.worldY) {
-                        worldY -= 5;
-                    }
-                    else {
-                        alive = false;
-                    }
+                else {
+                    alive = false;
                 }
-                case LEFT -> {
-                    if (worldX + gp.tileSize / 2 <= gp.player.worldX) {
-                        worldX += 5;
-                    }
-                    else {
-                        alive = false;
-                    }
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                if (worldY - gp.tileSize / 2 >= gp.player.worldY) {
+                    worldY -= 5;
                 }
-                case RIGHT -> {
-                    if (worldX - gp.tileSize / 2 >= gp.player.worldX) {
-                        worldX -= 5;
-                    }
-                    else {
-                        alive = false;
-                    }
+                else {
+                    alive = false;
+                }
+            }
+            case LEFT -> {
+                if (worldX + gp.tileSize / 2 <= gp.player.worldX) {
+                    worldX += 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case RIGHT -> {
+                if (worldX - gp.tileSize / 2 >= gp.player.worldX) {
+                    worldX -= 5;
+                }
+                else {
+                    alive = false;
                 }
             }
         }
-        else {
-            move();
-            health--;
-        }
+    }
+
+    protected void cycleSprites() {
 
         spriteCounter++;
+
         if (spriteCounter > animationSpeed) {
             if (spriteNum == 1) {
                 spriteNum = 2;
@@ -99,7 +115,9 @@ public class PRJ_Boomerang extends Projectile {
 
             spriteCounter = 0;
         }
+    }
 
+    protected void checkDeath() {
         if (!alive) {
             resetValues();
         }

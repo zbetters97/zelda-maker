@@ -45,26 +45,10 @@ public class PRJ_Arrow extends Projectile {
         collisionOn = false;
 
         if (user == gp.player) {
-
-            Entity enemy = getEnemy(this);
-            if (enemy != null && enemy != user) {
-
-                if (speed == 12) {
-                    collisionOn = false;
-                    alive = true;
-                }
-            }
-            else {
-                collisionOn = false;
-            }
+            checkCollision();
         }
         else {
-            boolean contactPlayer = gp.cChecker.checkPlayer(this);
-
-            if (contactPlayer) {
-                damagePlayer(attack);
-                resetValues();
-            }
+            checkPlayerCollision();
         }
 
         gp.cChecker.checkTile(this);
@@ -81,12 +65,41 @@ public class PRJ_Arrow extends Projectile {
         }
 
         health--;
+        checkDeath();
+    }
+
+    protected void checkCollision() {
+        Entity enemy = getEnemy(this);
+        if (enemy != null && enemy != user) {
+
+            damageEnemy(enemy);
+
+            if (speed == 12) {
+                collisionOn = false;
+                alive = true;
+            }
+        }
+        else {
+            collisionOn = false;
+        }
+    }
+
+    private void checkPlayerCollision() {
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+
+        if (contactPlayer) {
+            damagePlayer(attack);
+            resetValues();
+        }
+    }
+
+    protected void checkDeath() {
         if (health <= 0) {
             resetValues();
         }
     }
 
-    public void resetValues() {
+    protected void resetValues() {
         alive = false;
         attack = 2;
         speed = 6;

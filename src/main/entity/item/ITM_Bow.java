@@ -22,7 +22,7 @@ public class ITM_Bow extends Entity {
 
     protected void use() {
         if (user.arrows > 0) {
-            if (user.charge < 120) {
+            if (120 > user.charge) {
                 user.charge++;
             }
 
@@ -32,31 +32,30 @@ public class ITM_Bow extends Entity {
 
     protected void attack() {
 
-        if (user.arrows > 0) {
-            projectile = new PRJ_Arrow(gp);
+        projectile = new PRJ_Arrow(gp);
 
-            if (80 > user.charge && user.charge >= 40) {
-                projectile.speed += 3;
-                projectile.attack++;
-            }
-            else if (120 > user.charge && user.charge >= 80) {
-                projectile.speed += 4;
-                projectile.attack += 2;
-            }
-            else if (user.charge >= 120) {
-                projectile.speed += 5;
-                projectile.attack += 3;
-            }
+        setPower();
 
-            projectile.set(user.worldX, user.worldY, user.direction, true, user);
-            addProjectile(projectile);
+        projectile.set(user.worldX, user.worldY, user.direction, true, user);
+        addProjectile(projectile);
 
-            if (user.arrows > 0) {
-                user.arrows--;
-            }
+        user.action = Action.IDLE;
+        user.arrows--;
+        user.charge = 0;
+    }
 
-            user.action = Action.IDLE;
-            user.charge = 0;
+    private void setPower() {
+        if (80 > user.charge && user.charge >= 40) {
+            projectile.speed += 3;
+            projectile.attack++;
+        }
+        else if (120 > user.charge && user.charge >= 80) {
+            projectile.speed += 4;
+            projectile.attack += 2;
+        }
+        else if (user.charge >= 120) {
+            projectile.speed += 5;
+            projectile.attack += 3;
         }
     }
 }

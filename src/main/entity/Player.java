@@ -702,35 +702,6 @@ public class Player extends Entity {
     }
 
     /**
-     * DAMAGE ENEMY
-     * Handles logic when an enemy is hit by an attack
-     * Called by detectEnemyCollision()
-     * @param target Enemy being damaged
-     */
-    private void damageEnemy(Entity target) {
-
-        // Damage same as player attack value
-        int damage = attack;
-
-        // Keep damage above 0
-        if (damage < 0) {
-            damage = 1;
-        }
-
-        // Damage target
-        target.health -= damage;
-        target.invincible = true;
-
-        // Target lost all health, starting dying animation
-        if (target.health <= 0) {
-            target.dying = true;
-        }
-
-        // Push target back
-        setKnockback(target, this, 1);
-    }
-
-    /**
      * ROLLING
      * Handles logic for when the player rolls
      * Called by getAction() when action = ROLLING

@@ -364,6 +364,34 @@ public class Entity {
     }
 
     /**
+     * DAMAGE ENEMY
+     * Handles logic when an enemy is hit by an attack
+     * @param target Enemy being damaged
+     */
+    protected void damageEnemy(Entity target) {
+
+        // Damage same as player attack value
+        int damage = attack;
+
+        // Keep damage above 0
+        if (damage < 0) {
+            damage = 1;
+        }
+
+        // Damage target
+        target.health -= damage;
+        target.invincible = true;
+
+        // Target loses all health, start dying animation
+        if (target.health <= 0) {
+            target.dying = true;
+        }
+
+        // Push target back
+        setKnockback(target, this, 1);
+    }
+
+    /**
      * SET KNOCKBACK
      * Starts the knockback animation on the target
      * @param target Entity hit by knockback
@@ -439,6 +467,8 @@ public class Entity {
         // Knockback player
         setKnockback(gp.player, this, 1);
     }
+
+    protected void checkDeath() { }
 
     /**
      * MANAGE VALUES
