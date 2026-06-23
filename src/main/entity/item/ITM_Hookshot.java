@@ -15,7 +15,7 @@ public class ITM_Hookshot extends Entity {
         name = itmName;
         this.user = user;
 
-        projectile = new PRJ_Claw(gp);
+        projectile = new PRJ_Claw(gp, user);
     }
 
     public void getImages() {

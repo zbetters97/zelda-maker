@@ -77,6 +77,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final Player player = new Player(this);
     public final Entity[][] npc = new Entity[maxMap][10];
     public final Entity[][] enemy = new Entity[maxMap][10];
+    public final Entity[][] obj_i = new Entity[maxMap][10];
     public final Entity[][] projectile = new Entity[maxMap][10];
 
     /**
@@ -192,6 +193,7 @@ public class GamePanel extends JPanel implements Runnable {
         player.update();
         updateNPCs();
         updateEnemies();
+        updateIObjects();
         updateProjectiles();
     }
 
@@ -217,6 +219,16 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+    private void updateIObjects() {
+        for (int i = 0; i < obj_i[0].length; i++) {
+            if (obj_i[currentMap][i] != null) {
+                obj_i[currentMap][i].update();
+                if (!obj_i[currentMap][i].alive) {
+                    obj_i[currentMap][i] = null;
+                }
+            }
+        }
+    }
     private void updateProjectiles() {
         for (int i = 0; i < projectile[0].length; i++) {
             if (projectile[currentMap][i] != null) {
@@ -236,6 +248,7 @@ public class GamePanel extends JPanel implements Runnable {
     private void drawToTempScreen() {
         drawTiles();
         drawEntities();
+        drawIObjects();
         drawProjectiles();
         ui.draw(g2);
     }
@@ -272,6 +285,13 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Empty list
         entityList.clear();
+    }
+    private void drawIObjects() {
+        for (Entity objI : obj_i[currentMap]) {
+            if (objI != null) {
+                entityList.add(objI);
+            }
+        }
     }
     private void drawProjectiles() {
         for (Entity pr : projectile[currentMap]) {

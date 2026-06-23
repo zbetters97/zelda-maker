@@ -52,6 +52,19 @@ public class EMY_Keese extends Entity {
         up2 = down2 = left2 = right2 = setupImage("/enemy/keese_down_2");
     }
 
+    public void update() {
+        // No action if in knockback state
+        if (knockback) {
+            handleKnockback();
+        }
+        else {
+            setAction();
+            updateDirection();
+        }
+
+        manageValues();
+    }
+
     /**
      * SET ACTION
      * Updates the actions the entity will take

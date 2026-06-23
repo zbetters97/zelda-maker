@@ -11,9 +11,10 @@ public class PRJ_Claw extends Projectile {
     public static final String prjName = "Claw Projectile";
 
     private Entity grabbedEntity;
+    private boolean latched = false;
     private BufferedImage grabUp1, grabDown1, grabLeft1, grabRight1, chainHor, chainVer;
 
-    public PRJ_Claw(GamePanel gp) {
+    public PRJ_Claw(GamePanel gp, Entity user) {
         super(gp);
 
         type = type_projectile;
@@ -24,6 +25,8 @@ public class PRJ_Claw extends Projectile {
         maxHealth = 30;
         health = maxHealth;
         alive = false;
+
+        this.user = user;
 
         hitbox = new Rectangle(12, 16, 24, 24);
         hitboxDefaultX = hitbox.x;
@@ -52,9 +55,14 @@ public class PRJ_Claw extends Projectile {
 
     public void update() {
 
-        // Max length reached
+        // Max length reached or Entity hit
         if (health <= 0) {
-            returnToUser();
+            if (latched) {
+                moveUser();
+            }
+            else {
+                returnToUser();
+            }
         }
         // No object hit
         else {
@@ -63,8 +71,7 @@ public class PRJ_Claw extends Projectile {
 
             collisionOn = false;
 
-            checkGrabbableCollision();
-            checkObstacleCollision();
+            checkCollision();
             if (collisionOn) {
                 health = 0;
             }
@@ -73,11 +80,29 @@ public class PRJ_Claw extends Projectile {
         checkDeath();
     }
 
+    protected void checkCollision() {
+        checkGrabbableCollision();
+        checkObstacleCollision();
+        checkLatchableCollision();
+    }
+
     protected void checkGrabbableCollision() {
-        Entity enemy = getEnemy(this);
-        if (enemy != null) {
-            grabbedEntity = enemy;
+
+        Entity target = getEnemy(this);
+
+        if (target != null) {
+            grabbedEntity = target;
             collisionOn = true;
+        }
+    }
+
+    protected void checkLatchableCollision() {
+        int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
+
+        if (iObject != -1) {
+            latched = true;
+            grabbedEntity = null;
+            health = 0;
         }
     }
 
@@ -86,9 +111,53 @@ public class PRJ_Claw extends Projectile {
         gp.cChecker.checkEntity(this, gp.npc);
     }
 
+    private void moveUser() {
+
+        if (user.collisionOn) {
+            alive = false;
+            return;
+        }
+
+        // Move user towards latched
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (user.worldY >= worldY) {
+                    user.worldY -= 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                if (user.worldY <= worldY) {
+                    user.worldY += 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case LEFT -> {
+                if (user.worldX >= worldX) {
+                    user.worldX -= 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case RIGHT -> {
+                if (user.worldX <= worldX) {
+                    user.worldX += 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+        }
+    }
+
     private void returnToUser() {
 
-        // Move backwards to to user
+        // Move backwards to user
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
@@ -151,8 +220,9 @@ public class PRJ_Claw extends Projectile {
     protected void resetValues() {
         alive = false;
         collisionOn = false;
-        health = maxHealth;
         grabbedEntity = null;
+        latched = false;
+        health = maxHealth;
         user.action = Action.IDLE;
     }
 

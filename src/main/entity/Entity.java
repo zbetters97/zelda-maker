@@ -65,6 +65,7 @@ public class Entity {
     protected int animationSpeed;
 
     /* ATTACK VALUES */
+    protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
     protected int swingSpeed1;
     protected int swingSpeed2;
     protected int swingSpeed3;
@@ -92,7 +93,6 @@ public class Entity {
     public int hitboxDefaultY;
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
-    protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
 
     /* INVENTORY VALUES */
     public int arrows = 0;
@@ -101,6 +101,7 @@ public class Entity {
     public Projectile projectile;
     public Entity user;
     public int charge = 0;
+    protected boolean grabbable = false;
 
     /* SPRITE ATTRIBUTES */
     public BufferedImage image;
@@ -115,7 +116,8 @@ public class Entity {
     protected final int type_item = 2;
 
     /* OBJECT TYPES */
-    public final int type_projectile = 3;
+    public final int type_object_i = 3;
+    public final int type_projectile = 4;
 
     /**
      * CONSTRUCTOR
@@ -186,17 +188,6 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
-
-        // No action if in knockback state
-        if (knockback) {
-            handleKnockback();
-        }
-        else {
-            setAction();
-            updateDirection();
-        }
-
-        manageValues();
     }
 
     /**
@@ -333,6 +324,8 @@ public class Entity {
     protected void attack() {
 
     }
+
+    protected void interact(Entity user) {}
 
     /**
      * USE
@@ -524,7 +517,7 @@ public class Entity {
             playHurtAnimation(g2);
         }
         // Dying animation
-        else if (dying) {
+        if (dying) {
             playDyingAnimation(g2);
         }
 

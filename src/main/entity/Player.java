@@ -21,6 +21,7 @@ public class Player extends Entity {
     private GamePanel.Direction lockonDirection;
 
     /* ANIMATION HANDLERS */
+    private int spinCharge = 0;
     private int coolDownCounter = 0;
     private int
             attackNum = 1, attackCounter = 0,
@@ -278,6 +279,9 @@ public class Player extends Entity {
         // Check enemy collision
         gp.cChecker.checkEntity(this, gp.enemy);
 
+        // Check interactive object collision
+        gp.cChecker.checkEntity(this, gp.obj_i);
+
         // Player contacted enemy, take damage
         Entity enemy = getEnemy(this);
         if (enemy != null && !enemy.invincible) {
@@ -327,7 +331,18 @@ public class Player extends Entity {
                 if (moving && coolDownCounter == 0) {
                     startRoll();
                 }
+                else {
+                    checkIObjects();
+                }
             }
+        }
+    }
+
+    private void checkIObjects() {
+        int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
+
+        if (iObject != -1) {
+            gp.obj_i[gp.currentMap][iObject].interact(this);
         }
     }
 
@@ -487,10 +502,10 @@ public class Player extends Entity {
 
         // Increase spin charge if player holds B button
         if (gp.keyH.bPressed) {
-            charge++;
+            spinCharge++;
         }
         else {
-            charge = 0;
+            spinCharge = 0;
         }
 
         attackCounter++;
@@ -508,14 +523,14 @@ public class Player extends Entity {
             action = Action.IDLE;
 
             // Spin charge ready for spin attack
-            if (charge > swingSpeed3 && gp.keyH.bPressed) {
+            if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
                 action = Action.SPINCHARGING;
                 lockedOn = true;
                 lockonDirection = direction;
             }
 
             attackCounter = 0;
-            charge = 0;
+            spinCharge = 0;
         }
     }
 
