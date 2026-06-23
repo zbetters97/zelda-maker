@@ -233,9 +233,6 @@ public class Player extends Entity {
      */
     public void update() {
 
-        // Always check for collision
-        checkCollision();
-
         if (knockback) {
             handleKnockback();
             manageValues();
@@ -256,37 +253,11 @@ public class Player extends Entity {
         }
         // Auto-move player if action denies input but allows movement
         else if (action.allowsTranslation()) {
+
             move();
         }
 
         manageValues();
-    }
-
-    /**
-     * CHECK COLLISION
-     * Checks if player has collided with anything
-     * Called by update()
-     */
-    protected void checkCollision() {
-        collisionOn = false;
-
-        // Check tile collision
-        gp.cChecker.checkTile(this);
-
-        // Check NPC collision
-        gp.cChecker.checkEntity(this, gp.npc);
-
-        // Check enemy collision
-        gp.cChecker.checkEntity(this, gp.enemy);
-
-        // Check interactive object collision
-        gp.cChecker.checkEntity(this, gp.obj_i);
-
-        // Player contacted enemy, take damage
-        Entity enemy = getEnemy(this);
-        if (enemy != null && !enemy.invincible) {
-            damagePlayer(enemy.attack);
-        }
     }
 
     /**
@@ -332,13 +303,13 @@ public class Player extends Entity {
                     startRoll();
                 }
                 else {
-                    checkIObjects();
+                    interactIObjects();
                 }
             }
         }
     }
 
-    private void checkIObjects() {
+    private void interactIObjects() {
         int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
 
         if (iObject != -1) {
@@ -472,6 +443,10 @@ public class Player extends Entity {
      */
     protected void move() {
         GamePanel.Direction newDirection = getMoveDirection();
+
+        collisionOn = false;
+        checkCollision();
+
         super.move(newDirection);
     }
 
@@ -490,6 +465,33 @@ public class Player extends Entity {
         }
         else {
             return direction;
+        }
+    }
+
+    /**
+     * CHECK COLLISION
+     * Checks if player has collided with anything
+     * Called by move()
+     */
+    protected void checkCollision() {
+        collisionOn = false;
+
+        // Check tile collision
+        gp.cChecker.checkTile(this);
+
+        // Check NPC collision
+        gp.cChecker.checkEntity(this, gp.npc);
+
+        // Check enemy collision
+        gp.cChecker.checkEntity(this, gp.enemy);
+
+        // Check interactive object collision
+        gp.cChecker.checkEntity(this, gp.obj_i);
+
+        // Player contacted enemy, take damage
+        Entity enemy = getEnemy(this);
+        if (enemy != null && !enemy.invincible) {
+            damagePlayer(enemy.attack);
         }
     }
 

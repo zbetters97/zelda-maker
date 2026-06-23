@@ -84,6 +84,7 @@ public class Entity {
     protected int knockbackCounter = 0;
     public boolean dying = false;
     private int dyingCounter = 0;
+    protected boolean opened = false;
 
     /* COLLISION VALUES */
     public boolean collisionOn = true;
@@ -225,6 +226,7 @@ public class Entity {
      * Called by updateDirection() if o collision
      */
     protected void move(GamePanel.Direction direction) {
+
         if (!canMove || collisionOn) {
             moving = false;
             return;

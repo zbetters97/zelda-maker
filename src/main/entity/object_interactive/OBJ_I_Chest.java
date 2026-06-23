@@ -30,13 +30,26 @@ public class OBJ_I_Chest extends Entity {
     }
 
     public void getImages() {
-        down1 = setupImage("/objects_interactive/obj_chest_closed");
-        down2 = setupImage("/objects_interactive/obj_chest_opened");
+        up1 = setupImage("/objects_interactive/obj_chest_closed");
+        up2 = setupImage("/objects_interactive/obj_chest_opened");
     }
 
     protected void interact(Entity user) {
+        if (opened) {
+            return;
+        }
+
         if (user.direction == UP || user.direction == UPLEFT || user.direction == UPRIGHT) {
-            System.out.println("called!");
+            opened = true;
+        }
+    }
+
+    protected void getSpriteImage() {
+        if (opened) {
+            image = up2;
+        }
+        else {
+            image = up1;
         }
     }
 }

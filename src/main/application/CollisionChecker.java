@@ -112,9 +112,9 @@ public record CollisionChecker(GamePanel gp) {
      */
     public int checkEntity(Entity entity, Entity[][] targets) {
 
-        int enemyIndex = -1;
+        int entityIndex = -1;
 
-        for (int i = 0; i < targets[0].length; i++) {
+        for (int i = 0; i < targets[gp.currentMap].length; i++) {
             if (targets[gp.currentMap][i] != null && targets[gp.currentMap][i] != entity) {
 
                 Entity target = targets[gp.currentMap][i];
@@ -148,11 +148,6 @@ public record CollisionChecker(GamePanel gp) {
                     case RIGHT -> entity.hitbox.x += entity.speed;
                 }
 
-                if (entity.hitbox.intersects(target.hitbox)) {
-                    entity.collisionOn = true;
-                    enemyIndex = i;
-                }
-
                 // Reset entity solid area
                 entity.hitbox.x = entity.hitboxDefaultX;
                 entity.hitbox.y = entity.hitboxDefaultY;
@@ -163,7 +158,7 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
 
-        return enemyIndex;
+        return entityIndex;
     }
 
     /**

@@ -85,7 +85,6 @@ public class PRJ_Claw extends Projectile {
         checkObstacleCollision();
         checkLatchableCollision();
     }
-
     protected void checkGrabbableCollision() {
 
         Entity target = getEnemy(this);
@@ -95,7 +94,6 @@ public class PRJ_Claw extends Projectile {
             collisionOn = true;
         }
     }
-
     protected void checkLatchableCollision() {
         int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
 
@@ -105,7 +103,6 @@ public class PRJ_Claw extends Projectile {
             health = 0;
         }
     }
-
     protected void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
         gp.cChecker.checkEntity(this, gp.npc);
@@ -197,7 +194,6 @@ public class PRJ_Claw extends Projectile {
             pullEntity();
         }
     }
-
     private void pullEntity() {
         grabbedEntity.worldX = worldX;
         grabbedEntity.worldY = worldY;
