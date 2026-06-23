@@ -27,8 +27,9 @@ public class EMY_Keese extends Entity {
         // General attributes
         entity_type = type_enemy;
         name = emyName;
-        speed = 2;
-        defaultSpeed = speed;
+        //defaultSpeed = 2;
+        defaultSpeed = 0;
+        speed = defaultSpeed;
         animationSpeed = 5;
         health = 4;
         attack = 1;

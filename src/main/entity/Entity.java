@@ -104,7 +104,9 @@ public class Entity {
 
     /* SPRITE ATTRIBUTES */
     public BufferedImage image;
-    protected BufferedImage up1, up2,  down1, down2, left1, left2, right1, right2;
+    protected BufferedImage
+            up1, up2,  down1, down2, left1, left2, right1, right2,
+            grabUp1, grabDown1, grabLeft1, grabRight1;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
 

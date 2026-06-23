@@ -25,7 +25,7 @@ public class PRJ_Arrow extends Projectile {
         health = maxHealth;
         alive = false;
 
-        hitbox = new Rectangle(12, 16, 24, 24);
+        hitbox = new Rectangle(4, 8, 24, 24);
         hitboxDefaultX = hitbox.x;
         hitboxDefaultY = hitbox.y;
         hitboxDefaultWidth = hitbox.width;
@@ -45,14 +45,12 @@ public class PRJ_Arrow extends Projectile {
         collisionOn = false;
 
         if (user == gp.player) {
+            checkEnemyCollision();
             checkCollision();
         }
         else {
             checkPlayerCollision();
         }
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.npc);
 
         if (!canPickup) {
             move();
@@ -69,18 +67,24 @@ public class PRJ_Arrow extends Projectile {
     }
 
     protected void checkCollision() {
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkEntity(this, gp.npc);
+    }
+
+    protected void checkEnemyCollision() {
+
         Entity enemy = getEnemy(this);
         if (enemy != null && enemy != user) {
 
             damageEnemy(enemy);
 
-            if (speed == 12) {
+            if (speed >= 8) {
                 collisionOn = false;
                 alive = true;
             }
-        }
-        else {
-            collisionOn = false;
+            else {
+                alive = false;
+            }
         }
     }
 
@@ -89,19 +93,19 @@ public class PRJ_Arrow extends Projectile {
 
         if (contactPlayer) {
             damagePlayer(attack);
-            resetValues();
+            alive = false;
         }
     }
 
     protected void checkDeath() {
-        if (health <= 0) {
+        if (health <= 0 || !alive) {
             resetValues();
         }
     }
 
     protected void resetValues() {
         alive = false;
-        attack = 2;
-        speed = 6;
+        attack = defaultAttack;
+        speed = defaultSpeed;
     }
 }

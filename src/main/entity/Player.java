@@ -3,6 +3,7 @@ package entity;
 import application.GamePanel;
 import entity.item.ITM_Boomerang;
 import entity.item.ITM_Bow;
+import entity.item.ITM_Hookshot;
 import entity.item.ITM_Shovel;
 
 import java.awt.*;
@@ -200,7 +201,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        currentItem = new ITM_Boomerang(gp, this);
+        currentItem = new ITM_Bow(gp, this);
     }
 
     /**
@@ -353,7 +354,7 @@ public class Player extends Entity {
         // HAS ITEM EQUIPPED
         if (currentItem != null) {
             switch (currentItem.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName -> {
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> {
                     currentItem.use();
                 }
                 case ITM_Bow.itmName -> {
@@ -802,6 +803,11 @@ public class Player extends Entity {
         }
     }
 
+    /**
+     * THROWING
+     * Runs throwing animation and logic
+     * Called by startAction() when player action is THROWING
+     */
     private void throwing() {
 
         throwCounter++;
@@ -813,8 +819,7 @@ public class Player extends Entity {
             throwNum = 2;
         }
 
-        if (throwCounter > 28) {
-            action = Action.IDLE;
+        if (throwCounter > 28 && action == Action.IDLE) {
             throwNum = 1;
             throwCounter = 0;
         }

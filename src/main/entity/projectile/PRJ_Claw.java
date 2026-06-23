@@ -5,50 +5,63 @@ import entity.Entity;
 
 import java.awt.*;
 
-public class PRJ_Boomerang extends Projectile {
+public class PRJ_Claw extends Projectile {
 
-    public static final String prjName = "Boomerang Projectile";
+    public static final String prjName = "Claw Projectile";
 
-    private boolean returning = false;
+    private Entity grabbedEntity;
 
-    public PRJ_Boomerang(GamePanel gp) {
+    public PRJ_Claw(GamePanel gp) {
         super(gp);
 
         type = type_projectile;
         name = prjName;
 
-        speed = 8;
-        animationSpeed = 3;
+        speed = 10;
 
         maxHealth = 30;
         health = maxHealth;
         alive = false;
 
-        hitbox = new Rectangle(12, 12, 24, 24);
+        hitbox = new Rectangle(12, 16, 24, 24);
         hitboxDefaultX = hitbox.x;
         hitboxDefaultY = hitbox.y;
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
+
+        getGrabImages();
     }
 
     public void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/projectiles/boomerang_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/projectiles/boomerang_down_2");
+        up1 = up2 = setupImage("/projectiles/hookshot_up_1");
+        down1 = down2 = setupImage("/projectiles/hookshot_down_1");
+        left1 = left2 = setupImage("/projectiles/hookshot_left_1");
+        right1 = right2 = setupImage("/projectiles/hookshot_right_1");
+    }
+    public void getGrabImages() {
+        grabUp1 = setupImage("/projectiles/hookshot_grab_up_1");
+        grabDown1 = setupImage("/projectiles/hookshot_grab_down_1");
+        grabLeft1 = setupImage("/projectiles/hookshot_grab_left_1");
+        grabRight1 = setupImage("/projectiles/hookshot_grab_right_1");
     }
 
     public void update() {
 
-        checkCollision();
-
-        if (returning) {
+        // Max length reached
+        if (health <= 0) {
             returnToUser();
         }
+        // No object hit
         else {
             move();
             health--;
+
+            checkCollision();
+            if (collisionOn) {
+                health = 0;
+            }
         }
 
-        cycleSprites();
         checkDeath();
     }
 
@@ -57,20 +70,14 @@ public class PRJ_Boomerang extends Projectile {
 
         Entity enemy = getEnemy(this);
         if (enemy != null) {
-            damageEnemy(enemy);
-        }
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.enemy);
-        int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
-
-        if (health <= 0 || npcIndex != -1 || collisionOn) {
-            returning = true;
+            grabbedEntity = enemy;
+            collisionOn = true;
         }
     }
 
-
     private void returnToUser() {
+
+        // Move backwards to to user
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
@@ -105,21 +112,22 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
         }
+
+        if (grabbedEntity != null) {
+            pullEntity();
+        }
     }
 
-    protected void cycleSprites() {
+    private void pullEntity() {
+        grabbedEntity.worldX = worldX;
+        grabbedEntity.worldY = worldY;
 
-        spriteCounter++;
-
-        if (spriteCounter > animationSpeed) {
-            if (spriteNum == 1) {
-                spriteNum = 2;
-            }
-            else if (spriteNum == 2) {
-                spriteNum = 1;
-            }
-
-            spriteCounter = 0;
+        // Offset X/Y so entity isn't on top of player
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.worldY -= gp.tileSize / 2;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.worldY += gp.tileSize / 2;
+            case LEFT -> grabbedEntity.worldX -= gp.tileSize / 2;
+            case RIGHT -> grabbedEntity.worldX += gp.tileSize / 2;
         }
     }
 
@@ -130,7 +138,6 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     protected void resetValues() {
-        returning = false;
         alive = false;
         collisionOn = false;
         health = maxHealth;
