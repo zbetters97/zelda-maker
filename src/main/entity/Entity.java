@@ -104,9 +104,7 @@ public class Entity {
 
     /* SPRITE ATTRIBUTES */
     public BufferedImage image;
-    protected BufferedImage
-            up1, up2,  down1, down2, left1, left2, right1, right2,
-            grabUp1, grabDown1, grabLeft1, grabRight1;
+    protected BufferedImage up1, up2,  down1, down2, left1, left2, right1, right2;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
 
@@ -328,6 +326,10 @@ public class Entity {
         }
     }
 
+    /**
+     * ATTACK
+     * Attack logic for specific entity
+     */
     protected void attack() {
 
     }
@@ -338,6 +340,11 @@ public class Entity {
      */
     protected void use() { }
 
+    /**
+     * ADD PROJECTILE
+     * Adds new projectile entity to gp projectile list
+     * @param projectile Projectile to be added
+     */
     protected void addProjectile(Projectile projectile) {
         for (int i = 0; i < gp.projectile[0].length; i++) {
             if (gp.projectile[gp.currentMap][i] == null) {
@@ -470,12 +477,16 @@ public class Entity {
         setKnockback(gp.player, this, 1);
     }
 
+    /**
+     * CHECK DEATH
+     * Checks if the entity has died
+     */
     protected void checkDeath() { }
 
     /**
      * MANAGE VALUES
      * Resets or reassigns entity attributes
-     * called at the end of update
+     * Called at the end of update
      */
     protected void manageValues() {
         // Shield after taking damage
@@ -491,6 +502,14 @@ public class Entity {
     }
 
     /**
+     * RESET VALUES
+     * Resets values to defaults
+     */
+    protected void resetValues() {
+
+    }
+
+    /**
      * DRAW
      * Draws the sprite data to the graphics
      * @param g2 GamePanel
@@ -498,30 +517,14 @@ public class Entity {
     public void draw(Graphics2D g2) {
 
         offCenter();
-
-        // Match image to sprite direction
-        if (spriteNum == 1) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up1;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
-                case LEFT -> left1;
-                case RIGHT -> right1;
-            };
-        } else if (spriteNum == 2) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up2;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
-                case LEFT -> left2;
-                case RIGHT -> right2;
-            };
-        }
+        getSpriteImage();
 
         // Flash sprite if hurt
         if (invincible) {
             playHurtAnimation(g2);
         }
         // Dying animation
-        if (dying) {
+        else if (dying) {
             playDyingAnimation(g2);
         }
 
@@ -581,6 +584,24 @@ public class Entity {
      */
     public int getScreenY() {
         return worldY - gp.player.worldY + gp.player.screenY;
+    }
+
+    protected void getSpriteImage() {
+        if (spriteNum == 1) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
+                case LEFT -> left1;
+                case RIGHT -> right1;
+            };
+        } else if (spriteNum == 2) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
+                case LEFT -> left2;
+                case RIGHT -> right2;
+            };
+        }
     }
 
     /** SPRITE ANIMATIONS **/

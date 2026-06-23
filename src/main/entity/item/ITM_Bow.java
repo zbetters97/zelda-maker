@@ -39,21 +39,21 @@ public class ITM_Bow extends Entity {
         projectile.set(user.worldX, user.worldY, user.direction, true, user);
         addProjectile(projectile);
 
-        user.action = Action.IDLE;
         user.arrows--;
         user.charge = 0;
+        user.action = Action.IDLE;
     }
 
     private void setPower() {
-        if (80 > user.charge && user.charge >= 40) {
+        if (40 <= user.charge && user.charge < 80) {
             projectile.speed += 3;
             projectile.attack++;
         }
-        else if (120 > user.charge && user.charge >= 80) {
+        else if (80 <= user.charge && user.charge < 120) {
             projectile.speed += 4;
             projectile.attack += 2;
         }
-        else if (user.charge >= 120) {
+        else if (120 <= user.charge) {
             projectile.speed += 5;
             projectile.attack += 3;
         }

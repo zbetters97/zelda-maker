@@ -201,7 +201,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        currentItem = new ITM_Bow(gp, this);
+        currentItem = new ITM_Hookshot(gp, this);
     }
 
     /**
@@ -858,18 +858,7 @@ public class Player extends Entity {
     public void draw(Graphics2D g2) {
 
         offCenter();
-
-        // Match sprite to action
-        image = switch (action) {
-            case IDLE -> getIdleSprite();
-            case ATTACKING, SPINCHARGING -> getAttackSprite();
-            case SPINNING ->  getSpinSprite();
-            case ROLLING -> getRollingSprite();
-            case GUARDING -> getGuardSprite();
-            case DIGGING -> getDigSprite();
-            case AIMING -> getAimSprite();
-            case THROWING -> getThrowSprite();
-        };
+        getSpriteImage();
 
         if (invincible) {
            playHurtAnimation(g2);
@@ -914,6 +903,18 @@ public class Player extends Entity {
     }
 
     /** GET CURRENT SPRITE TO DRAW **/
+    protected void getSpriteImage() {
+        image = switch (action) {
+            case IDLE -> getIdleSprite();
+            case ATTACKING, SPINCHARGING -> getAttackSprite();
+            case SPINNING ->  getSpinSprite();
+            case ROLLING -> getRollingSprite();
+            case GUARDING -> getGuardSprite();
+            case DIGGING -> getDigSprite();
+            case AIMING -> getAimSprite();
+            case THROWING -> getThrowSprite();
+        };
+    }
     private BufferedImage getIdleSprite() {
         BufferedImage idleSprite;
 

@@ -4,12 +4,14 @@ import application.GamePanel;
 import entity.Entity;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class PRJ_Claw extends Projectile {
 
     public static final String prjName = "Claw Projectile";
 
     private Entity grabbedEntity;
+    private BufferedImage grabUp1, grabDown1, grabLeft1, grabRight1, chainHor, chainVer;
 
     public PRJ_Claw(GamePanel gp) {
         super(gp);
@@ -29,7 +31,7 @@ public class PRJ_Claw extends Projectile {
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
-        getGrabImages();
+        getClawImages();
     }
 
     public void getImages() {
@@ -38,11 +40,14 @@ public class PRJ_Claw extends Projectile {
         left1 = left2 = setupImage("/projectiles/hookshot_left_1");
         right1 = right2 = setupImage("/projectiles/hookshot_right_1");
     }
-    public void getGrabImages() {
+    public void getClawImages() {
         grabUp1 = setupImage("/projectiles/hookshot_grab_up_1");
         grabDown1 = setupImage("/projectiles/hookshot_grab_down_1");
         grabLeft1 = setupImage("/projectiles/hookshot_grab_left_1");
         grabRight1 = setupImage("/projectiles/hookshot_grab_right_1");
+
+        chainHor = setupImage("/projectiles/chain_hor");
+        chainVer = setupImage("/projectiles/chain_ver");
     }
 
     public void update() {
@@ -56,7 +61,10 @@ public class PRJ_Claw extends Projectile {
             move();
             health--;
 
-            checkCollision();
+            collisionOn = false;
+
+            checkGrabbableCollision();
+            checkObstacleCollision();
             if (collisionOn) {
                 health = 0;
             }
@@ -65,14 +73,17 @@ public class PRJ_Claw extends Projectile {
         checkDeath();
     }
 
-    protected void checkCollision() {
-        collisionOn = false;
-
+    protected void checkGrabbableCollision() {
         Entity enemy = getEnemy(this);
         if (enemy != null) {
             grabbedEntity = enemy;
             collisionOn = true;
         }
+    }
+
+    protected void checkObstacleCollision() {
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkEntity(this, gp.npc);
     }
 
     private void returnToUser() {
@@ -141,6 +152,54 @@ public class PRJ_Claw extends Projectile {
         alive = false;
         collisionOn = false;
         health = maxHealth;
+        grabbedEntity = null;
         user.action = Action.IDLE;
+    }
+
+    @Override
+    public void draw(Graphics2D g2) {
+
+        drawChain(g2);
+        super.draw(g2);
+    }
+
+    private void drawChain(Graphics2D g2) {
+
+        int startX = user.getScreenX() + gp.tileSize / 2;
+        int startY = user.getScreenY() + gp.tileSize / 2;
+
+        int endX = getScreenX() + gp.tileSize / 2;
+        int endY = getScreenY() + gp.tileSize / 2;
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
+                int step = chainVer.getHeight();
+                for (int y = startY; Math.abs(y - endY) > step;) {
+                    y += (endY > y) ? step : -step;
+                    g2.drawImage(chainVer, startX - chainVer.getWidth() / 2, y - chainVer.getHeight() / 2, null);
+                }
+            }
+            case LEFT, RIGHT -> {
+                int step = chainHor.getWidth();
+                for (int x = startX; Math.abs(x - endX) > step;) {
+                    x += (endX > x) ? step : -step;
+                    g2.drawImage(chainHor, x - chainHor.getWidth() / 2, startY - chainHor.getHeight() / 2, null);
+                }
+            }
+        }
+    }
+
+    protected void getSpriteImage() {
+        if (grabbedEntity != null) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> grabUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown1;
+                case LEFT -> grabLeft1;
+                case RIGHT -> grabRight1;
+            };
+        }
+        else {
+            super.getSpriteImage();
+        }
     }
 }

@@ -40,8 +40,6 @@ public class PRJ_Arrow extends Projectile {
     }
 
     public void update() {
-        super.update();
-
         collisionOn = false;
 
         if (user == gp.player) {

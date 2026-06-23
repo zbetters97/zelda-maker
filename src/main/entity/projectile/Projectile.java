@@ -27,6 +27,4 @@ public class Projectile extends Entity {
             case RIGHT -> worldX += speed;
         }
     }
-
-    protected void resetValues() { }
 }
