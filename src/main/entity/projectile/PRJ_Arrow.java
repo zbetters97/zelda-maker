@@ -15,7 +15,7 @@ public class PRJ_Arrow extends Projectile {
         type = type_projectile;
         name = prjName;
 
-        defaultSpeed = 3;
+        defaultSpeed = 5;
         speed = defaultSpeed;
 
         defaultAttack = 1;
@@ -76,7 +76,7 @@ public class PRJ_Arrow extends Projectile {
 
             damageEnemy(enemy);
 
-            if (speed >= 8) {
+            if (speed >= defaultSpeed + 6) {
                 collisionOn = false;
                 alive = true;
             }

@@ -25,10 +25,10 @@ public class ITM_Hookshot extends Entity {
     public void use() {
 
         if (!projectile.alive) {
-            projectile.set(user.worldX, user.worldY, user.direction, true, user);
+            projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);
             addProjectile(projectile);
 
-            user.action = Action.THROWING;
+            user.setAction(Action.THROWING);
         }
     }
 }

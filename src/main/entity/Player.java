@@ -15,16 +15,13 @@ import static application.GamePanel.Direction.*;
 
 public class Player extends Entity {
 
-    /* POSITIONING */
-    public int screenX, screenY;
-
     /* ANIMATION HANDLERS */
     private int spinCharge = 0;
     private int coolDownCounter = 0;
     private int
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
-            aimNum = 1, throwNum = 1, throwCounter = 0;
+            aimNum = 1, aimCounter = 0, throwNum = 1, throwCounter = 0;
 
     /* SPRITE IMAGES */
     private BufferedImage
@@ -180,7 +177,7 @@ public class Player extends Entity {
         aimRight1 = setupImage("/player/boy_aim_right_1");
         aimRight2 = setupImage("/player/boy_aim_right_2");
     }
-    public void getThrowImages() {
+    private void getThrowImages() {
         throwUp1 = setupImage("/player/boy_throw_up_1");
         throwUp2 = setupImage("/player/boy_throw_up_2");
         throwDown1 = setupImage("/player/boy_throw_down_1");
@@ -200,7 +197,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        currentItem = new ITM_Hookshot(gp, this);
+        currentItem = new ITM_Bow(gp, this);
     }
 
     /**
@@ -396,7 +393,7 @@ public class Player extends Entity {
             lockedOn = false;
         }
     }
-    public Entity findTarget() {
+    private Entity findTarget() {
 
         Entity target = null;
         int currentDistance = maxZTargetDistance;
@@ -415,7 +412,7 @@ public class Player extends Entity {
 
         return target;
     }
-    public void lockedOn() {
+    private void lockedOn() {
 
         // Locked target within 8 tiles
         if (lockedOnTarget != null && getTileDistance(lockedOnTarget) < maxZTargetDistance) {
@@ -441,7 +438,7 @@ public class Player extends Entity {
         }
     }
 
-    public Direction findTargetDirection(Entity target) {
+    private Direction findTargetDirection(Entity target) {
 
         Direction zDirection = direction;
 
@@ -601,10 +598,6 @@ public class Player extends Entity {
         if (enemy != null && !enemy.invincible) {
             damagePlayer(enemy.attack);
         }
-    }
-
-    public Entity getLockedOnTarget() {
-        return lockedOnTarget;
     }
 
     /**
@@ -914,11 +907,26 @@ public class Player extends Entity {
      */
     private void aiming() {
 
-        if (6 >= charge) {
-            aimNum = 1;
+        if (moving) {
+            aimCounter++;
+
+            if (aimCounter > 10) {
+                aimNum++;
+
+                if (aimNum > 2) {
+                    aimNum = 1;
+                }
+
+                aimCounter = 0;
+            }
         }
         else {
-            aimNum = 2;
+            if (6 >= charge) {
+                aimNum = 1;
+            }
+            else {
+                aimNum = 2;
+            }
         }
 
         if (gp.keyH.xPressed) {
@@ -926,7 +934,6 @@ public class Player extends Entity {
         }
         else {
             currentItem.attack();
-            lockedOn = false;
         }
     }
 
@@ -1309,5 +1316,17 @@ public class Player extends Entity {
         }
 
         return throwSprite;
+    }
+
+    /* GETTERS */
+    public int getScreenX() {
+        return screenX;
+    }
+    public int getScreenY() {
+        return screenY;
+    }
+
+    public Entity getLockedOnTarget() {
+        return lockedOnTarget;
     }
 }

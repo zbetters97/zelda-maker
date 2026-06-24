@@ -73,7 +73,7 @@ public class PRJ_Boomerang extends Projectile {
     private void returnToUser() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
+                if (worldY + gp.tileSize / 2 <= gp.player.getWorldY()) {
                     worldY += 5;
                 }
                 else {
@@ -81,7 +81,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldY - gp.tileSize / 2 >= gp.player.worldY) {
+                if (worldY - gp.tileSize / 2 >= gp.player.getWorldY()) {
                     worldY -= 5;
                 }
                 else {
@@ -89,7 +89,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case LEFT -> {
-                if (worldX + gp.tileSize / 2 <= gp.player.worldX) {
+                if (worldX + gp.tileSize / 2 <= gp.player.getWorldX()) {
                     worldX += 5;
                 }
                 else {
@@ -97,7 +97,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (worldX - gp.tileSize / 2 >= gp.player.worldX) {
+                if (worldX - gp.tileSize / 2 >= gp.player.getWorldX()) {
                     worldX -= 5;
                 }
                 else {
@@ -134,6 +134,6 @@ public class PRJ_Boomerang extends Projectile {
         alive = false;
         collisionOn = false;
         health = maxHealth;
-        user.action = Action.IDLE;
+        user.setAction(Action.IDLE);
     }
 }

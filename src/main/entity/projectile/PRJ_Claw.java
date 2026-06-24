@@ -115,38 +115,41 @@ public class PRJ_Claw extends Projectile {
             return;
         }
 
-        int stopX = grabbedEntity.worldX + gp.tileSize;
-        int stopY = grabbedEntity.worldY + gp.tileSize;
+        int stopX = grabbedEntity.getWorldX() + gp.tileSize;
+        int stopY = grabbedEntity.getWorldY() + gp.tileSize;
+
+        int userWorldX = user.getWorldX();
+        int userWorldY = user.getWorldY();
 
         // Move user towards latched
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (user.worldY > stopY) {
-                    user.worldY -= 5;
+                if (userWorldY > stopY) {
+                    user.setWorldY(userWorldY - 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (user.worldY < stopY) {
-                    user.worldY += 5;
+                if (userWorldY < stopY) {
+                    user.setWorldY(userWorldY + 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case LEFT -> {
-                if (user.worldX > stopX) {
-                    user.worldX -= 5;
+                if (userWorldX > stopX) {
+                    user.setWorldX(userWorldX - 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case RIGHT -> {
-                if (user.worldX < stopX) {
-                    user.worldX += 5;
+                if (userWorldX < stopX) {
+                    user.setWorldX(userWorldX + 5);
                 }
                 else {
                     alive = false;
@@ -160,7 +163,7 @@ public class PRJ_Claw extends Projectile {
         // Move backwards to user
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (worldY + gp.tileSize / 2 <= gp.player.worldY) {
+                if (worldY + gp.tileSize / 2 <= gp.player.getWorldY()) {
                     worldY += 5;
                 }
                 else {
@@ -168,7 +171,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldY - gp.tileSize / 2 >= gp.player.worldY) {
+                if (worldY - gp.tileSize / 2 >= gp.player.getWorldY()) {
                     worldY -= 5;
                 }
                 else {
@@ -176,7 +179,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case LEFT -> {
-                if (worldX + gp.tileSize / 2 <= gp.player.worldX) {
+                if (worldX + gp.tileSize / 2 <= gp.player.getWorldX()) {
                     worldX += 5;
                 }
                 else {
@@ -184,7 +187,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (worldX - gp.tileSize / 2 >= gp.player.worldX) {
+                if (worldX - gp.tileSize / 2 >= gp.player.getWorldX()) {
                     worldX -= 5;
                 }
                 else {
@@ -198,15 +201,15 @@ public class PRJ_Claw extends Projectile {
         }
     }
     private void pullEntity() {
-        grabbedEntity.worldX = worldX;
-        grabbedEntity.worldY = worldY;
+        grabbedEntity.setWorldX(worldX);
+        grabbedEntity.setWorldY(worldY);
 
         // Offset X/Y so entity isn't on top of player
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> grabbedEntity.worldY -= gp.tileSize / 2;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.worldY += gp.tileSize / 2;
-            case LEFT -> grabbedEntity.worldX -= gp.tileSize / 2;
-            case RIGHT -> grabbedEntity.worldX += gp.tileSize / 2;
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldY(grabbedEntity.getWorldY() - gp.tileSize / 2);
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldY(grabbedEntity.getWorldY() + gp.tileSize / 2);
+            case LEFT -> grabbedEntity.setWorldX(grabbedEntity.getWorldX() - gp.tileSize / 2);
+            case RIGHT -> grabbedEntity.setWorldX(grabbedEntity.getWorldX() + gp.tileSize / 2);
         }
     }
 
@@ -222,7 +225,7 @@ public class PRJ_Claw extends Projectile {
         grabbedEntity = null;
         latched = false;
         health = maxHealth;
-        user.action = Action.IDLE;
+        user.setAction(Action.IDLE);
     }
 
     @Override

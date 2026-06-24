@@ -26,7 +26,7 @@ public class Entity {
         ROLLING(false, true, true),
         GUARDING(true, false, true),
         DIGGING(false, false, false),
-        AIMING(true, true, false),
+        AIMING(true, true, true),
         THROWING(false, false, false);
 
         private final boolean allowsFacing;
@@ -51,16 +51,17 @@ public class Entity {
     protected GamePanel gp;
 
     /* GENERAL ATTRIBUTES */
-    public int worldX, worldY;
+    protected int worldX, worldY;
+    protected int screenX, screenY;
     protected int worldXStart, worldYStart;
     protected int tempScreenX, tempScreenY;
-    public String name;
-    public int type;
+    protected String name;
+    protected int type;
 
     /* MOVEMENT VALUES */
-    public Direction direction = DOWN;
-    public Action action = Action.IDLE;
-    public int speed = 1;
+    protected Direction direction = DOWN;
+    protected Action action = Action.IDLE;
+    protected int speed = 1;
     protected int defaultSpeed;
     protected boolean moving = false;
 
@@ -611,22 +612,6 @@ public class Entity {
         }
     }
 
-    /**
-     * GET SCREEN X
-     * @return Screen X relative to player
-     */
-    public int getScreenX() {
-        return worldX - gp.player.worldX + gp.player.screenX;
-    }
-
-    /**
-     * GET SCREEN Y
-     * @return Screen Y relative to player
-     */
-    public int getScreenY() {
-        return worldY - gp.player.worldY + gp.player.screenY;
-    }
-
     protected void getSpriteImage() {
         if (spriteNum == 1) {
             image = switch (direction) {
@@ -665,13 +650,6 @@ public class Entity {
         }
     }
 
-    public int getTempScreenX() {
-        return tempScreenX;
-    }
-    public int getTempScreenY() {
-        return tempScreenY;
-    }
-
     /**
      * CHANGE ALPHA
      * Changes the opacity of the image
@@ -680,5 +658,48 @@ public class Entity {
      */
     protected void changeAlpha(Graphics2D g2, float alphaValue) {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
+    }
+
+    /* GETTERS and SETTERS */
+    public int getScreenX() {
+        return worldX - gp.player.worldX + gp.player.screenX;
+    }
+    public int getScreenY() {
+        return worldY - gp.player.worldY + gp.player.screenY;
+    }
+
+    public int getTempScreenX() {
+        return tempScreenX;
+    }
+    public int getTempScreenY() {
+        return tempScreenY;
+    }
+
+    public int getWorldX() {
+        return worldX;
+    }
+    public void setWorldX(int worldX) {
+        this.worldX = worldX;
+    }
+    public int getWorldY() {
+        return worldY;
+    }
+    public void setWorldY(int worldY) {
+        this.worldY = worldY;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setAction(Action action) {
+        this.action = action;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 }

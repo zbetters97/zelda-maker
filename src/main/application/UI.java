@@ -348,17 +348,17 @@ public class UI {
         g2.setFont(new Font("Arial", Font.PLAIN, 20));
 
         // Draw coordinates
-        g2.drawString("WorldX: " + gp.player.worldX, x, y);
+        g2.drawString("WorldX: " + gp.player.getWorldX(), x, y);
         y += lineHeight;
-        g2.drawString("WorldY: " + gp.player.worldY, x, y);
+        g2.drawString("WorldY: " + gp.player.getWorldY(), x, y);
         y += lineHeight;
-        g2.drawString("Column: " + (gp.player.worldX + gp.player.hitbox.x) / gp.tileSize, x, y);
+        g2.drawString("Column: " + (gp.player.getWorldX() + gp.player.hitbox.x) / gp.tileSize, x, y);
         y += lineHeight;
-        g2.drawString("Row: " + (gp.player.worldY + gp.player.hitbox.y) / gp.tileSize, x, y);
+        g2.drawString("Row: " + (gp.player.getWorldY() + gp.player.hitbox.y) / gp.tileSize, x, y);
 
         // Draw player hitbox
         g2.setColor(Color.RED);
-        g2.drawRect(gp.player.screenX + gp.player.hitbox.x, gp.player.screenY + gp.player.hitbox.y,
+        g2.drawRect(gp.player.getScreenX() + gp.player.hitbox.x, gp.player.getScreenY() + gp.player.hitbox.y,
                 gp.player.hitbox.width, gp.player.hitbox.height);
     }
 

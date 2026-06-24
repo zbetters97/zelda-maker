@@ -21,8 +21,6 @@ public class ITM_Shovel extends Entity {
     }
 
     public void use() {
-        if (user.action != Action.DIGGING) {
-            user.action = Action.DIGGING;
-        }
+        user.setAction(Action.DIGGING);
     }
 }

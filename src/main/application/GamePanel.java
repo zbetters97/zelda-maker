@@ -71,7 +71,6 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
 
-
     /* ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
@@ -276,7 +275,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // Sort draw order by Y coordinate
-        entityList.sort(Comparator.comparingInt(e -> e.worldY));
+        entityList.sort(Comparator.comparingInt(Entity::getWorldY));
 
         // Draw all entities
         for (Entity e : entityList) {

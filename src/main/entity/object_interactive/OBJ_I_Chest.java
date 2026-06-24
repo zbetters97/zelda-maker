@@ -39,7 +39,7 @@ public class OBJ_I_Chest extends Entity {
             return;
         }
 
-        if (user.direction == UP || user.direction == UPLEFT || user.direction == UPRIGHT) {
+        if (user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT) {
             opened = true;
         }
     }
