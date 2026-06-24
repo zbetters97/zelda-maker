@@ -125,7 +125,7 @@ public record CollisionChecker(GamePanel gp) {
                 target.hitbox.x = target.worldX + target.hitbox.x;
                 target.hitbox.y = target.worldY + target.hitbox.y;
 
-                switch (entity.direction) {
+                switch (entity.getMoveDirection()) {
                     case UP -> entity.hitbox.y -= entity.speed;
                     case UPLEFT -> {
                         entity.hitbox.y -= entity.speed;
@@ -146,6 +146,11 @@ public record CollisionChecker(GamePanel gp) {
                     }
                     case LEFT -> entity.hitbox.x -= entity.speed;
                     case RIGHT -> entity.hitbox.x += entity.speed;
+                }
+
+                if (entity.hitbox.intersects(target.hitbox)) {
+                    entity.collisionOn = true;
+                    entityIndex = i;
                 }
 
                 // Reset entity solid area

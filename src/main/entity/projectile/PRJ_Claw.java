@@ -99,7 +99,7 @@ public class PRJ_Claw extends Projectile {
 
         if (iObject != -1) {
             latched = true;
-            grabbedEntity = null;
+            grabbedEntity = gp.obj_i[gp.currentMap][iObject];
             health = 0;
         }
     }
@@ -115,10 +115,13 @@ public class PRJ_Claw extends Projectile {
             return;
         }
 
+        int stopX = grabbedEntity.worldX + gp.tileSize;
+        int stopY = grabbedEntity.worldY + gp.tileSize;
+
         // Move user towards latched
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (user.worldY >= worldY) {
+                if (user.worldY > stopY) {
                     user.worldY -= 5;
                 }
                 else {
@@ -126,7 +129,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (user.worldY <= worldY) {
+                if (user.worldY < stopY) {
                     user.worldY += 5;
                 }
                 else {
@@ -134,7 +137,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case LEFT -> {
-                if (user.worldX >= worldX) {
+                if (user.worldX > stopX) {
                     user.worldX -= 5;
                 }
                 else {
@@ -142,7 +145,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (user.worldX <= worldX) {
+                if (user.worldX < stopX) {
                     user.worldX += 5;
                 }
                 else {

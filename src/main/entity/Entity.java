@@ -1,6 +1,7 @@
 package entity;
 
 import application.GamePanel;
+import application.GamePanel.Direction;
 import entity.projectile.Projectile;
 
 import javax.imageio.ImageIO;
@@ -18,22 +19,24 @@ public class Entity {
      * List of predefined actions an Entity can perform
      */
     public enum Action {
-        IDLE(true, true),
-        ATTACKING(false, false),
-        SPINCHARGING(true, true),
-        SPINNING(false, false),
-        ROLLING(false, true),
-        GUARDING(true, false),
-        DIGGING(false, false),
-        AIMING(true, true),
-        THROWING(false, false);
+        IDLE(true, true, false),
+        ATTACKING(false, false, false),
+        SPINCHARGING(true, true, true),
+        SPINNING(false, false, true),
+        ROLLING(false, true, true),
+        GUARDING(true, false, true),
+        DIGGING(false, false, false),
+        AIMING(true, true, false),
+        THROWING(false, false, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
+        private final boolean locksFacing;
 
-        Action(boolean allowsFacing, boolean allowsTranslation) {
+        Action(boolean allowsFacing, boolean allowsTranslation, boolean locksFacing) {
             this.allowsFacing = allowsFacing;
             this.allowsTranslation = allowsTranslation;
+            this.locksFacing = locksFacing;
         }
 
         public boolean allowsFacing() {
@@ -42,6 +45,7 @@ public class Entity {
         public boolean allowsTranslation() {
             return allowsTranslation;
         }
+        public boolean locksFacing() { return locksFacing; }
     }
 
     protected GamePanel gp;
@@ -54,11 +58,16 @@ public class Entity {
     public int type;
 
     /* MOVEMENT VALUES */
-    public GamePanel.Direction direction = DOWN;
-    public Action action;
+    public Direction direction = DOWN;
+    public Action action = Action.IDLE;
     public int speed = 1;
     protected int defaultSpeed;
     protected boolean moving = false;
+
+    /* Z-TARGETING */
+    protected boolean lockedOn;
+    protected Entity lockedOnTarget;
+    protected Direction lockonDirection;
 
     /* ANIMATION VALUES */
     private int actionLockCounter = 0;
@@ -85,6 +94,7 @@ public class Entity {
     public boolean dying = false;
     private int dyingCounter = 0;
     protected boolean opened = false;
+    public final static int maxZTargetDistance = 7;
 
     /* COLLISION VALUES */
     public boolean collisionOn = true;
@@ -225,7 +235,7 @@ public class Entity {
      * Repositions the entity's X, Y based on direction and speed
      * Called by updateDirection() if o collision
      */
-    protected void move(GamePanel.Direction direction) {
+    protected void move(Direction direction) {
 
         if (!canMove || collisionOn) {
             moving = false;
@@ -310,13 +320,49 @@ public class Entity {
      * Called by CollisionDetector
      * @return Current direction of the entity
      */
-    public GamePanel.Direction getMoveDirection() {
+    public Direction getMoveDirection() {
         if (knockback) {
             return knockbackDirection;
+        }
+        else if (lockedOn || action.locksFacing()) {
+            return lockonDirection;
         }
         else {
             return direction;
         }
+    }
+
+    protected Direction getOppositeDirection(Direction direction) {
+
+        Direction oppositeDirection = switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> DOWN;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> UP;
+            case LEFT -> RIGHT;
+            case RIGHT -> LEFT;
+        };
+
+        return oppositeDirection;
+    }
+
+    public int getTileDistance(Entity target) {
+        int tileDistance = (getXDistance(target) + getYDistance(target)) / gp.tileSize;
+        return tileDistance;
+    }
+    public int getXDistance(Entity target) {
+        int xDistance = Math.abs(getCenterX() - target.getCenterX());
+        return xDistance;
+    }
+    public int getYDistance(Entity target) {
+        int yDistance = Math.abs(getCenterY() - target.getCenterY());
+        return yDistance;
+    }
+    public int getCenterX() {
+        int centerX = worldX + left1.getWidth() / 2;
+        return centerX;
+    }
+    public int getCenterY() {
+        int centerY = worldY + up1.getHeight() / 2;
+        return centerY;
     }
 
     /**
@@ -511,7 +557,7 @@ public class Entity {
      */
     public void draw(Graphics2D g2) {
 
-        offCenter();
+        adjustOffCenter();
         getSpriteImage();
 
         // Flash sprite if hurt
@@ -537,7 +583,7 @@ public class Entity {
      * OFF CENTER
      * Adjusts X, Y if near edge
      */
-    protected void offCenter() {
+    public void adjustOffCenter() {
         tempScreenX = getScreenX();
         tempScreenY = getScreenY();
 
@@ -617,6 +663,13 @@ public class Entity {
         if (dyingCounter >= 40) {
             alive = false;
         }
+    }
+
+    public int getTempScreenX() {
+        return tempScreenX;
+    }
+    public int getTempScreenY() {
+        return tempScreenY;
     }
 
     /**

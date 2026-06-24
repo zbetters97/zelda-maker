@@ -1,6 +1,7 @@
 package entity;
 
 import application.GamePanel;
+import application.GamePanel.Direction;
 import entity.item.ITM_Boomerang;
 import entity.item.ITM_Bow;
 import entity.item.ITM_Hookshot;
@@ -8,6 +9,7 @@ import entity.item.ITM_Shovel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
 
@@ -15,10 +17,6 @@ public class Player extends Entity {
 
     /* POSITIONING */
     public int screenX, screenY;
-
-    /* MOVEMENT ATTRIBUTES */
-    private boolean lockedOn;
-    private GamePanel.Direction lockonDirection;
 
     /* ANIMATION HANDLERS */
     private int spinCharge = 0;
@@ -247,13 +245,16 @@ public class Player extends Entity {
         // Update player behavior based on current action
         updateAction();
 
+        if (lockedOn) {
+            lockedOn();
+        }
+
         // Read directional input if current action allows
         if (action.allowsFacing()) {
             handleMovementInput();
         }
         // Auto-move player if action denies input but allows movement
         else if (action.allowsTranslation()) {
-
             move();
         }
 
@@ -281,8 +282,13 @@ public class Player extends Entity {
             spriteNum = 1;
             spriteCounter = 0;
         }
+        // Use item
         else if (gp.keyH.xPressed) {
             useItem();
+        }
+        // Z-target
+        else if (gp.keyH.lPressed) {
+            zTarget();
         }
     }
 
@@ -335,7 +341,7 @@ public class Player extends Entity {
      * Initiates the item use function
      * Called by handleActionInput()
      */
-    public void useItem() {
+    private void useItem() {
 
         // HAS ITEM EQUIPPED
         if (currentItem != null) {
@@ -344,7 +350,6 @@ public class Player extends Entity {
                     currentItem.use();
                 }
                 case ITM_Bow.itmName -> {
-                   lockedOn = true;
                    lockonDirection = direction;
                    currentItem.use();
                 }
@@ -354,6 +359,126 @@ public class Player extends Entity {
         else {
             gp.keyH.xPressed = false;
         }
+    }
+
+    private void zTarget() {
+
+        gp.keyH.lPressed = false;
+
+        // Find new target
+        Entity newTarget = findTarget();
+
+        // New target found
+        if (newTarget != null) {
+
+            // Not currently locked on
+            if (lockedOnTarget == null) {
+                lockedOnTarget = newTarget;
+                lockedOn = true;
+            }
+            // Already locked on
+            else {
+                // Moving backwards, turn off lock
+                if (Objects.equals(direction, getOppositeDirection(lockonDirection))) {
+                    lockedOnTarget = null;
+                    lockedOn = false;
+                }
+                // Switch targets
+                else {
+                    lockedOnTarget = newTarget;
+                    lockedOn = true;
+                }
+            }
+        }
+        // No target found
+        else if (lockedOnTarget != null) {
+            lockedOnTarget = null;
+            lockedOn = false;
+        }
+    }
+    public Entity findTarget() {
+
+        Entity target = null;
+        int currentDistance = maxZTargetDistance;
+
+        for (Entity e : gp.enemy[gp.currentMap]) {
+
+            if (e != null && e != lockedOnTarget && !e.dying) {
+
+                int enemyDistance = getTileDistance(e);
+                if (enemyDistance < currentDistance) {
+                    currentDistance = enemyDistance;
+                    target = e;
+                }
+            }
+        }
+
+        return target;
+    }
+    public void lockedOn() {
+
+        // Locked target within 8 tiles
+        if (lockedOnTarget != null && getTileDistance(lockedOnTarget) < maxZTargetDistance) {
+
+            // Target alive
+            if (lockedOnTarget.alive) {
+                direction = findTargetDirection(lockedOnTarget);
+                lockonDirection = direction;
+            }
+            // Target defeated
+            else {
+                lockedOnTarget = null;
+                lockedOn = false;
+
+                // Find new target
+                zTarget();
+            }
+        }
+        // Target out of range
+        else {
+            lockedOnTarget = null;
+            lockedOn = false;
+        }
+    }
+
+    public Direction findTargetDirection(Entity target) {
+
+        Direction zDirection = direction;
+
+        // Player X/Y
+        int px = (worldX + (gp.tileSize / 2));
+        int py = (worldY + (gp.tileSize / 2));
+
+        // Target X/Y
+        int ex = (target.worldX + (gp.tileSize / 2));
+        int ey = (target.worldY + (gp.tileSize / 2));
+
+        if (py > ey && py - ey >= Math.abs(px - ex)) // SOUTH
+        {
+            zDirection = UP;
+        }
+        else if (py >= ey && px > ex) // EAST / SOUTHEAST
+        {
+            zDirection = LEFT;
+        }
+        else if (py >= ey && ex > px) // WEST / SOUTHWEST
+        {
+            zDirection = RIGHT;
+        }
+        else if (ey > py && ey - py >= Math.abs(px - ex)) // NORTH
+        {
+            zDirection = DOWN;
+        }
+        else if (ey > py && px > ex) // EAST / NORTHEAST
+        {
+            zDirection = LEFT;
+        }
+        else if (ey > py && ex > px) // WEST / NORTHWEST
+        {
+            zDirection = RIGHT;
+        }
+
+        return zDirection;
     }
 
     /**
@@ -412,7 +537,7 @@ public class Player extends Entity {
      */
     private void updateFacing() {
 
-        GamePanel.Direction nextDirection = direction;
+        Direction nextDirection = direction;
 
         boolean up = gp.keyH.upPressed;
         boolean down = gp.keyH.downPressed;
@@ -428,7 +553,8 @@ public class Player extends Entity {
         else if (left) nextDirection = LEFT;
         else if (right) nextDirection = RIGHT;
 
-        if (lockedOn) {
+        // Do not change actual direction if face-locked
+        if (lockedOn || action.locksFacing()) {
             lockonDirection = nextDirection;
         }
         else {
@@ -442,30 +568,12 @@ public class Player extends Entity {
      * Called by updateDirection() if no collision
      */
     protected void move() {
-        GamePanel.Direction newDirection = getMoveDirection();
+        Direction newDirection = getMoveDirection();
 
         collisionOn = false;
         checkCollision();
 
         super.move(newDirection);
-    }
-
-    /**
-     * RESOLVE MOVE DIRECTION
-     * @return updated player direction
-     * Decides if direction or lockonDirection should be used
-     * Called by move()
-     */
-    public GamePanel.Direction getMoveDirection() {
-        if (knockback) {
-            return knockbackDirection;
-        }
-        else if (action == Action.ROLLING || lockedOn) {
-            return lockonDirection;
-        }
-        else {
-            return direction;
-        }
     }
 
     /**
@@ -493,6 +601,10 @@ public class Player extends Entity {
         if (enemy != null && !enemy.invincible) {
             damagePlayer(enemy.attack);
         }
+    }
+
+    public Entity getLockedOnTarget() {
+        return lockedOnTarget;
     }
 
     /**
@@ -527,7 +639,6 @@ public class Player extends Entity {
             // Spin charge ready for spin attack
             if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
                 action = Action.SPINCHARGING;
-                lockedOn = true;
                 lockonDirection = direction;
             }
 
@@ -588,6 +699,7 @@ public class Player extends Entity {
             if (charge < 120) {
                 charge += 2;
             }
+
             speed = 2;
         }
         // Charge is ready, start spin and reset values
@@ -595,7 +707,6 @@ public class Player extends Entity {
             updateSpinDirection();
 
             charge = 0;
-            lockedOn = false;
             attackNum = 1;
             spriteNum = 0;
             speed = defaultSpeed;
@@ -606,7 +717,6 @@ public class Player extends Entity {
             charge = 0;
             attackNum = 1;
             attackCounter = 0;
-            lockedOn = false;
             action = Action.IDLE;
         }
     }

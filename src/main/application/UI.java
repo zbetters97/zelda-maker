@@ -1,8 +1,12 @@
 package application;
 
+import entity.Entity;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,13 +19,19 @@ public class UI {
     private Graphics2D g2;
     private Font PK_DS;
 
-    // UI COLORS
+    /* UI COLORS */
     private final Color itm_brown_1 = new Color(168, 127, 89);
-    private final Color itm_brown_2 = new Color(217, 180, 122);
     private final Color itm_green = new Color(95, 190, 80);
 
+    /* Z-TARGETING */
+    private int zTargetCounter = 0;
+    private int zTargetDirection = 0;
+    private int zTargetRotation = 0;
+
     /* SPRITES */
-    private BufferedImage heart_0, heart_1, heart_2, heart_3, heart_4;
+    private BufferedImage
+            heart_0, heart_1, heart_2, heart_3, heart_4,
+            ztarget_arrow, ztarget_circle;
 
     /**
      * CONSTRUCTOR
@@ -32,7 +42,7 @@ public class UI {
         this.gp = gp;
 
         importFont();
-        getHeartImages();
+        getAllImages();
     }
 
     /**
@@ -49,13 +59,20 @@ public class UI {
         }
     }
 
-    /* GET IMAGES */
+    private void getAllImages() {
+        getHeartImages();
+        getZTargetImages();
+    }
     private void getHeartImages() {
         heart_0 = setupImage("/ui/ui_heart_0", 23, 23);
         heart_1 = setupImage("/ui/ui_heart_1", 23, 23);
         heart_2 = setupImage("/ui/ui_heart_2", 23, 23);
         heart_3 = setupImage("/ui/ui_heart_3", 23, 23);
         heart_4 = setupImage("/ui/ui_heart_4", 23, 23);
+    }
+    private void getZTargetImages() {
+        ztarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
+        ztarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
     }
 
     /**
@@ -80,9 +97,10 @@ public class UI {
      * called by draw()
      */
     private void drawHUD() {
+        drawZTarget();
+        drawChargeBar();
         drawPlayerHealth();
         drawPlayerItem();
-        drawChargeBar();
         drawDebug();
     }
 
@@ -225,6 +243,94 @@ public class UI {
         if (charge < 120) return new Color(0, 205, 0);
 
         return new Color(0, 240, 0);
+    }
+
+    private void drawZTarget() {
+
+        Entity target = gp.player.getLockedOnTarget();
+
+        // No enemy locked on
+        if (target == null) {
+
+            // Find closest enemy
+            Entity newTarget = getNewTarget();
+
+            // Close enemy found, draw Z-target
+            if (newTarget != null) {
+                drawZTargetArrow(newTarget);
+            }
+        }
+        // Enemy locked on
+        else {
+            drawZTargetCircle(target);
+        }
+    }
+    private Entity getNewTarget() {
+
+        Entity newTarget = null;
+        int currentDistance = Entity.maxZTargetDistance;
+
+        for (Entity e : gp.enemy[gp.currentMap]) {
+
+            if (e != null) {
+
+                // Enemy distance from player
+                int enemyDistance = e.getTileDistance(gp.player);
+
+                // Find closest enemy distance within 8 tiles
+                if (enemyDistance < currentDistance) {
+                    currentDistance = enemyDistance;
+                    newTarget = e;
+                }
+            }
+        }
+
+        return newTarget;
+    }
+    private void drawZTargetArrow(Entity newTarget) {
+        newTarget.adjustOffCenter();
+
+        if (zTargetCounter < 20 && zTargetDirection == 0) {
+            zTargetCounter++;
+        }
+        else if (zTargetCounter < 20 && zTargetDirection == 1) {
+            zTargetCounter--;
+        }
+        if (zTargetCounter == 20) {
+            zTargetCounter--;
+            zTargetDirection = 1;
+        }
+        else if (zTargetCounter == 0) {
+            zTargetCounter++;
+            zTargetDirection = 0;
+        }
+
+        int x = newTarget.getTempScreenX() - 10;
+        int y = newTarget.getTempScreenY() - 30 + zTargetCounter;
+
+        g2.drawImage(ztarget_arrow, x, y, null);
+    }
+    private void drawZTargetCircle(Entity target) {
+        target.adjustOffCenter();
+
+        zTargetRotation += 3;
+        if (zTargetRotation >= 180) {
+            zTargetRotation = 0;
+        }
+
+        BufferedImage img = rotateImage(ztarget_circle, zTargetRotation);
+
+        g2.drawImage(img, target.getTempScreenX() - 10, target.getTempScreenY() - 10, null);
+    }
+    private BufferedImage rotateImage(BufferedImage img, int degrees) {
+
+        AffineTransform rotation = AffineTransform.getRotateInstance(
+                Math.toRadians(degrees), (double) img.getWidth() / 2, (double) img.getHeight() / 2
+        );
+
+        AffineTransformOp op = new AffineTransformOp(rotation, AffineTransformOp.TYPE_BICUBIC);
+
+        return op.filter(img, null);
     }
 
     /**
