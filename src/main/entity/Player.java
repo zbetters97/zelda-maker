@@ -15,7 +15,7 @@ import static application.GamePanel.Direction.*;
 
 public class Player extends Entity {
 
-    /* ANIMATION HANDLERS */
+    /** ANIMATION HANDLERS */
     private int spinCharge = 0;
     private int coolDownCounter = 0;
     private int
@@ -23,7 +23,7 @@ public class Player extends Entity {
             digNum = 1, digCounter = 0,
             aimNum = 1, aimCounter = 0, throwNum = 1, throwCounter = 0;
 
-    /* SPRITE IMAGES */
+    /** SPRITE IMAGES */
     private BufferedImage
             spinUp1, spinUp2, spinDown1, spinDown2,
             spinLeft1, spinLeft2, spinRight1, spinRight2,
@@ -77,7 +77,7 @@ public class Player extends Entity {
         swingSpeed3 = 15;
     }
 
-    /* GET IMAGES */
+    /** GET IMAGES */
     protected void getImages() {
         up1 = setupImage("/player/boy_up_1");
         up2 = setupImage("/player/boy_up_2");
@@ -297,15 +297,12 @@ public class Player extends Entity {
         gp.keyH.aPressed = false;
 
         // Different action based on current status
-        switch (action) {
-            case IDLE -> {
-                // Cooldown needed for rolling
-                if (moving && coolDownCounter == 0) {
-                    startRoll();
-                }
-                else {
-                    interactIObjects();
-                }
+        if (action == Action.IDLE) {
+            // Cooldown needed for rolling
+            if (moving && coolDownCounter == 0) {
+                startRoll();
+            } else {
+                interactIObjects();
             }
         }
     }
@@ -338,24 +335,23 @@ public class Player extends Entity {
      */
     private void useItem() {
 
-        // HAS ITEM EQUIPPED
+        // Item equipped
         if (currentItem != null) {
             switch (currentItem.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> {
-                    currentItem.use();
-                }
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> currentItem.use();
                 case ITM_Bow.itmName -> {
                    lockonDirection = direction;
                    currentItem.use();
                 }
             }
         }
-        // NO ITEM EQUIPPED
+        // No equipped item
         else {
             gp.keyH.xPressed = false;
         }
     }
 
+    /** Z-TARGETING */
     private void startZTarget() {
 
         gp.keyH.lPressed = false;
@@ -474,6 +470,7 @@ public class Player extends Entity {
 
         return zDirection;
     }
+    /** END Z-TARGETING */
 
     /**
      * UPDATE ACTION
@@ -1037,7 +1034,7 @@ public class Player extends Entity {
         }
     }
 
-    /** GET CURRENT SPRITE TO DRAW **/
+    /** GET CURRENT SPRITE TO DRAW */
     protected void getSpriteImage() {
         image = switch (action) {
             case IDLE -> getIdleSprite();
@@ -1319,7 +1316,7 @@ public class Player extends Entity {
         return throwSprite;
     }
 
-    /* GETTERS */
+    /** GETTERS */
     public int getScreenX() {
         return screenX;
     }

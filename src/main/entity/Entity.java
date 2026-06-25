@@ -25,7 +25,7 @@ public class Entity {
         SPINCHARGING(true, true, true),
         SPINNING(false, false, true),
         ROLLING(false, true, true),
-        GUARDING(true, false, true),
+        GUARDING(true, false, false),
         DIGGING(false, false, false),
         AIMING(true, true, true),
         THROWING(false, false, false);
@@ -51,14 +51,14 @@ public class Entity {
 
     protected GamePanel gp;
 
-    /* GENERAL ATTRIBUTES */
+    /** GENERAL ATTRIBUTES */
     protected int worldX, worldY;
     protected int screenX, screenY;
     protected int worldXStart, worldYStart;
     protected int tempScreenX, tempScreenY;
     private final int bounds = 999;
 
-    /* MOVEMENT VALUES */
+    /** MOVEMENT VALUES */
     protected Direction direction = DOWN;
     protected Action action = Action.IDLE;
     protected int speed = 1;
@@ -67,16 +67,17 @@ public class Entity {
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
 
-    /* Z-TARGETING */
+    /** Z-TARGETING */
     protected boolean lockedOn;
     protected Entity lockedOnTarget;
     protected Direction lockonDirection;
+    public final static int maxZTargetDistance = 7;
 
-    /* ANIMATION VALUES */
+    /** ANIMATION VALUES */
     protected int actionLockCounter = 0;
     protected int animationSpeed;
 
-    /* RPG VALUES */
+    /** RPG VALUES */
     protected String name;
     protected int type;
     public boolean alive = true;
@@ -88,9 +89,8 @@ public class Entity {
     public boolean dying = false;
     private int dyingCounter = 0;
     protected boolean opened = false;
-    public final static int maxZTargetDistance = 7;
 
-    /* COMBAT VALUES */
+    /** COMBAT VALUES */
     public int attack;
     public int defaultAttack;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
@@ -102,7 +102,7 @@ public class Entity {
     protected GamePanel.Direction knockbackDirection;
     protected int knockbackCounter = 0;
 
-    /* COLLISION VALUES */
+    /** COLLISION VALUES */
     public boolean collisionOn = true;
     protected boolean canMove = true;
     public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
@@ -111,16 +111,16 @@ public class Entity {
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
 
-    /* INVENTORY VALUES */
+    /** INVENTORY VALUES */
     public int arrows = 0;
 
-    /* PROJECTILE VALUES */
+    /** PROJECTILE VALUES */
     public Projectile projectile;
     public Entity user;
     public int charge = 0;
     protected boolean grabbable = false;
 
-    /* SPRITE ATTRIBUTES */
+    /** SPRITE ATTRIBUTES */
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
     public BufferedImage image;
@@ -129,13 +129,13 @@ public class Entity {
             attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
 
-    /* ENTITY TYPES */
+    /** ENTITY TYPES */
     protected int entity_type;
     protected final int type_npc = 0;
     protected final int type_enemy = 1;
     protected final int type_item = 2;
 
-    /* OBJECT TYPES */
+    /** OBJECT TYPES */
     public final int type_object_i = 3;
     public final int type_projectile = 4;
 
@@ -148,17 +148,10 @@ public class Entity {
         getImages();
     }
 
-    /* CHILD FUNCTIONS */
     /**
      * GET IMAGE
      */
     protected void getImages() { }
-
-    /**
-     * SET ACTION
-     */
-    protected void setAction() { }
-    /* END CHILD FUNCTIONS */
 
     /**
      * SETUP IMAGE
@@ -211,6 +204,11 @@ public class Entity {
     }
 
     /**
+     * SET ACTION
+     */
+    protected void setAction() { }
+
+    /**
      * UPDATE DIRECTION
      * Handles logic involving moving the entity
      */
@@ -220,6 +218,23 @@ public class Entity {
 
         if (moving) {
             cycleSprites();
+        }
+    }
+
+    /**
+     * GET MOVE DIRECTION
+     * Called by CollisionDetector
+     * @return Current direction of the entity
+     */
+    public Direction getMoveDirection() {
+        if (knockback) {
+            return knockbackDirection;
+        }
+        else if (lockedOn || action.locksFacing()) {
+            return lockonDirection;
+        }
+        else {
+            return direction;
         }
     }
 
@@ -299,23 +314,6 @@ public class Entity {
     }
 
     /**
-     * GET MOVE DIRECTION
-     * Called by CollisionDetector
-     * @return Current direction of the entity
-     */
-    public Direction getMoveDirection() {
-        if (knockback) {
-            return knockbackDirection;
-        }
-        else if (lockedOn || action.locksFacing()) {
-            return lockonDirection;
-        }
-        else {
-            return direction;
-        }
-    }
-
-    /**
      * SET DIRECTION
      * Randomly re-assigns the direction the Entity is facing
      * @param rate Integer frequency of updates (60 = 1 sec)
@@ -355,7 +353,7 @@ public class Entity {
         return oppositeDirection;
     }
 
-    /* PATH FINDING */
+    /** PATH FINDING */
     public void searchPath(int goalCol, int goalRow) {
 
         if (action == Action.ATTACKING) {
@@ -547,7 +545,31 @@ public class Entity {
 
         return withinBounds;
     }
+    /** END PATH FINDING*/
 
+    protected void interact(Entity user) {}
+
+    /**
+     * USE
+     * Initiates using the Entity
+     */
+    protected void use() { }
+
+    /**
+     * ADD PROJECTILE
+     * Adds new projectile entity to gp projectile list
+     * @param projectile Projectile to be added
+     */
+    protected void addProjectile(Projectile projectile) {
+        for (int i = 0; i < gp.projectile[0].length; i++) {
+            if (gp.projectile[gp.currentMap][i] == null) {
+                gp.projectile[gp.currentMap][i] = projectile;
+                break;
+            }
+        }
+    }
+
+    /** COMBAT */
     /**
      * ATTACK
      * Attack logic for specific entity
@@ -651,28 +673,6 @@ public class Entity {
                 spriteNum = 1;
                 spriteCounter = 0;
                 action = Action.ATTACKING;
-            }
-        }
-    }
-
-    protected void interact(Entity user) {}
-
-    /**
-     * USE
-     * Initiates using the Entity
-     */
-    protected void use() { }
-
-    /**
-     * ADD PROJECTILE
-     * Adds new projectile entity to gp projectile list
-     * @param projectile Projectile to be added
-     */
-    protected void addProjectile(Projectile projectile) {
-        for (int i = 0; i < gp.projectile[0].length; i++) {
-            if (gp.projectile[gp.currentMap][i] == null) {
-                gp.projectile[gp.currentMap][i] = projectile;
-                break;
             }
         }
     }
@@ -810,6 +810,7 @@ public class Entity {
         gp.player.health -= damage;
         gp.player.invincible = true;
     }
+    /** END COMBAT*/
 
     /**
      * CHECK DEATH
@@ -910,6 +911,7 @@ public class Entity {
         }
     }
 
+    /** GET CURRENT SPRITE TO DRAW **/
     protected void getSpriteImage() {
         if (action == Action.ATTACKING) {
             getAttackImage();
@@ -995,7 +997,7 @@ public class Entity {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
     }
 
-    /* GETTERS and SETTERS */
+    /** GETTERS and SETTERS */
     public int getScreenX() {
         return worldX - gp.player.worldX + gp.player.screenX;
     }

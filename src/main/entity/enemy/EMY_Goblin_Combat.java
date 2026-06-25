@@ -4,7 +4,6 @@ import application.GamePanel;
 import entity.Entity;
 
 import java.awt.*;
-import java.util.Random;
 
 public class EMY_Goblin_Combat extends Entity {
 
@@ -69,6 +68,7 @@ public class EMY_Goblin_Combat extends Entity {
             manageValues();
             return;
         }
+
         if (action == Action.ATTACKING) {
             attack();
         }
@@ -113,6 +113,6 @@ public class EMY_Goblin_Combat extends Entity {
     }
 
     protected void reactToDamage() {
-        actionLockCounter = 0;
+        resetValues();
     }
 }
