@@ -25,9 +25,6 @@ public class Player extends Entity {
 
     /* SPRITE IMAGES */
     private BufferedImage
-            attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
-            attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4,
-
             spinUp1, spinUp2, spinDown1, spinDown2,
             spinLeft1, spinLeft2, spinRight1, spinRight2,
 
@@ -197,7 +194,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        currentItem = new ITM_Bow(gp, this);
+        currentItem = new ITM_Hookshot(gp, this);
     }
 
     /**
@@ -242,8 +239,9 @@ public class Player extends Entity {
         // Update player behavior based on current action
         updateAction();
 
-        if (lockedOn) {
-            lockedOn();
+        // Update lockon direction if allowed to update facing
+        if (lockedOn && action.allowsFacing()) {
+            zTargeting();
         }
 
         // Read directional input if current action allows
@@ -285,7 +283,7 @@ public class Player extends Entity {
         }
         // Z-target
         else if (gp.keyH.lPressed) {
-            zTarget();
+            startZTarget();
         }
     }
 
@@ -358,12 +356,12 @@ public class Player extends Entity {
         }
     }
 
-    private void zTarget() {
+    private void startZTarget() {
 
         gp.keyH.lPressed = false;
 
         // Find new target
-        Entity newTarget = findTarget();
+        Entity newTarget = findZTarget();
 
         // New target found
         if (newTarget != null) {
@@ -393,7 +391,7 @@ public class Player extends Entity {
             lockedOn = false;
         }
     }
-    private Entity findTarget() {
+    private Entity findZTarget() {
 
         Entity target = null;
         int currentDistance = maxZTargetDistance;
@@ -412,14 +410,14 @@ public class Player extends Entity {
 
         return target;
     }
-    private void lockedOn() {
+    private void zTargeting() {
 
         // Locked target within 8 tiles
         if (lockedOnTarget != null && getTileDistance(lockedOnTarget) < maxZTargetDistance) {
 
             // Target alive
             if (lockedOnTarget.alive) {
-                direction = findTargetDirection(lockedOnTarget);
+                direction = getZTargetDirection(lockedOnTarget);
                 lockonDirection = direction;
             }
             // Target defeated
@@ -428,7 +426,7 @@ public class Player extends Entity {
                 lockedOn = false;
 
                 // Find new target
-                zTarget();
+                findZTarget();
             }
         }
         // Target out of range
@@ -437,8 +435,7 @@ public class Player extends Entity {
             lockedOn = false;
         }
     }
-
-    private Direction findTargetDirection(Entity target) {
+    private Direction getZTargetDirection(Entity target) {
 
         Direction zDirection = direction;
 
@@ -710,6 +707,7 @@ public class Player extends Entity {
             charge = 0;
             attackNum = 1;
             attackCounter = 0;
+            speed = defaultSpeed;
             action = Action.IDLE;
         }
     }
@@ -907,6 +905,8 @@ public class Player extends Entity {
      */
     private void aiming() {
 
+        speed = 2;
+
         if (moving) {
             aimCounter++;
 
@@ -934,6 +934,7 @@ public class Player extends Entity {
         }
         else {
             currentItem.attack();
+            speed = defaultSpeed;
         }
     }
 

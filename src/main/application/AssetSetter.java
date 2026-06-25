@@ -1,5 +1,6 @@
 package application;
 
+import entity.enemy.EMY_Goblin_Combat;
 import entity.enemy.EMY_Keese;
 import entity.npc.NPC_OldMan;
 import entity.object_interactive.OBJ_I_Chest;
@@ -25,7 +26,9 @@ public record AssetSetter(GamePanel gp) {
         int mapNum = 0;
         int i = 0;
 
-        gp.enemy[mapNum][i] = new EMY_Keese(gp, 26, 21);
+        gp.enemy[mapNum][i] = new EMY_Keese(gp, 26, 20);
+        i++;
+        gp.enemy[mapNum][i] = new EMY_Goblin_Combat(gp, 26, 22);
     }
 
     private void setIObjects() {

@@ -101,7 +101,7 @@ public class PRJ_Arrow extends Projectile {
         }
     }
 
-    protected void resetValues() {
+    public void resetValues() {
         alive = false;
         attack = defaultAttack;
         speed = defaultSpeed;

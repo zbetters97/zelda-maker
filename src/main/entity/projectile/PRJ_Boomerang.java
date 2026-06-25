@@ -129,7 +129,7 @@ public class PRJ_Boomerang extends Projectile {
         }
     }
 
-    protected void resetValues() {
+    public void resetValues() {
         returning = false;
         alive = false;
         collisionOn = false;

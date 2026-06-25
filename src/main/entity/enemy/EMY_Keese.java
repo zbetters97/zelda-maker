@@ -47,7 +47,7 @@ public class EMY_Keese extends Entity {
      * Fetches sprites
      * Called by constructor in Entity parent class
      */
-    public void getImages() {
+    protected void getImages() {
         up1 = down1 = left1 = right1 = setupImage("/enemy/keese_down_1");
         up2 = down2 = left2 = right2 = setupImage("/enemy/keese_down_2");
     }

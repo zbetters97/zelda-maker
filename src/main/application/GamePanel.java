@@ -1,5 +1,6 @@
 package application;
 
+import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -70,6 +71,7 @@ public class GamePanel extends JPanel implements Runnable {
     public TileManager tileM = new TileManager(this);
     public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
+    public PathFinder pFinder = new PathFinder(this);
 
     /* ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();

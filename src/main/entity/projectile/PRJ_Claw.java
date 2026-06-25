@@ -201,15 +201,16 @@ public class PRJ_Claw extends Projectile {
         }
     }
     private void pullEntity() {
-        grabbedEntity.setWorldX(worldX);
-        grabbedEntity.setWorldY(worldY);
+
+        grabbedEntity.resetValues();
+        grabbedEntity.setDirection(getOppositeDirection(direction));
 
         // Offset X/Y so entity isn't on top of player
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldY(grabbedEntity.getWorldY() - gp.tileSize / 2);
-            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldY(grabbedEntity.getWorldY() + gp.tileSize / 2);
-            case LEFT -> grabbedEntity.setWorldX(grabbedEntity.getWorldX() - gp.tileSize / 2);
-            case RIGHT -> grabbedEntity.setWorldX(grabbedEntity.getWorldX() + gp.tileSize / 2);
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldY(worldY - gp.tileSize / 2);
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldY(worldY + gp.tileSize / 2);
+            case LEFT -> grabbedEntity.setWorldX(worldX - gp.tileSize / 2);
+            case RIGHT -> grabbedEntity.setWorldX(worldX + gp.tileSize / 2);
         }
     }
 
@@ -219,7 +220,7 @@ public class PRJ_Claw extends Projectile {
         }
     }
 
-    protected void resetValues() {
+    public void resetValues() {
         alive = false;
         collisionOn = false;
         grabbedEntity = null;
