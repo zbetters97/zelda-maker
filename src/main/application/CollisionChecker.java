@@ -12,10 +12,10 @@ public record CollisionChecker(GamePanel gp) {
     public void checkTile(Entity entity) {
 
         // Collision box (left side, right side, top, bottom)
-        int entityLeftWorldX = entity.getWorldX() + entity.hitbox.x;
-        int entityRightWorldX = entity.getWorldX() + entity.hitbox.x + entity.hitbox.width;
-        int entityTopWorldY = entity.getWorldY() + entity.hitbox.y;
-        int entityBottomWorldY = entity.getWorldY() + entity.hitbox.y + entity.hitbox.height;
+        int entityLeftWorldX = entity.getWorldX() + entity.getHitbox().x;
+        int entityRightWorldX = entity.getWorldX() + entity.getHitbox().x + entity.getHitbox().width;
+        int entityTopWorldY = entity.getWorldY() + entity.getHitbox().y;
+        int entityBottomWorldY = entity.getWorldY() + entity.getHitbox().y + entity.getHitbox().height;
 
         int entityLeftCol = entityLeftWorldX / gp.tileSize;
         int entityRightCol = entityRightWorldX / gp.tileSize;
@@ -119,47 +119,47 @@ public record CollisionChecker(GamePanel gp) {
 
                 Entity target = targets[gp.currentMap][i];
 
-                entity.hitbox.x = entity.getWorldX() + entity.hitbox.x;
-                entity.hitbox.y = entity.getWorldY() + entity.hitbox.y;
+                entity.getHitbox().x = entity.getWorldX() + entity.getHitbox().x;
+                entity.getHitbox().y = entity.getWorldY() + entity.getHitbox().y;
                 
-                target.hitbox.x = target.getWorldX() + target.hitbox.x;
-                target.hitbox.y = target.getWorldY() + target.hitbox.y;
+                target.getHitbox().x = target.getWorldX() + target.getHitbox().x;
+                target.getHitbox().y = target.getWorldY() + target.getHitbox().y;
 
                 switch (entity.getMoveDirection()) {
-                    case UP -> entity.hitbox.y -= entity.getSpeed();
+                    case UP -> entity.getHitbox().y -= entity.getSpeed();
                     case UPLEFT -> {
-                        entity.hitbox.y -= entity.getSpeed();
-                        entity.hitbox.x -= entity.getSpeed();
+                        entity.getHitbox().y -= entity.getSpeed();
+                        entity.getHitbox().x -= entity.getSpeed();
                     }
                     case UPRIGHT -> {
-                        entity.hitbox.y -= entity.getSpeed();
-                        entity.hitbox.x += entity.getSpeed();
+                        entity.getHitbox().y -= entity.getSpeed();
+                        entity.getHitbox().x += entity.getSpeed();
                     }
-                    case DOWN -> entity.hitbox.y += entity.getSpeed();
+                    case DOWN -> entity.getHitbox().y += entity.getSpeed();
                     case DOWNLEFT -> {
-                        entity.hitbox.y += entity.getSpeed();
-                        entity.hitbox.x -= entity.getSpeed();
+                        entity.getHitbox().y += entity.getSpeed();
+                        entity.getHitbox().x -= entity.getSpeed();
                     }
                     case DOWNRIGHT -> {
-                        entity.hitbox.y += entity.getSpeed();
-                        entity.hitbox.x += entity.getSpeed();
+                        entity.getHitbox().y += entity.getSpeed();
+                        entity.getHitbox().x += entity.getSpeed();
                     }
-                    case LEFT -> entity.hitbox.x -= entity.getSpeed();
-                    case RIGHT -> entity.hitbox.x += entity.getSpeed();
+                    case LEFT -> entity.getHitbox().x -= entity.getSpeed();
+                    case RIGHT -> entity.getHitbox().x += entity.getSpeed();
                 }
 
-                if (entity.hitbox.intersects(target.hitbox)) {
+                if (entity.getHitbox().intersects(target.getHitbox())) {
                     entity.collisionOn = true;
                     entityIndex = i;
                 }
 
                 // Reset entity solid area
-                entity.hitbox.x = entity.hitboxDefaultX;
-                entity.hitbox.y = entity.hitboxDefaultY;
+                entity.getHitbox().x = entity.getHitboxDefaultX();
+                entity.getHitbox().y = entity.getHitboxDefaultY();
 
                 // Reset object solid area
-                target.hitbox.x = target.hitboxDefaultX;
-                target.hitbox.y = target.hitboxDefaultY;
+                target.getHitbox().x = target.getHitboxDefaultX();
+                target.getHitbox().y = target.getHitboxDefaultY();
             }
         }
 
@@ -175,35 +175,35 @@ public record CollisionChecker(GamePanel gp) {
 
         boolean contactedPlayer = false;
 
-        entity.hitbox.x = entity.getWorldX() + entity.hitbox.x;
-        entity.hitbox.y = entity.getWorldY() + entity.hitbox.y;
+        entity.getHitbox().x = entity.getWorldX() + entity.getHitbox().x;
+        entity.getHitbox().y = entity.getWorldY() + entity.getHitbox().y;
 
-        gp.player.hitbox.x = gp.player.getWorldX() + gp.player.hitbox.x;
-        gp.player.hitbox.y = gp.player.getWorldY() + gp.player.hitbox.y;
+        gp.player.getHitbox().x = gp.player.getWorldX() + gp.player.getHitbox().x;
+        gp.player.getHitbox().y = gp.player.getWorldY() + gp.player.getHitbox().y;
 
         switch (entity.getDirection()) {
-            case UP -> entity.hitbox.y -= entity.getSpeed();
-            case DOWN -> entity.hitbox.y += entity.getSpeed();
-            case LEFT -> entity.hitbox.x -= entity.getSpeed();
-            case RIGHT -> entity.hitbox.x += entity.getSpeed();
+            case UP -> entity.getHitbox().y -= entity.getSpeed();
+            case DOWN -> entity.getHitbox().y += entity.getSpeed();
+            case LEFT -> entity.getHitbox().x -= entity.getSpeed();
+            case RIGHT -> entity.getHitbox().x += entity.getSpeed();
             default -> {
                 entity.collisionOn = true;
                 return false;
             }
         }
 
-        if (entity.hitbox.intersects(gp.player.hitbox)) {
+        if (entity.getHitbox().intersects(gp.player.getHitbox())) {
             entity.collisionOn = true;
             contactedPlayer = true;
         }
 
         // Reset entity solid area
-        entity.hitbox.x = entity.hitboxDefaultX;
-        entity.hitbox.y = entity.hitboxDefaultY;
+        entity.getHitbox().x = entity.getHitboxDefaultX();
+        entity.getHitbox().y = entity.getHitboxDefaultY();
 
         // Reset player solid area
-        gp.player.hitbox.x = gp.player.hitboxDefaultX;
-        gp.player.hitbox.y = gp.player.hitboxDefaultY;
+        gp.player.getHitbox().x = gp.player.getHitboxDefaultX();
+        gp.player.getHitbox().y = gp.player.getHitboxDefaultY();
 
         return contactedPlayer;
     }

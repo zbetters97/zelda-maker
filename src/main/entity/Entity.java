@@ -79,7 +79,6 @@ public class Entity {
 
     /** RPG VALUES */
     protected String name;
-    protected int type;
     public boolean alive = true;
     public int health;
     public int maxHealth;
@@ -105,9 +104,9 @@ public class Entity {
     /** COLLISION VALUES */
     public boolean collisionOn = true;
     protected boolean canMove = true;
-    public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
-    public int hitboxDefaultX;
-    public int hitboxDefaultY;
+    protected Rectangle hitbox = new Rectangle(0, 0, 48, 48);
+    protected int hitboxDefaultX;
+    protected int hitboxDefaultY;
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
 
@@ -705,9 +704,9 @@ public class Entity {
         // Damage same as player attack value
         int damage = attack;
 
-        // Keep damage above 0
+        // Keep damage at or above 0
         if (damage < 0) {
-            damage = 1;
+            damage = 0;
         }
 
         // Damage target
@@ -1044,5 +1043,15 @@ public class Entity {
     }
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public Rectangle getHitbox() {
+        return hitbox;
+    }
+    public int getHitboxDefaultX() {
+        return hitboxDefaultX;
+    }
+    public int getHitboxDefaultY() {
+        return hitboxDefaultY;
     }
 }

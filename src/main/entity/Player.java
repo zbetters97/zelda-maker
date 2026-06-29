@@ -193,6 +193,7 @@ public class Player extends Entity {
         setDefaultAnimationValues();
         setDefaultPosition();
 
+        attack = 2;
         arrows = 50;
         currentItem = new ITM_Hookshot(gp, this);
     }

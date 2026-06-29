@@ -12,7 +12,7 @@ public class PRJ_Arrow extends Projectile {
     public PRJ_Arrow(GamePanel gp) {
         super(gp);
 
-        type = type_projectile;
+        entity_type = type_projectile;
         name = prjName;
 
         defaultSpeed = 5;

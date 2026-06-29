@@ -352,14 +352,14 @@ public class UI {
         y += lineHeight;
         g2.drawString("WorldY: " + gp.player.getWorldY(), x, y);
         y += lineHeight;
-        g2.drawString("Column: " + (gp.player.getWorldX() + gp.player.hitbox.x) / gp.tileSize, x, y);
+        g2.drawString("Column: " + (gp.player.getWorldX() + gp.player.getHitbox().x) / gp.tileSize, x, y);
         y += lineHeight;
-        g2.drawString("Row: " + (gp.player.getWorldY() + gp.player.hitbox.y) / gp.tileSize, x, y);
+        g2.drawString("Row: " + (gp.player.getWorldY() + gp.player.getHitbox().y) / gp.tileSize, x, y);
 
         // Draw player hitbox
         g2.setColor(Color.RED);
-        g2.drawRect(gp.player.getScreenX() + gp.player.hitbox.x, gp.player.getScreenY() + gp.player.hitbox.y,
-                gp.player.hitbox.width, gp.player.hitbox.height);
+        g2.drawRect(gp.player.getScreenX() + gp.player.getHitbox().x, gp.player.getScreenY() + gp.player.getHitbox().y,
+                gp.player.getHitbox().width, gp.player.getHitbox().height);
     }
 
     /**

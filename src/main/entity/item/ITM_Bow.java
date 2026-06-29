@@ -11,7 +11,7 @@ public class ITM_Bow extends Entity {
     public ITM_Bow(GamePanel gp, Entity user) {
         super(gp);
 
-        type = type_item;
+        entity_type = type_item;
         name = itmName;
         this.user = user;
     }

@@ -14,7 +14,7 @@ public class PRJ_Boomerang extends Projectile {
     public PRJ_Boomerang(GamePanel gp) {
         super(gp);
 
-        type = type_projectile;
+        entity_type = type_projectile;
         name = prjName;
 
         speed = 8;

@@ -17,7 +17,7 @@ public class PRJ_Claw extends Projectile {
     public PRJ_Claw(GamePanel gp, Entity user) {
         super(gp);
 
-        type = type_projectile;
+        entity_type = type_projectile;
         name = prjName;
 
         speed = 10;

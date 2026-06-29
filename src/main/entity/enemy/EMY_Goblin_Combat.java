@@ -16,7 +16,7 @@ public class EMY_Goblin_Combat extends Entity {
         worldXStart = this.worldX;
         worldYStart = this.worldY;
 
-        type = type_enemy;
+        entity_type = type_enemy;
         name = emyName;
 
         maxHealth = 12;

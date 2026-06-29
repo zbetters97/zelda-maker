@@ -16,7 +16,7 @@ public class OBJ_I_Chest extends Entity {
         this.worldX = worldX * gp.tileSize;
         this.worldY = worldY * gp.tileSize;
 
-        type = type_object_i;
+        entity_type = type_object_i;
         name = objName;
 
         grabbable = true;
