@@ -41,7 +41,8 @@ public class EMY_Goblin_Combat extends Entity {
         getAttackImages();
     }
 
-    public void getImages() {
+    @Override
+    protected void getImages() {
         up1 = setupImage("/enemy/goblin_up_1");
         up2 = setupImage("/enemy/goblin_up_2");
         down1 = setupImage("/enemy/goblin_down_1");
@@ -51,7 +52,7 @@ public class EMY_Goblin_Combat extends Entity {
         right1 = setupImage("/enemy/goblin_right_1");
         right2 = setupImage("/enemy/goblin_right_2");
     }
-    public void getAttackImages() {
+    private void getAttackImages() {
         attackUp1 = setupImage("/enemy/goblin_attack_up_1", gp.tileSize, gp.tileSize * 2);
         attackUp2 = setupImage("/enemy/goblin_attack_up_2", gp.tileSize, gp.tileSize * 2);
         attackDown1 = setupImage("/enemy/goblin_attack_down_1", gp.tileSize, gp.tileSize * 2);
@@ -62,6 +63,7 @@ public class EMY_Goblin_Combat extends Entity {
         attackRight2 = setupImage("/enemy/goblin_attack_right_2", gp.tileSize * 2, gp.tileSize);
     }
 
+    @Override
     public void update() {
         if (knockback) {
             handleKnockback();
@@ -81,6 +83,7 @@ public class EMY_Goblin_Combat extends Entity {
         manageValues();
     }
 
+    @Override
     public void setAction() {
 
         if (onPath) {
@@ -112,6 +115,7 @@ public class EMY_Goblin_Combat extends Entity {
         }
     }
 
+    @Override
     protected void reactToDamage() {
         resetValues();
     }

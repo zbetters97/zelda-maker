@@ -32,6 +32,7 @@ public class PRJ_Arrow extends Projectile {
         hitboxDefaultHeight = hitbox.height;
     }
 
+    @Override
     public void getImages() {
         up1 = up2 = setupImage("/projectiles/arrow_up_1", 35, 35);
         down1 = down2 = setupImage("/projectiles/arrow_down_1", 35, 35);
@@ -39,6 +40,7 @@ public class PRJ_Arrow extends Projectile {
         right1 = right2 = setupImage("/projectiles/arrow_right_1", 35, 35);
     }
 
+    @Override
     public void update() {
         collisionOn = false;
 
@@ -64,12 +66,12 @@ public class PRJ_Arrow extends Projectile {
         checkDeath();
     }
 
+    @Override
     protected void checkCollision() {
         gp.cChecker.checkTile(this);
         gp.cChecker.checkEntity(this, gp.npc);
     }
-
-    protected void checkEnemyCollision() {
+    private void checkEnemyCollision() {
 
         Entity enemy = getEnemy(this);
         if (enemy != null && enemy != user) {
@@ -85,7 +87,6 @@ public class PRJ_Arrow extends Projectile {
             }
         }
     }
-
     private void checkPlayerCollision() {
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
@@ -95,12 +96,14 @@ public class PRJ_Arrow extends Projectile {
         }
     }
 
+    @Override
     protected void checkDeath() {
         if (health <= 0 || !alive) {
             resetValues();
         }
     }
 
+    @Override
     public void resetValues() {
         alive = false;
         attack = defaultAttack;

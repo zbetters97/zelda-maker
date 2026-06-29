@@ -148,7 +148,10 @@ public record CollisionChecker(GamePanel gp) {
                     case RIGHT -> entity.getHitbox().x += entity.getSpeed();
                 }
 
-                if (entity.getHitbox().intersects(target.getHitbox())) {
+                boolean intersects = entity.getHitbox().intersects(target.getHitbox());
+                boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
+
+                if (intersects && canCollide) {
                     entity.collisionOn = true;
                     entityIndex = i;
                 }
@@ -194,7 +197,9 @@ public record CollisionChecker(GamePanel gp) {
 
         if (entity.getHitbox().intersects(gp.player.getHitbox())) {
             entity.collisionOn = true;
-            contactedPlayer = true;
+
+            // Player and self are on same elevation, player contacted
+            contactedPlayer = entity.isOnSameElevation(gp.player);
         }
 
         // Reset entity solid area

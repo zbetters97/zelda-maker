@@ -18,11 +18,13 @@ public class ITM_Hookshot extends Entity {
         projectile = new PRJ_Claw(gp, user);
     }
 
-    public void getImages() {
+    @Override
+    protected void getImages() {
         image = down1 = setupImage("/items/itm_hookshot");
     }
 
-    public void use() {
+    @Override
+    protected void use() {
 
         if (!projectile.alive) {
             projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);

@@ -29,11 +29,13 @@ public class OBJ_I_Chest extends Entity {
         hitboxDefaultHeight = hitbox.height;
     }
 
-    public void getImages() {
+    @Override
+    protected void getImages() {
         up1 = setupImage("/objects_interactive/obj_chest_closed");
         up2 = setupImage("/objects_interactive/obj_chest_opened");
     }
 
+    @Override
     protected void interact(Entity user) {
         if (opened) {
             return;
@@ -44,6 +46,7 @@ public class OBJ_I_Chest extends Entity {
         }
     }
 
+    @Override
     protected void getSpriteImage() {
         if (opened) {
             image = up2;

@@ -47,11 +47,13 @@ public class EMY_Keese extends Entity {
      * Fetches sprites
      * Called by constructor in Entity parent class
      */
+    @Override
     protected void getImages() {
         up1 = down1 = left1 = right1 = setupImage("/enemy/keese_down_1");
         up2 = down2 = left2 = right2 = setupImage("/enemy/keese_down_2");
     }
 
+    @Override
     public void update() {
         // No action if in knockback state
         if (knockback) {
@@ -70,7 +72,8 @@ public class EMY_Keese extends Entity {
      * Updates the actions the entity will take
      * Called by update() in Entity parent class
      */
-    public void setAction() {
+    @Override
+    protected void setAction() {
         setDirection(25);
     }
 }

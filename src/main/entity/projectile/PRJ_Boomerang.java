@@ -31,11 +31,13 @@ public class PRJ_Boomerang extends Projectile {
         hitboxDefaultHeight = hitbox.height;
     }
 
+    @Override
     public void getImages() {
         up1 = down1 = left1 = right1 = setupImage("/projectiles/boomerang_down_1");
         up2 = down2 = left2 = right2 = setupImage("/projectiles/boomerang_down_2");
     }
 
+    @Override
     public void update() {
 
         checkCollision();
@@ -52,6 +54,7 @@ public class PRJ_Boomerang extends Projectile {
         checkDeath();
     }
 
+    @Override
     protected void checkCollision() {
         collisionOn = false;
 
@@ -68,7 +71,6 @@ public class PRJ_Boomerang extends Projectile {
             returning = true;
         }
     }
-
 
     private void returnToUser() {
         switch (direction) {
@@ -107,6 +109,7 @@ public class PRJ_Boomerang extends Projectile {
         }
     }
 
+    @Override
     protected void cycleSprites() {
 
         spriteCounter++;
@@ -123,12 +126,14 @@ public class PRJ_Boomerang extends Projectile {
         }
     }
 
+    @Override
     protected void checkDeath() {
         if (!alive) {
             resetValues();
         }
     }
 
+    @Override
     public void resetValues() {
         returning = false;
         alive = false;

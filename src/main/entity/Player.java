@@ -2,10 +2,7 @@ package entity;
 
 import application.GamePanel;
 import application.GamePanel.Direction;
-import entity.item.ITM_Boomerang;
-import entity.item.ITM_Bow;
-import entity.item.ITM_Hookshot;
-import entity.item.ITM_Shovel;
+import entity.item.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -21,7 +18,9 @@ public class Player extends Entity {
     private int
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
-            aimNum = 1, aimCounter = 0, throwNum = 1, throwCounter = 0;
+            aimNum = 1, aimCounter = 0,
+            throwNum = 1, throwCounter = 0,
+            jumpNum = 1, jumpCounter = 0;
 
     /** SPRITE IMAGES */
     private BufferedImage
@@ -41,7 +40,12 @@ public class Player extends Entity {
             aimLeft1, aimLeft2, aimRight1, aimRight2,
     
             throwUp1, throwUp2, throwDown1, throwDown2,
-            throwLeft1, throwLeft2, throwRight1, throwRight2;
+            throwLeft1, throwLeft2, throwRight1, throwRight2,
+
+            jumpUp1, jumpUp2, jumpUp3, jumpDown1, jumpDown2, jumpDown3,
+            jumpLeft1, jumpLeft2, jumpLeft3, jumpRight1, jumpRight2, jumpRight3,
+
+            soarUp1, soarDown1, soarLeft1, soarRight1;
 
     /**
      * CONSTRUCTOR
@@ -78,6 +82,7 @@ public class Player extends Entity {
     }
 
     /** GET IMAGES */
+    @Override
     protected void getImages() {
         up1 = setupImage("/player/boy_up_1");
         up2 = setupImage("/player/boy_up_2");
@@ -97,6 +102,8 @@ public class Player extends Entity {
         getDigImages();
         getAimImages();
         getThrowImages();
+        getJumpImages();
+        getSoarImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -184,6 +191,26 @@ public class Player extends Entity {
         throwRight1 = setupImage("/player/boy_throw_right_1");
         throwRight2 = setupImage("/player/boy_throw_right_2");
     }
+    private void getJumpImages() {
+        jumpUp1 = setupImage("/player/boy_jump_up_1");
+        jumpUp2 = setupImage("/player/boy_jump_up_2");
+        jumpUp3 = setupImage("/player/boy_jump_up_3");
+        jumpDown1 = setupImage("/player/boy_jump_down_1");
+        jumpDown2 = setupImage("/player/boy_jump_down_2");
+        jumpDown3 = setupImage("/player/boy_jump_down_3");
+        jumpLeft1 = setupImage("/player/boy_jump_left_1");
+        jumpLeft2 = setupImage("/player/boy_jump_left_2");
+        jumpLeft3 = setupImage("/player/boy_jump_left_3");
+        jumpRight1 = setupImage("/player/boy_jump_right_1");
+        jumpRight2 = setupImage("/player/boy_jump_right_2");
+        jumpRight3 = setupImage("/player/boy_jump_right_3");
+    }
+    private void getSoarImages() {
+        soarUp1 = setupImage("/player/boy_jump_up_1");
+        soarDown1 = setupImage("/player/boy_soar_down_1");
+        soarLeft1 = setupImage("/player/boy_soar_left_1");
+        soarRight1 = setupImage("/player/boy_soar_right_1");
+    }
 
     /**
      * SET DEFAULT VALUES
@@ -195,7 +222,7 @@ public class Player extends Entity {
 
         attack = 2;
         arrows = 50;
-        currentItem = new ITM_Hookshot(gp, this);
+        currentItem = new ITM_Cape(gp, this);
     }
 
     /**
@@ -224,6 +251,7 @@ public class Player extends Entity {
      * Updates player character based on user inputs
      * Called by GamePanel every frame
      */
+    @Override
     public void update() {
 
         if (knockback) {
@@ -340,7 +368,7 @@ public class Player extends Entity {
         if (currentItem != null) {
             switch (currentItem.name) {
                 case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> currentItem.use();
-                case ITM_Bow.itmName -> {
+                case ITM_Bow.itmName, ITM_Feather.itmName, ITM_Cape.itmName -> {
                    lockonDirection = direction;
                    currentItem.use();
                 }
@@ -488,6 +516,7 @@ public class Player extends Entity {
             case DIGGING -> digging();
             case AIMING -> aiming();
             case THROWING -> throwing();
+            case JUMPING, SOARING -> jumping();
         }
     }
 
@@ -510,6 +539,7 @@ public class Player extends Entity {
      * Handles player movement logic
      * Called by handleMovementInput() when an arrow key is pressed
      */
+    @Override
     protected void updateDirection() {
        updateFacing();
 
@@ -573,6 +603,7 @@ public class Player extends Entity {
      * Checks if player has collided with anything
      * Called by move()
      */
+    @Override
     protected void checkCollision() {
         collisionOn = false;
 
@@ -600,6 +631,7 @@ public class Player extends Entity {
      * Handles logic for swinging sword
      * Called by updateAction() when action is ATTACKING
      */
+    @Override
     protected void attack() {
 
         // Increase spin charge if player holds B button
@@ -611,13 +643,13 @@ public class Player extends Entity {
         }
 
         attackCounter++;
-        if (swingSpeed1 >= attackCounter) {
+        if (attackCounter <= swingSpeed1) {
             attackNum = 1;
         }
-        else if (swingSpeed2 >= attackCounter) {
+        else if (attackCounter <= swingSpeed2) {
             attackNum = 2;
         }
-        else if (swingSpeed3 >= attackCounter) {
+        else if (attackCounter <= swingSpeed3) {
             attackNum = 3;
             adjustSwingHitbox();
         }
@@ -625,7 +657,7 @@ public class Player extends Entity {
             action = Action.IDLE;
 
             // Spin charge ready for spin attack
-            if (spinCharge > swingSpeed3 && gp.keyH.bPressed) {
+            if (swingSpeed3 < spinCharge && gp.keyH.bPressed) {
                 action = Action.SPINCHARGING;
                 lockonDirection = direction;
             }
@@ -691,7 +723,7 @@ public class Player extends Entity {
             speed = 2;
         }
         // Charge is ready, start spin and reset values
-        else if (charge >= 120) {
+        else if (120 <= charge) {
             updateSpinDirection();
 
             charge = 0;
@@ -828,16 +860,16 @@ public class Player extends Entity {
         speed = 5;
 
         spriteCounter++;
-        if (6 > spriteCounter) {
+        if (spriteCounter < 6) {
             spriteNum = 1;
         }
-        else if (10 > spriteCounter) {
+        else if (spriteCounter < 10) {
             spriteNum = 2;
         }
-        else if (15 > spriteCounter) {
+        else if (spriteCounter < 15) {
             spriteNum = 3;
         }
-        else if (20 > spriteCounter) {
+        else if (spriteCounter < 20) {
             spriteNum = 4;
         }
         else {
@@ -863,7 +895,8 @@ public class Player extends Entity {
 
             if (spriteCounter < 7) {
                 spriteNum = 1;
-            } else {
+            }
+            else {
                 spriteNum = 2;
             }
         }
@@ -883,13 +916,13 @@ public class Player extends Entity {
     private void digging() {
         digCounter++;
 
-        if (12 >= digCounter) {
+        if (digCounter <= 12) {
             digNum = 1;
         }
-        else if (24 > digCounter) {
+        else if (digCounter < 24 ) {
             digNum = 2;
         }
-        else if (digCounter > 24) {
+        else {
             digNum = 1;
             digCounter = 0;
             action = Action.IDLE;
@@ -908,18 +941,17 @@ public class Player extends Entity {
         if (moving) {
             aimCounter++;
 
-            if (aimCounter > 10) {
+            if (10 < aimCounter) {
                 aimNum++;
 
-                if (aimNum > 2) {
+                if (2 < aimNum) {
                     aimNum = 1;
                 }
 
                 aimCounter = 0;
             }
-        }
-        else {
-            if (6 >= charge) {
+        } else {
+            if (charge <= 6) {
                 aimNum = 1;
             }
             else {
@@ -945,16 +977,85 @@ public class Player extends Entity {
 
         throwCounter++;
 
-        if (6 >= throwCounter) {
+        if (throwCounter <= 6) {
             throwNum = 1;
         }
         else {
             throwNum = 2;
         }
 
-        if (throwCounter > 28 && action == Action.IDLE) {
+        if (28 < throwCounter && action == Action.IDLE) {
             throwNum = 1;
             throwCounter = 0;
+        }
+    }
+
+    /**
+     * JUMPING
+     * Runs jumping animation and logic
+     * Called by startAction() when player action is JUMPING
+     */
+    private void jumping() {
+
+        jumpCounter++;
+
+        if (jumpCounter <= 6) {
+            jumpNum = 1;
+        }
+        else if (12 <= jumpCounter && jumpCounter < 18) {
+            jumpNum = 2;
+        }
+        else if (jumpCounter < 27) {
+            jumpNum = 3;
+        }
+        else if (28 <= jumpCounter) {
+            if (action == Action.SOARING) {
+                jumpNum = 4;
+                soaring();
+            }
+            else {
+                jumpNum = 1;
+                jumpCounter = 0;
+                isElevated = false;
+                action = Action.IDLE;
+            }
+        }
+    }
+
+    /**
+     * SOARING
+     * Runs soaring animation and logic
+     * Called by jumping() after player jumps and is SOARING
+     */
+    private void soaring() {
+
+        if (jumpCounter < 60) {
+            soarInDirection();
+        }
+        else if (70 <= jumpCounter) {
+            jumpNum = 1;
+            jumpCounter = 0;
+            isElevated = false;
+            action = Action.IDLE;
+        }
+    }
+
+    /**
+     * SOAR IN DIRECTION
+     * Automatically moves the player forward if no collision
+     * Called by soaring() when jumpCounter < 60
+     */
+    private void soarInDirection() {
+
+        // Don't move if colliding with something
+        checkCollision();
+        if (collisionOn) return;
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> worldY--;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY++;
+            case LEFT -> worldX--;
+            case RIGHT -> worldX++;
         }
     }
 
@@ -963,6 +1064,7 @@ public class Player extends Entity {
      * Resets or reassigns player attributes
      * Called by update() at the end
      */
+    @Override
     protected void manageValues() {
 
         // Decrease cooldown if filled
@@ -988,6 +1090,7 @@ public class Player extends Entity {
      * Called by GamePanel every frame
      * @param g2 GamePanel
      */
+    @Override
     public void draw(Graphics2D g2) {
 
         offCenter();
@@ -995,6 +1098,11 @@ public class Player extends Entity {
 
         if (invincible) {
            playHurtAnimation(g2);
+        }
+
+        if (isElevated) {
+            g2.setColor(Color.BLACK);
+            g2.fillOval(tempScreenX + 10, tempScreenY + 70, 30, 10);
         }
 
         g2.drawImage(image, tempScreenX, tempScreenY, null);
@@ -1007,7 +1115,7 @@ public class Player extends Entity {
      * OFF CENTER
      * Adjusts X, Y if near edge
      */
-    protected void offCenter() {
+    private void offCenter() {
         tempScreenX = screenX;
         tempScreenY = screenY;
 
@@ -1036,6 +1144,7 @@ public class Player extends Entity {
     }
 
     /** GET CURRENT SPRITE TO DRAW */
+    @Override
     protected void getSpriteImage() {
         image = switch (action) {
             case IDLE -> getIdleSprite();
@@ -1046,6 +1155,7 @@ public class Player extends Entity {
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
             case THROWING -> getThrowSprite();
+            case JUMPING, SOARING -> getJumpSprite();
         };
     }
     private BufferedImage getIdleSprite() {
@@ -1316,15 +1426,46 @@ public class Player extends Entity {
 
         return throwSprite;
     }
+    private BufferedImage getJumpSprite() {
+        BufferedImage jumpSprite;
+
+        tempScreenY -= 30;
+
+        if (jumpNum == 1) {
+            jumpSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> jumpUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> jumpDown1;
+                case LEFT -> jumpLeft1;
+                case RIGHT -> jumpRight1;
+            };
+        }
+        else if (jumpNum == 2) {
+            jumpSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> jumpUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> jumpDown2;
+                case LEFT -> jumpLeft2;
+                case RIGHT -> jumpRight2;
+            };
+        } else if (jumpNum == 3) {
+            jumpSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> jumpUp3;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> jumpDown3;
+                case LEFT -> jumpLeft3;
+                case RIGHT -> jumpRight3;
+            };
+        } else {
+            jumpSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> soarUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> soarDown1;
+                case LEFT -> soarLeft1;
+                case RIGHT -> soarRight1;
+            };
+        }
+
+        return jumpSprite;        
+    }
 
     /** GETTERS */
-    public int getScreenX() {
-        return screenX;
-    }
-    public int getScreenY() {
-        return screenY;
-    }
-
     public Entity getLockedOnTarget() {
         return lockedOnTarget;
     }

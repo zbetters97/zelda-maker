@@ -18,11 +18,13 @@ public class ITM_Boomerang extends Entity {
         projectile = new PRJ_Boomerang(gp);
     }
 
-    public void getImages() {
+    @Override
+    protected void getImages() {
         image = down1 = setupImage("/items/itm_boomerang");
     }
 
-    public void use() {
+    @Override
+    protected void use() {
 
         if (!projectile.alive) {
             projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);

@@ -28,7 +28,9 @@ public class Entity {
         GUARDING(true, false, false),
         DIGGING(false, false, false),
         AIMING(true, true, true),
-        THROWING(false, false, false);
+        THROWING(false, false, false),
+        JUMPING(true, true, false),
+        SOARING(true, true, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
@@ -88,6 +90,7 @@ public class Entity {
     public boolean dying = false;
     private int dyingCounter = 0;
     protected boolean opened = false;
+    protected boolean isElevated = false;
 
     /** COMBAT VALUES */
     public int attack;
@@ -253,6 +256,10 @@ public class Entity {
         if (contactPlayer && canHurtPlayer) {
             damagePlayer(attack);
         }
+    }
+
+    public boolean canCollideWith(Entity target) {
+        return true;
     }
 
     /**
@@ -1024,6 +1031,14 @@ public class Entity {
         this.worldY = worldY;
     }
 
+    public int getType() {
+        return entity_type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public Direction getDirection() {
         return direction;
     }
@@ -1043,6 +1058,16 @@ public class Entity {
     }
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public boolean getElevated() {
+        return isElevated;
+    }
+    public void setElevated(boolean isElevated) {
+        this.isElevated = isElevated;
+    }
+    public boolean isOnSameElevation(Entity target) {
+        return target.getElevated() == isElevated;
     }
 
     public Rectangle getHitbox() {

@@ -16,10 +16,12 @@ public class ITM_Bow extends Entity {
         this.user = user;
     }
 
-    public void getImages() {
+    @Override
+    protected void getImages() {
         image = down1 = setupImage("/items/itm_bow");
     }
 
+    @Override
     protected void use() {
         if (user.arrows > 0) {
             if (120 > user.charge) {
@@ -30,6 +32,7 @@ public class ITM_Bow extends Entity {
         }
     }
 
+    @Override
     protected void attack() {
 
         projectile = new PRJ_Arrow(gp);

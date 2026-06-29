@@ -37,13 +37,14 @@ public class PRJ_Claw extends Projectile {
         getClawImages();
     }
 
+    @Override
     public void getImages() {
         up1 = up2 = setupImage("/projectiles/hookshot_up_1");
         down1 = down2 = setupImage("/projectiles/hookshot_down_1");
         left1 = left2 = setupImage("/projectiles/hookshot_left_1");
         right1 = right2 = setupImage("/projectiles/hookshot_right_1");
     }
-    public void getClawImages() {
+    private void getClawImages() {
         grabUp1 = setupImage("/projectiles/hookshot_grab_up_1");
         grabDown1 = setupImage("/projectiles/hookshot_grab_down_1");
         grabLeft1 = setupImage("/projectiles/hookshot_grab_left_1");
@@ -53,6 +54,7 @@ public class PRJ_Claw extends Projectile {
         chainVer = setupImage("/projectiles/chain_ver");
     }
 
+    @Override
     public void update() {
 
         // Max length reached or Entity hit
@@ -80,12 +82,13 @@ public class PRJ_Claw extends Projectile {
         checkDeath();
     }
 
+    @Override
     protected void checkCollision() {
         checkGrabbableCollision();
         checkObstacleCollision();
         checkLatchableCollision();
     }
-    protected void checkGrabbableCollision() {
+    private void checkGrabbableCollision() {
 
         Entity target = getEnemy(this);
 
@@ -94,7 +97,7 @@ public class PRJ_Claw extends Projectile {
             collisionOn = true;
         }
     }
-    protected void checkLatchableCollision() {
+    private void checkLatchableCollision() {
         int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
 
         if (iObject != -1) {
@@ -103,7 +106,7 @@ public class PRJ_Claw extends Projectile {
             health = 0;
         }
     }
-    protected void checkObstacleCollision() {
+    private void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
         gp.cChecker.checkEntity(this, gp.npc);
     }
@@ -111,9 +114,12 @@ public class PRJ_Claw extends Projectile {
     private void moveUser() {
 
         if (user.collisionOn) {
+            user.setElevated(false);
             alive = false;
             return;
         }
+
+        user.setElevated(true);
 
         int stopX = grabbedEntity.getWorldX() + gp.tileSize;
         int stopY = grabbedEntity.getWorldY() + gp.tileSize;
@@ -214,12 +220,14 @@ public class PRJ_Claw extends Projectile {
         }
     }
 
+    @Override
     protected void checkDeath() {
         if (!alive) {
             resetValues();
         }
     }
 
+    @Override
     public void resetValues() {
         alive = false;
         collisionOn = false;
@@ -262,6 +270,7 @@ public class PRJ_Claw extends Projectile {
         }
     }
 
+    @Override
     protected void getSpriteImage() {
         if (grabbedEntity != null) {
             image = switch (direction) {

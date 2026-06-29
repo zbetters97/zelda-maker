@@ -5,8 +5,6 @@ import entity.Entity;
 
 import java.awt.*;
 
-import static application.GamePanel.Direction.DOWN;
-
 public class NPC_OldMan extends Entity {
 
     public static final String npcName = "Old Man";
@@ -46,6 +44,7 @@ public class NPC_OldMan extends Entity {
      * Fetches sprites
      * Called by constructor in Entity parent class
      */
+    @Override
     protected void getImages() {
         up1 = setupImage("/npc/oldman_up_1");
         up2 = setupImage("/npc/oldman_up_2");
@@ -62,6 +61,7 @@ public class NPC_OldMan extends Entity {
      * Updates the actions the entity will take
      * Called by update() in Entity parent class
      */
+    @Override
     protected void setAction() {
         setDirection(60);
     }

@@ -27,4 +27,15 @@ public class Projectile extends Entity {
             case RIGHT -> worldX += speed;
         }
     }
+
+    @Override
+    public boolean canCollideWith(Entity target) {
+
+        // Ignore enemies on a different elevation
+        if (target.getType() == type_enemy || target == gp.player) {
+            return isOnSameElevation(target);
+        }
+
+        return true;
+    }
 }
