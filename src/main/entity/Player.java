@@ -12,6 +12,10 @@ import static application.GamePanel.Direction.*;
 
 public class Player extends Entity {
 
+    /* X/Y VALUES */
+    public int safeWorldX = 0;
+    public int safeWorldY = 0;
+
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
     private int coolDownCounter = 0;
@@ -20,7 +24,8 @@ public class Player extends Entity {
             digNum = 1, digCounter = 0,
             aimNum = 1, aimCounter = 0,
             throwNum = 1, throwCounter = 0,
-            jumpNum = 1, jumpCounter = 0;
+            jumpNum = 1, jumpCounter = 0,
+            fallNum = 1, fallCounter = 0;
 
     /** SPRITE IMAGES */
     private BufferedImage
@@ -45,7 +50,9 @@ public class Player extends Entity {
             jumpUp1, jumpUp2, jumpUp3, jumpDown1, jumpDown2, jumpDown3,
             jumpLeft1, jumpLeft2, jumpLeft3, jumpRight1, jumpRight2, jumpRight3,
 
-            soarUp1, soarDown1, soarLeft1, soarRight1;
+            soarUp1, soarDown1, soarLeft1, soarRight1,
+
+            fall1, fall2, fall3;
 
     /**
      * CONSTRUCTOR
@@ -104,6 +111,7 @@ public class Player extends Entity {
         getThrowImages();
         getJumpImages();
         getSoarImages();
+        getFallImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -211,6 +219,11 @@ public class Player extends Entity {
         soarLeft1 = setupImage("/player/boy_soar_left_1");
         soarRight1 = setupImage("/player/boy_soar_right_1");
     }
+    private void getFallImages() {
+        fall1 = setupImage("/player/boy_fall_1");
+        fall2 = setupImage("/player/boy_fall_2");
+        fall3 = setupImage("/player/boy_fall_3");
+    }
 
     /**
      * SET DEFAULT VALUES
@@ -241,6 +254,9 @@ public class Player extends Entity {
     private void setDefaultPosition() {
         worldX = gp.tileSize * 23;
         worldY = gp.tileSize * 21;
+
+        safeWorldX = worldX;
+        safeWorldY = worldY;
 
         gp.currentMap = 0;
         gp.currentArea = gp.outside;
@@ -366,6 +382,8 @@ public class Player extends Entity {
 
         // Item equipped
         if (currentItem != null) {
+
+
             switch (currentItem.name) {
                 case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> currentItem.use();
                 case ITM_Bow.itmName, ITM_Feather.itmName, ITM_Cape.itmName -> {
@@ -517,6 +535,7 @@ public class Player extends Entity {
             case AIMING -> aiming();
             case THROWING -> throwing();
             case JUMPING, SOARING -> jumping();
+            case FALLING -> falling();
         }
     }
 
@@ -596,6 +615,8 @@ public class Player extends Entity {
         checkCollision();
 
         super.move(newDirection);
+
+        gp.cChecker.checkHazard(this);
     }
 
     /**
@@ -1037,6 +1058,8 @@ public class Player extends Entity {
             jumpCounter = 0;
             isElevated = false;
             action = Action.IDLE;
+
+            gp.cChecker.checkHazard(this);
         }
     }
 
@@ -1057,6 +1080,34 @@ public class Player extends Entity {
             case LEFT -> worldX--;
             case RIGHT -> worldX++;
         }
+    }
+
+    private void falling() {
+
+        fallCounter++;
+
+        if (fallCounter <= 6) {
+            fallNum = 1;
+        }
+        else if (fallCounter < 18) {
+            fallNum = 2;
+        }
+        else if (fallCounter < 24) {
+            fallNum = 3;
+        }
+        else if (fallCounter < 60) {
+            fallNum = 4;
+        }
+        else if (80 <= fallCounter) {
+            fallNum = 1;
+            fallCounter = 0;
+            health -= 2;
+            action = Action.IDLE;
+
+            worldX = safeWorldX;
+            worldY = safeWorldY;
+        }
+
     }
 
     /**
@@ -1156,6 +1207,7 @@ public class Player extends Entity {
             case AIMING -> getAimSprite();
             case THROWING -> getThrowSprite();
             case JUMPING, SOARING -> getJumpSprite();
+            case FALLING -> getFallSprite();
         };
     }
     private BufferedImage getIdleSprite() {
@@ -1463,6 +1515,24 @@ public class Player extends Entity {
         }
 
         return jumpSprite;        
+    }
+    private BufferedImage getFallSprite() {
+        BufferedImage fallSprite;
+
+        if (fallNum == 1) {
+            fallSprite = fall1;
+        }
+        else if (fallNum == 2) {
+            fallSprite = fall2;
+        }
+        else if (fallNum == 3) {
+            fallSprite = fall3;
+        }
+        else {
+            fallSprite = null;
+        }
+
+        return fallSprite;
     }
 
     /** GETTERS */

@@ -1,6 +1,9 @@
 package application;
 
 import entity.Entity;
+import tile.Tile;
+
+import static entity.Entity.Action.FALLING;
 
 public record CollisionChecker(GamePanel gp) {
 
@@ -11,11 +14,11 @@ public record CollisionChecker(GamePanel gp) {
      */
     public void checkTile(Entity entity) {
 
-        // Collision box (left side, right side, top, bottom)
-        int entityLeftWorldX = entity.getWorldX() + entity.getHitbox().x;
-        int entityRightWorldX = entity.getWorldX() + entity.getHitbox().x + entity.getHitbox().width;
+        // Collision box (top, bottom, left, right)
         int entityTopWorldY = entity.getWorldY() + entity.getHitbox().y;
-        int entityBottomWorldY = entity.getWorldY() + entity.getHitbox().y + entity.getHitbox().height;
+        int entityBottomWorldY = entity.getWorldY() + entity.getHitbox().y + entity.getHitbox().height - 1;
+        int entityLeftWorldX = entity.getWorldX() + entity.getHitbox().x;
+        int entityRightWorldX = entity.getWorldX() + entity.getHitbox().x + entity.getHitbox().width - 1;
 
         int entityLeftCol = entityLeftWorldX / gp.tileSize;
         int entityRightCol = entityRightWorldX / gp.tileSize;
@@ -27,80 +30,141 @@ public record CollisionChecker(GamePanel gp) {
             return;
         }
 
-        // Detect the two tiles player is interacting with
-        int tileNum1, tileNum2;
+        int dx = 0;
+        int dy = 0;
 
-        // Find tile player will interact with, factoring in speed
         switch (entity.getMoveDirection()) {
-            case UP -> {
-                entityTopRow = (entityTopWorldY - entity.getSpeed()) / gp.tileSize;
-
-                // Tiles at top-left and top-right
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow];
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow];
-            }
+            case UP -> dy -= entity.getSpeed();
             case UPLEFT -> {
-                // Tiles at top-left and left-top
-                entityTopRow = (entityTopWorldY - entity.getSpeed()) / gp.tileSize;
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow];
-
-                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / gp.tileSize;
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow];
+                dx -= entity.getSpeed();
+                dy -= entity.getSpeed();
             }
             case UPRIGHT -> {
-                // Tiles at top-right and right-top
-                entityTopRow = (entityTopWorldY - entity.getSpeed()) / gp.tileSize;
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow];
-
-                entityRightCol = (entityRightWorldX + entity.getSpeed()) / gp.tileSize;
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow];
+                dx = entity.getSpeed();
+                dy -= entity.getSpeed();
             }
-            case DOWN -> {
-                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / gp.tileSize;
-
-                // Tiles at bottom-left and bottom-right
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow];
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow];
-            }
+            case DOWN -> dy = entity.getSpeed();
             case DOWNLEFT -> {
-
-                // Tiles at bottom-left and left-bottom
-                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / gp.tileSize;
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow];
-
-                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / gp.tileSize;
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow];
+                dx -= entity.getSpeed();
+                dy = entity.getSpeed();
             }
             case DOWNRIGHT -> {
-                // Tiles at bottom-right and right-bottom
-                entityBottomRow = (entityBottomWorldY + entity.getSpeed()) / gp.tileSize;
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow];
+                dx = entity.getSpeed();
+                dy = entity.getSpeed();
+            }
+            case LEFT -> dx -= entity.getSpeed();
+            case RIGHT -> dx = entity.getSpeed();
+        }
 
-                entityRightCol = (entityRightWorldX + entity.getSpeed()) / gp.tileSize;
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow];
+        int leftCol = (entityLeftWorldX + dx) / gp.tileSize;
+        int rightCol = (entityRightWorldX + dx) / gp.tileSize;
+        int topRow = (entityTopWorldY + dy) / gp.tileSize;
+        int bottomRow = (entityBottomWorldY + dy) / gp.tileSize;
+
+        // Detect the two tiles player is interacting with
+        Tile tile1 = null, tile2 = null;
+
+        switch (entity.getMoveDirection()) {
+            case UP -> {
+                tile1 = getTileAtColRow(leftCol, topRow);
+                tile2 = getTileAtColRow(rightCol, topRow);
+            }
+            case UPLEFT -> {
+                tile1 = getTileAtColRow(entityLeftCol, topRow);
+                tile2 = getTileAtColRow(leftCol, topRow);
+            }
+            case UPRIGHT -> {
+                tile1 = getTileAtColRow(entityRightCol, topRow);
+                tile2 = getTileAtColRow(rightCol, topRow);
+            }
+            case DOWN -> {
+                tile1 = getTileAtColRow(leftCol, bottomRow);
+                tile2 = getTileAtColRow(rightCol, bottomRow);
+            }
+            case DOWNLEFT -> {
+                tile1 = getTileAtColRow(entityLeftCol, bottomRow);
+                tile2 = getTileAtColRow(leftCol, bottomRow);
+            }
+            case DOWNRIGHT -> {
+                tile1 = getTileAtColRow(entityRightCol, bottomRow);
+                tile2 = getTileAtColRow(rightCol, bottomRow);
             }
             case LEFT -> {
-                entityLeftCol = (entityLeftWorldX - entity.getSpeed()) / gp.tileSize;
-
-                // Tiles at left-top and left-bottom
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityTopRow];
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityLeftCol][entityBottomRow];
+                tile1 = getTileAtColRow(leftCol, topRow);
+                tile2 = getTileAtColRow(leftCol, bottomRow);
             }
             case RIGHT -> {
-                entityRightCol = (entityRightWorldX + entity.getSpeed()) / gp.tileSize;
-
-                // Tiles at right-top and right-bottom
-                tileNum1 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityTopRow];
-                tileNum2 = gp.tileM.mapTileNum[gp.currentMap][entityRightCol][entityBottomRow];
-            }
-            default -> {
-                entity.collisionOn = true;
-                return;
+                tile1 = getTileAtColRow(rightCol, topRow);
+                tile2 = getTileAtColRow(rightCol, bottomRow);
             }
         }
 
-        if (gp.tileM.tiles[tileNum1].hasCollision || gp.tileM.tiles[tileNum2].hasCollision) {
-            entity.collisionOn = true;
+        checkTileCollision(entity, tile1, tile2);
+    }
+    private Tile getTileAtColRow(int col, int row) {
+        return gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
+    }
+    private void checkTileCollision(Entity entity, Tile tile1, Tile tile2) {
+        // Bottomless pits
+        if (tile1.isPit || tile2.isPit) {
+
+            // Entity in air
+            if (entity.getElevated()) {
+                return;
+            }
+
+            // NPCs and enemies
+            if (entity.getType() == entity.type_npc || entity.getType() == entity.type_enemy) {
+                entity.setCollision(true);
+            }
+        }
+        // Collision titles
+        else if (tile1.hasCollision || tile2.hasCollision) {
+            entity.setCollision(true);
+        }
+    }
+
+    public void checkHazard(Entity entity) {
+        Tile tile = getCurrentTile(entity);
+
+        if (tile.isPit) {
+            handlePit(entity);
+        }
+        // Player is on ground, save safe X/Y
+        else if (entity == gp.player && !gp.player.getElevated()) {
+
+            // Get current X/Y based on hitbox center
+            int centerX = gp.player.getWorldX() + gp.player.getHitbox().x + gp.player.getHitbox().width / 2;
+            int centerY = gp.player.getWorldY() + gp.player.getHitbox().y + gp.player.getHitbox().height / 2;
+
+            // Snap to tile size
+            int safeX = (centerX / gp.tileSize) * gp.tileSize;
+            int safeY = (centerY / gp.tileSize) * gp.tileSize;
+
+            // Store restore point
+            gp.player.safeWorldX = safeX;
+            gp.player.safeWorldY = safeY;
+        }
+    }
+    private Tile getCurrentTile(Entity entity) {
+        int centerX = entity.getWorldX() + entity.getHitbox().x + entity.getHitbox().width / 2;
+        int centerY = entity.getWorldY() + entity.getHitbox().y + entity.getHitbox().height / 2;
+
+        int col = centerX / gp.tileSize;
+        int row = centerY / gp.tileSize;
+
+        return getTileAtColRow(col, row);
+    }
+    private void handlePit(Entity entity) {
+        if (entity.getElevated()) {
+            return;
+        }
+
+        if (entity == gp.player) {
+            gp.player.setAction(FALLING);
+        }
+        else {
+            entity.alive = false;
         }
     }
 
@@ -152,7 +216,7 @@ public record CollisionChecker(GamePanel gp) {
                 boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
 
                 if (intersects && canCollide) {
-                    entity.collisionOn = true;
+                    entity.setCollision(true);
                     entityIndex = i;
                 }
 
@@ -190,13 +254,13 @@ public record CollisionChecker(GamePanel gp) {
             case LEFT -> entity.getHitbox().x -= entity.getSpeed();
             case RIGHT -> entity.getHitbox().x += entity.getSpeed();
             default -> {
-                entity.collisionOn = true;
+                entity.setCollision(true);
                 return false;
             }
         }
 
         if (entity.getHitbox().intersects(gp.player.getHitbox())) {
-            entity.collisionOn = true;
+            entity.setCollision(true);
 
             // Player and self are on same elevation, player contacted
             contactedPlayer = entity.isOnSameElevation(gp.player);

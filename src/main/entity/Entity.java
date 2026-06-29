@@ -30,7 +30,8 @@ public class Entity {
         AIMING(true, true, true),
         THROWING(false, false, false),
         JUMPING(true, true, false),
-        SOARING(true, true, false);
+        SOARING(true, true, false),
+        FALLING(false, false, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
@@ -105,7 +106,7 @@ public class Entity {
     protected int knockbackCounter = 0;
 
     /** COLLISION VALUES */
-    public boolean collisionOn = true;
+    protected boolean collisionOn = true;
     protected boolean canMove = true;
     protected Rectangle hitbox = new Rectangle(0, 0, 48, 48);
     protected int hitboxDefaultX;
@@ -132,10 +133,10 @@ public class Entity {
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
 
     /** ENTITY TYPES */
-    protected int entity_type;
-    protected final int type_npc = 0;
-    protected final int type_enemy = 1;
-    protected final int type_item = 2;
+    protected int entity_type = -1;
+    public final int type_npc = 0;
+    public final int type_enemy = 1;
+    public final int type_item = 2;
 
     /** OBJECT TYPES */
     public final int type_object_i = 3;
@@ -1044,6 +1045,13 @@ public class Entity {
     }
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public boolean getCollision() {
+        return collisionOn;
+    }
+    public void setCollision(boolean collisionOn) {
+        this.collisionOn = collisionOn;
     }
 
     public Action getAction() {
