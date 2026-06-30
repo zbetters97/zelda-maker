@@ -3,14 +3,14 @@ package application;
 import entity.enemy.EMY_Goblin_Combat;
 import entity.enemy.EMY_Keese;
 import entity.npc.NPC_OldMan;
-import entity.object_interactive.OBJ_I_Chest;
+import entity.object.OBJ_Chest;
 
 public record AssetSetter(GamePanel gp) {
 
     public void setup() {
         setNPCs();
         setEnemies();
-        setIObjects();
+        setObjects();
     }
 
     private void setNPCs() {
@@ -31,10 +31,10 @@ public record AssetSetter(GamePanel gp) {
         gp.enemy[mapNum][i] = new EMY_Goblin_Combat(gp, 26, 22);
     }
 
-    private void setIObjects() {
+    private void setObjects() {
         int mapNum = 0;
         int i = 0;
 
-        gp.obj_i[mapNum][i] = new OBJ_I_Chest(gp, 15, 21);
+        gp.obj[mapNum][i] = new OBJ_Chest(gp, 15, 21);
     }
 }

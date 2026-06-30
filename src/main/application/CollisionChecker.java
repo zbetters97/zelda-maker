@@ -3,8 +3,9 @@ package application;
 import entity.Entity;
 import tile.Tile;
 
-import static entity.Entity.Action.DROWNING;
-import static entity.Entity.Action.FALLING;
+import java.awt.*;
+
+import static entity.Entity.Action.*;
 
 public record CollisionChecker(GamePanel gp) {
 
@@ -211,54 +212,55 @@ public record CollisionChecker(GamePanel gp) {
         int entityIndex = -1;
 
         for (int i = 0; i < targets[gp.currentMap].length; i++) {
-            if (targets[gp.currentMap][i] != null && targets[gp.currentMap][i] != entity) {
 
-                Entity target = targets[gp.currentMap][i];
+            Entity target = targets[gp.currentMap][i];
 
-                entity.getHitbox().x = entity.getWorldX() + entity.getHitbox().x;
-                entity.getHitbox().y = entity.getWorldY() + entity.getHitbox().y;
-                
-                target.getHitbox().x = target.getWorldX() + target.getHitbox().x;
-                target.getHitbox().y = target.getWorldY() + target.getHitbox().y;
+            if (target == null || target == entity) {
+                continue;
+            }
 
-                switch (entity.getMoveDirection()) {
-                    case UP -> entity.getHitbox().y -= entity.getSpeed();
-                    case UPLEFT -> {
-                        entity.getHitbox().y -= entity.getSpeed();
-                        entity.getHitbox().x -= entity.getSpeed();
-                    }
-                    case UPRIGHT -> {
-                        entity.getHitbox().y -= entity.getSpeed();
-                        entity.getHitbox().x += entity.getSpeed();
-                    }
-                    case DOWN -> entity.getHitbox().y += entity.getSpeed();
-                    case DOWNLEFT -> {
-                        entity.getHitbox().y += entity.getSpeed();
-                        entity.getHitbox().x -= entity.getSpeed();
-                    }
-                    case DOWNRIGHT -> {
-                        entity.getHitbox().y += entity.getSpeed();
-                        entity.getHitbox().x += entity.getSpeed();
-                    }
-                    case LEFT -> entity.getHitbox().x -= entity.getSpeed();
-                    case RIGHT -> entity.getHitbox().x += entity.getSpeed();
+            // Current position of entity
+            Rectangle currentRect = new Rectangle(entity.getHitbox());
+            currentRect.x = entity.getWorldX() + entity.getHitboxDefaultX();
+            currentRect.y = entity.getWorldY() + entity.getHitboxDefaultY();
+
+            // Future position of entity
+            Rectangle futureRect = new Rectangle(currentRect);
+            switch (entity.getMoveDirection()) {
+                case UP -> futureRect.y -= entity.getSpeed();
+                case UPLEFT -> {
+                    futureRect.x -= entity.getSpeed();
+                    futureRect.y -= entity.getSpeed();
                 }
-
-                boolean intersects = entity.getHitbox().intersects(target.getHitbox());
-                boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
-
-                if (intersects && canCollide) {
-                    entity.setCollision(true);
-                    entityIndex = i;
+                case UPRIGHT -> {
+                    futureRect.x += entity.getSpeed();
+                    futureRect.y -= entity.getSpeed();
                 }
+                case DOWN -> futureRect.y += entity.getSpeed();
+                case DOWNLEFT -> {
+                    futureRect.x -= entity.getSpeed();
+                    futureRect.y += entity.getSpeed();
+                }
+                case DOWNRIGHT -> {
+                    futureRect.x += entity.getSpeed();
+                    futureRect.y += entity.getSpeed();
+                }
+                case LEFT -> futureRect.x -= entity.getSpeed();
+                case RIGHT -> futureRect.x += entity.getSpeed();
+            }
 
-                // Reset entity solid area
-                entity.getHitbox().x = entity.getHitboxDefaultX();
-                entity.getHitbox().y = entity.getHitboxDefaultY();
+            // Target rectangle
+            Rectangle targetRect = new Rectangle(target.getHitbox());
+            targetRect.x = target.getWorldX() + target.getHitboxDefaultX();
+            targetRect.y = target.getWorldY() + target.getHitboxDefaultY();
 
-                // Reset object solid area
-                target.getHitbox().x = target.getHitboxDefaultX();
-                target.getHitbox().y = target.getHitboxDefaultY();
+            boolean notIntersecting = !currentRect.intersects(targetRect);
+            boolean willIntersect = futureRect.intersects(targetRect);
+            boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
+
+            if (notIntersecting && willIntersect && canCollide) {
+                entity.setCollision(true);
+                entityIndex = i;
             }
         }
 
@@ -271,6 +273,10 @@ public record CollisionChecker(GamePanel gp) {
      * @param entity Entity to check collision for
      */
     public boolean checkPlayer(Entity entity) {
+
+        if (gp.player.getAction() == FALLING || gp.player.getAction() == DROWNING) {
+            return false;
+        }
 
         boolean contactedPlayer = false;
 

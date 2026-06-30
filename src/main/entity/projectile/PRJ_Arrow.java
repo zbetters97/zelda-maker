@@ -91,7 +91,7 @@ public class PRJ_Arrow extends Projectile {
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
         if (contactPlayer) {
-            damagePlayer(attack);
+            damagePlayer(this);
             alive = false;
         }
     }

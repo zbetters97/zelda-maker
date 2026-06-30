@@ -24,16 +24,16 @@ public class GamePanel extends JPanel implements Runnable {
         RIGHT
     }
 
-    /* GENERAL CONFIG */
+    /** GENERAL CONFIG */
     private Graphics2D g2;
     private Thread gameThread;
     public static UtilityTool utility = new UtilityTool();
 
-    /* CONTROLS / SOUND / UI */
+    /** CONTROLS / SOUND / UI */
     public KeyHandler keyH = new KeyHandler();
     public UI ui = new UI(this);
 
-    /* SCREEN SETTINGS */
+    /** SCREEN SETTINGS */
     private final int originalTileSize = 16; // 16x16 tile
     private final int scale = 3; // scale rate to accommodate for large screen
     public final int tileSize = originalTileSize * scale; // scaled tile (16*3 = 48px)
@@ -42,43 +42,43 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenWidth = tileSize * maxScreenCol; // screen width (in tiles) 768px
     public final int screenHeight = tileSize * maxScreenRow;
 
-    /* WORLD SIZE */
+    /** WORLD SIZE */
     public int maxWorldCol = 100;
     public int maxWorldRow = 100;
     public int worldWidth = tileSize * maxWorldCol;
     public int worldHeight  = tileSize * maxWorldRow;
 
-    /* MAPS */
+    /** MAPS */
     public final String[] mapFiles = {"map_world.txt"};
     public final int maxMap = mapFiles.length;
     public int currentMap = 0;
 
-    /* FULL SCREEN SETTINGS */
+    /** FULL SCREEN SETTINGS */
     public boolean fullScreenOn = false;
     private int screenWidth2 = screenWidth;
     private int screenHeight2 = screenHeight;
     private BufferedImage tempScreen;
 
-    /* GAME STATES */
+    /** GAME STATES */
     public int gameState;
     public final int titleState = 0;
 
-    /* AREA STATES */
+    /** AREA STATES */
     public int currentArea;
     public final int outside = 1;
 
-    /* HANDLERS */
+    /** HANDLERS */
     public TileManager tileM = new TileManager(this);
     public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
 
-    /* ENTITIES */
+    /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
     public final Entity[][] npc = new Entity[maxMap][10];
     public final Entity[][] enemy = new Entity[maxMap][10];
-    public final Entity[][] obj_i = new Entity[maxMap][10];
+    public final Entity[][] obj = new Entity[maxMap][10];
     public final Entity[][] projectile = new Entity[maxMap][10];
 
     /**
@@ -194,7 +194,7 @@ public class GamePanel extends JPanel implements Runnable {
         player.update();
         updateNPCs();
         updateEnemies();
-        updateIObjects();
+        updateObjects();
         updateProjectiles();
     }
 
@@ -220,12 +220,12 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
-    private void updateIObjects() {
-        for (int i = 0; i < obj_i[0].length; i++) {
-            if (obj_i[currentMap][i] != null) {
-                obj_i[currentMap][i].update();
-                if (!obj_i[currentMap][i].alive) {
-                    obj_i[currentMap][i] = null;
+    private void updateObjects() {
+        for (int i = 0; i < obj[0].length; i++) {
+            if (obj[currentMap][i] != null) {
+                obj[currentMap][i].update();
+                if (!obj[currentMap][i].alive) {
+                    obj[currentMap][i] = null;
                 }
             }
         }
@@ -249,8 +249,6 @@ public class GamePanel extends JPanel implements Runnable {
     private void drawToTempScreen() {
         drawTiles();
         drawEntities();
-        drawIObjects();
-        drawProjectiles();
         ui.draw(g2);
     }
 
@@ -269,10 +267,24 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        // ENEMIES
+        // Enemies
         for (Entity n : enemy[currentMap]) {
             if (n != null) {
                 entityList.add(n);
+            }
+        }
+
+        // Objects
+        for (Entity objI : obj[currentMap]) {
+            if (objI != null) {
+                entityList.add(objI);
+            }
+        }
+
+        // Projectiles
+        for (Entity pr : projectile[currentMap]) {
+            if (pr != null) {
+                entityList.add(pr);
             }
         }
 
@@ -286,20 +298,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Empty list
         entityList.clear();
-    }
-    private void drawIObjects() {
-        for (Entity objI : obj_i[currentMap]) {
-            if (objI != null) {
-                entityList.add(objI);
-            }
-        }
-    }
-    private void drawProjectiles() {
-        for (Entity pr : projectile[currentMap]) {
-            if (pr != null) {
-                entityList.add(pr);
-            }
-        }
     }
 
     /**

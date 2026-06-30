@@ -98,11 +98,11 @@ public class PRJ_Claw extends Projectile {
         }
     }
     private void checkLatchableCollision() {
-        int iObject = gp.cChecker.checkEntity(this, gp.obj_i);
+        int object = gp.cChecker.checkEntity(this, gp.obj);
 
-        if (iObject != -1) {
+        if (object != -1) {
             latched = true;
-            grabbedEntity = gp.obj_i[gp.currentMap][iObject];
+            grabbedEntity = gp.obj[gp.currentMap][object];
             health = 0;
         }
     }
@@ -210,6 +210,7 @@ public class PRJ_Claw extends Projectile {
 
         grabbedEntity.resetValues();
         grabbedEntity.setDirection(getOppositeDirection(direction));
+        grabbedEntity.setElevated(true);
 
         // Offset X/Y so entity isn't on top of player
         switch (direction) {
@@ -236,6 +237,10 @@ public class PRJ_Claw extends Projectile {
         health = maxHealth;
         user.setElevated(false);
         user.setAction(Action.IDLE);
+
+        if (grabbedEntity != null) {
+            grabbedEntity.setElevated(true);
+        }
     }
 
     @Override

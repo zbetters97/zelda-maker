@@ -4,6 +4,8 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.projectile.Projectile;
 
+import static entity.Entity.Action.*;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -64,7 +66,7 @@ public class Entity {
 
     /** MOVEMENT VALUES */
     protected Direction direction = DOWN;
-    protected Action action = Action.IDLE;
+    protected Action action = IDLE;
     protected int speed = 1;
     protected int defaultSpeed;
     protected boolean moving = false;
@@ -86,7 +88,7 @@ public class Entity {
     public boolean alive = true;
     public int health;
     public int maxHealth;
-    public Entity currentItem;
+    protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
     public boolean dying = false;
@@ -134,14 +136,14 @@ public class Entity {
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
 
     /** ENTITY TYPES */
-    protected int entity_type = -1;
-    public final int type_npc = 0;
-    public final int type_enemy = 1;
-    public final int type_item = 2;
+    protected int entity_type = 0;
+    public final int type_npc = 1;
+    public final int type_enemy = 2;
+    public final int type_item = 3;
 
     /** OBJECT TYPES */
-    public final int type_object_i = 3;
-    public final int type_projectile = 4;
+    public final int type_object = 4;
+    public final int type_projectile = 5;
 
     /**
      * CONSTRUCTOR
@@ -250,14 +252,15 @@ public class Entity {
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.obj_i);
+        gp.cChecker.checkEntity(this, gp.obj);
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         boolean canHurtPlayer = entity_type == type_enemy;
-
         if (contactPlayer && canHurtPlayer) {
-            damagePlayer(attack);
+            damagePlayer(this);
         }
+
+        gp.cChecker.checkHazard(this);
     }
 
     public boolean canCollideWith(Entity target) {
@@ -364,7 +367,7 @@ public class Entity {
     /** PATH FINDING */
     public void searchPath(int goalCol, int goalRow) {
 
-        if (action == Action.ATTACKING) {
+        if (action == ATTACKING) {
             return;
         }
 
@@ -377,7 +380,7 @@ public class Entity {
         // PATH FOUND
         if (gp.pFinder.search()) {
 
-            // NEXT WORLDX & WORLDY
+            // NEXT WORLD X & WORLD Y
             int nextX = gp.pFinder.pathList.getFirst().col * gp.tileSize;
             int nextY = gp.pFinder.pathList.getFirst().row * gp.tileSize;
 
@@ -455,6 +458,7 @@ public class Entity {
             }
         }
     }
+
     public boolean playerWithinBounds() {
 
         boolean playerWithinBounds = true;
@@ -578,11 +582,56 @@ public class Entity {
     }
 
     /** COMBAT */
+    protected void attack() {
+
+    }
+    protected void setAttacking(int rate, int straight, int horizontal) {
+
+        boolean targetInRange = false;
+        int xDis = getXDistance(gp.player);
+        int yDis = getYDistance(gp.player);
+
+        // If player is attacking within hitbox
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (gp.player.getCenterY() < getCenterY() && yDis < straight && xDis < horizontal) {
+                    targetInRange = true;
+                }
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                if (gp.player.getCenterY() > getCenterY() && yDis < straight && xDis < horizontal) {
+                    targetInRange = true;
+                }
+            }
+            case LEFT -> {
+                if (gp.player.getCenterX() < getCenterX() && xDis < straight && yDis < horizontal) {
+                    targetInRange = true;
+                }
+            }
+            case RIGHT -> {
+                if (gp.player.getCenterX() > getCenterX() && xDis < straight && yDis < horizontal) {
+                    targetInRange = true;
+                }
+            }
+        }
+
+        // Player is within range
+        if (targetInRange) {
+
+            // Random chance to attack player
+            int i = new Random().nextInt(rate);
+            if (i == 0) {
+                spriteNum = 1;
+                spriteCounter = 0;
+                action = ATTACKING;
+            }
+        }
+    }
     /**
      * ATTACK
      * Attack logic for specific entity
      */
-    protected void attack() {
+    protected void attacking() {
 
         attackCounter++;
 
@@ -624,7 +673,7 @@ public class Entity {
             }
 
             if (gp.cChecker.checkPlayer(this)) {
-                damagePlayer(attack);
+                damagePlayer(this);
             }
 
             // Restore hitbox
@@ -638,50 +687,7 @@ public class Entity {
         if (attackCounter > swingSpeed2) {
             attackNum = 1;
             attackCounter = 0;
-            action = Action.IDLE;
-        }
-    }
-
-    protected void setAttacking(int rate, int straight, int horizontal) {
-
-        boolean targetInRange = false;
-        int xDis = getXDistance(gp.player);
-        int yDis = getYDistance(gp.player);
-
-        // If player is attacking within hitbox
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> {
-                if (gp.player.getCenterY() < getCenterY() && yDis < straight && xDis < horizontal) {
-                    targetInRange = true;
-                }
-            }
-            case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (gp.player.getCenterY() > getCenterY() && yDis < straight && xDis < horizontal) {
-                    targetInRange = true;
-                }
-            }
-            case LEFT -> {
-                if (gp.player.getCenterX() < getCenterX() && xDis < straight && yDis < horizontal) {
-                    targetInRange = true;
-                }
-            }
-            case RIGHT -> {
-                if (gp.player.getCenterX() > getCenterX() && xDis < straight && yDis < horizontal) {
-                    targetInRange = true;
-                }
-            }
-        }
-
-        // Player is within range
-        if (targetInRange) {
-
-            // Random chance to attack player
-            int i = new Random().nextInt(rate);
-            if (i == 0) {
-                spriteNum = 1;
-                spriteCounter = 0;
-                action = Action.ATTACKING;
-            }
+            action = IDLE;
         }
     }
 
@@ -747,7 +753,7 @@ public class Entity {
         target.knockback = true;
 
         // Direction attacker was facing when hit
-        target.knockbackDirection = attacker.direction;
+        target.knockbackDirection = attacker.getMoveDirection();
 
         target.speed += knockbackPower;
     }
@@ -789,16 +795,16 @@ public class Entity {
     /**
      * DAMAGE PLAYER
      * Handles logic for damaging the player
-     * @param attack Attack value of the weapon used
+     * @param enemy The enemy attacking the player
      */
-    protected void damagePlayer(int attack) {
+    protected void damagePlayer(Entity enemy) {
 
         // Player can't be damaged
         if (gp.player.invincible) {
             return;
         }
 
-        int damage = attack;
+        int damage = enemy.attack;
 
         // Keep damage at or above 0
         if (damage < 0) {
@@ -806,11 +812,11 @@ public class Entity {
         }
 
         // Knockback player
-        setKnockback(gp.player, this, 1);
+        setKnockback(gp.player, enemy, 1);
 
         // Player blocked with shield
-        if (gp.player.getAction() == Action.GUARDING &&
-                gp.player.getDirection() == getOppositeDirection(direction)) {
+        if (gp.player.getAction() == GUARDING &&
+                gp.player.getDirection() == getOppositeDirection(enemy.getDirection())) {
             return;
         }
 
@@ -849,12 +855,38 @@ public class Entity {
      * Resets values to defaults
      */
     public void resetValues() {
-        action = Action.IDLE;
-        spriteNum = 1;
-        spriteCounter = 0;
-        attackNum = 1;
-        attackCounter = 0;
+
+        action = IDLE;
+        alive = true;
+
+        attackNum = 1; attackCounter = 0;
+        knockback = false; knockbackCounter = 0;
+        invincible = false; invincibleCounter = 0;
+        dying = false; dyingCounter = 0;
+
+        speed = defaultSpeed;
+        collisionOn = false;
+        canMove = true; moving = false;
+        onPath = false; pathCompleted = false;
+
+        lockedOn = false; lockedOnTarget = null;
+
+        charge = 0;
         actionLockCounter = 0;
+        spriteNum = 1; spriteCounter = 0;
+
+        opened = false;
+        isElevated = false;
+    }
+
+    /**
+     * RESURRECT
+     * Brings entity back to life
+     */
+    public void resurrect() {
+        resetValues();
+        alive = true;
+        health = maxHealth;
     }
 
     /**
@@ -921,7 +953,7 @@ public class Entity {
 
     /** GET CURRENT SPRITE TO DRAW **/
     protected void getSpriteImage() {
-        if (action == Action.ATTACKING) {
+        if (action == ATTACKING) {
             getAttackImage();
         }
         else {
@@ -1077,6 +1109,10 @@ public class Entity {
     }
     public boolean isOnSameElevation(Entity target) {
         return target.getElevated() == isElevated;
+    }
+
+    public Entity getItem() {
+        return item;
     }
 
     public Rectangle getHitbox() {

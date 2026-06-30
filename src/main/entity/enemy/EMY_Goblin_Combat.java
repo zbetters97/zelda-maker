@@ -72,7 +72,7 @@ public class EMY_Goblin_Combat extends Entity {
         }
 
         if (action == Action.ATTACKING) {
-            attack();
+            attacking();
         }
 
         setAction();

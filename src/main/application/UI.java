@@ -165,10 +165,10 @@ public class UI {
         g2.setStroke(new BasicStroke(4));
         g2.drawOval(x, y, width, height);
 
-        if (gp.player.currentItem != null) {
+        if (gp.player.getItem() != null) {
             x += 10;
             y += 10;
-            g2.drawImage(gp.player.currentItem.image, x, y, gp.tileSize + 10, gp.tileSize + 10, null);
+            g2.drawImage(gp.player.getItem().image, x, y, gp.tileSize + 10, gp.tileSize + 10, null);
         }
 
         // DRAW ITEM BUTTON

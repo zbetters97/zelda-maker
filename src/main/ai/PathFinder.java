@@ -89,12 +89,12 @@ public class PathFinder {
                 node[col][row].solid = true;
             }
 
-            // Check interactive objects
-            for (int i = 0; i < gp.obj_i[0].length; i++) {
+            // Check objects
+            for (int i = 0; i < gp.obj[0].length; i++) {
 
-                if (gp.obj_i[gp.currentMap][i] != null && gp.obj_i[gp.currentMap][i].getCollision()) {
-                    int iCol = gp.obj_i[gp.currentMap][i].getWorldX() / gp.tileSize;
-                    int iRow = gp.obj_i[gp.currentMap][i].getWorldY() / gp.tileSize;
+                if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getCollision()) {
+                    int iCol = gp.obj[gp.currentMap][i].getWorldX() / gp.tileSize;
+                    int iRow = gp.obj[gp.currentMap][i].getWorldY() / gp.tileSize;
                     node[iCol][iRow].solid = true;
                 }
             }

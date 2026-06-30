@@ -1,4 +1,4 @@
-package entity.object_interactive;
+package entity.object;
 
 import application.GamePanel;
 import entity.Entity;
@@ -7,16 +7,16 @@ import java.awt.*;
 
 import static application.GamePanel.Direction.*;
 
-public class OBJ_I_Chest extends Entity {
+public class OBJ_Chest extends Entity {
 
     public static final String objName = "Chest";
 
-    public OBJ_I_Chest(GamePanel gp, int worldX, int worldY) {
+    public OBJ_Chest(GamePanel gp, int worldX, int worldY) {
         super(gp);
         this.worldX = worldX * gp.tileSize;
         this.worldY = worldY * gp.tileSize;
 
-        entity_type = type_object_i;
+        entity_type = type_object;
         name = objName;
 
         grabbable = true;
@@ -31,8 +31,8 @@ public class OBJ_I_Chest extends Entity {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/objects_interactive/obj_chest_closed");
-        up2 = setupImage("/objects_interactive/obj_chest_opened");
+        up1 = setupImage("/objects/obj_chest_closed");
+        up2 = setupImage("/objects/obj_chest_opened");
     }
 
     @Override
