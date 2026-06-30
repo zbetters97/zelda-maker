@@ -142,6 +142,7 @@ public record CollisionChecker(GamePanel gp) {
     public void checkHazard(Entity entity) {
         Tile tile = getCurrentTile(entity);
 
+
         if (tile.isPit) {
             handlePit(entity);
         }
@@ -201,15 +202,36 @@ public record CollisionChecker(GamePanel gp) {
         gp.player.safeWorldY = safeY;
     }
 
-    /**
-     * CHECK ENTITY
-     * @param entity Entity to check collision for
-     * @param targets List of entities to check collision on
-     * @return Index of entity in list
-     */
-    public int checkEntity(Entity entity, Entity[][] targets) {
+    public int checkMovementCollision(Entity entity, Entity[][] targets) {
 
         int entityIndex = -1;
+
+        Rectangle futureRect = getWorldHitbox(entity);
+
+        switch (entity.getMoveDirection()) {
+            case UP -> futureRect.y -= entity.getSpeed();
+            case UPLEFT -> {
+                futureRect.x -= entity.getSpeed();
+                futureRect.y -= entity.getSpeed();
+            }
+            case UPRIGHT -> {
+                futureRect.x += entity.getSpeed();
+                futureRect.y -= entity.getSpeed();
+            }
+            case DOWN -> futureRect.y += entity.getSpeed();
+            case DOWNLEFT -> {
+                futureRect.x -= entity.getSpeed();
+                futureRect.y += entity.getSpeed();
+            }
+            case DOWNRIGHT -> {
+                futureRect.x += entity.getSpeed();
+                futureRect.y += entity.getSpeed();
+            }
+            case LEFT -> futureRect.x -= entity.getSpeed();
+            case RIGHT -> futureRect.x += entity.getSpeed();
+        }
+
+        Rectangle currentRect = getWorldHitbox(entity);
 
         for (int i = 0; i < targets[gp.currentMap].length; i++) {
 
@@ -219,52 +241,54 @@ public record CollisionChecker(GamePanel gp) {
                 continue;
             }
 
-            // Current position of entity
-            Rectangle currentRect = new Rectangle(entity.getHitbox());
-            currentRect.x = entity.getWorldX() + entity.getHitboxDefaultX();
-            currentRect.y = entity.getWorldY() + entity.getHitboxDefaultY();
+            Rectangle targetRect = getWorldHitbox(target);
 
-            // Future position of entity
-            Rectangle futureRect = new Rectangle(currentRect);
-            switch (entity.getMoveDirection()) {
-                case UP -> futureRect.y -= entity.getSpeed();
-                case UPLEFT -> {
-                    futureRect.x -= entity.getSpeed();
-                    futureRect.y -= entity.getSpeed();
-                }
-                case UPRIGHT -> {
-                    futureRect.x += entity.getSpeed();
-                    futureRect.y -= entity.getSpeed();
-                }
-                case DOWN -> futureRect.y += entity.getSpeed();
-                case DOWNLEFT -> {
-                    futureRect.x -= entity.getSpeed();
-                    futureRect.y += entity.getSpeed();
-                }
-                case DOWNRIGHT -> {
-                    futureRect.x += entity.getSpeed();
-                    futureRect.y += entity.getSpeed();
-                }
-                case LEFT -> futureRect.x -= entity.getSpeed();
-                case RIGHT -> futureRect.x += entity.getSpeed();
-            }
-
-            // Target rectangle
-            Rectangle targetRect = new Rectangle(target.getHitbox());
-            targetRect.x = target.getWorldX() + target.getHitboxDefaultX();
-            targetRect.y = target.getWorldY() + target.getHitboxDefaultY();
-
-            boolean notIntersecting = !currentRect.intersects(targetRect);
+            boolean alreadyIntersecting = currentRect.intersects(targetRect);
             boolean willIntersect = futureRect.intersects(targetRect);
             boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
 
-            if (notIntersecting && willIntersect && canCollide) {
+            if (!alreadyIntersecting && willIntersect && canCollide) {
                 entity.setCollision(true);
                 entityIndex = i;
+                break;
             }
         }
 
         return entityIndex;
+    }
+    public int checkOverlapCollision(Entity entity, Entity[][] targets) {
+
+        int entityIndex = -1;
+
+        Rectangle entityRect = getWorldHitbox(entity);
+
+        for (int i = 0; i < targets[gp.currentMap].length; i++) {
+
+            Entity target = targets[gp.currentMap][i];
+
+            if (target == null || target == entity) {
+                continue;
+            }
+
+            Rectangle targetRect = getWorldHitbox(target);
+            boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
+
+            if (entityRect.intersects(targetRect) && canCollide) {
+                entityIndex = i;
+                break;
+            }
+        }
+
+        return entityIndex;
+    }
+    private Rectangle getWorldHitbox(Entity entity) {
+
+        Rectangle rect = new Rectangle(entity.getHitbox());
+
+        rect.x = entity.getWorldX() + entity.getHitboxDefaultX();
+        rect.y = entity.getWorldY() + entity.getHitboxDefaultY();
+
+        return rect;
     }
 
     /**

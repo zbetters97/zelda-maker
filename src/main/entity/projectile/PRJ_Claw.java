@@ -90,7 +90,7 @@ public class PRJ_Claw extends Projectile {
     }
     private void checkGrabbableCollision() {
 
-        Entity target = getEnemy(this);
+        Entity target = overlapEnemy(this);
 
         if (target != null) {
             grabbedEntity = target;
@@ -98,7 +98,7 @@ public class PRJ_Claw extends Projectile {
         }
     }
     private void checkLatchableCollision() {
-        int object = gp.cChecker.checkEntity(this, gp.obj);
+        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
 
         if (object != -1) {
             latched = true;
@@ -108,7 +108,7 @@ public class PRJ_Claw extends Projectile {
     }
     private void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkOverlapCollision(this, gp.npc);
     }
 
     private void moveUser() {
@@ -232,14 +232,14 @@ public class PRJ_Claw extends Projectile {
     public void resetValues() {
         alive = false;
         collisionOn = false;
-        grabbedEntity = null;
         latched = false;
         health = maxHealth;
         user.setElevated(false);
         user.setAction(Action.IDLE);
 
         if (grabbedEntity != null) {
-            grabbedEntity.setElevated(true);
+            grabbedEntity.setElevated(false);
+            grabbedEntity = null;
         }
     }
 

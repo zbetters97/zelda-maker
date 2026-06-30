@@ -3,6 +3,7 @@ package entity;
 import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.item.*;
+
 import static entity.Entity.Action.*;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class Player extends Entity {
 
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
-    private int coolDownCounter = 0,
+    private int
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
             aimNum = 1, aimCounter = 0,
@@ -83,9 +84,9 @@ public class Player extends Entity {
         attackBox.height = 42;
 
         // Attack speed
-        swingSpeed1 = 4;
-        swingSpeed2 = 7;
-        swingSpeed3 = 15;
+        swingSpeed1 = 2;
+        swingSpeed2 = 5;
+        swingSpeed3 = 10;
     }
 
     /** GET IMAGES */
@@ -350,7 +351,7 @@ public class Player extends Entity {
         // Different action based on current status
         if (action == IDLE) {
             // Cooldown needed for rolling
-            if (moving && coolDownCounter == 0) {
+            if (moving && actionLockCounter == 0) {
                 startRoll();
             } else {
                 interactObject();
@@ -367,10 +368,10 @@ public class Player extends Entity {
         spriteNum = 1;
         spriteCounter = 0;
         lockonDirection = direction;
-        coolDownCounter = 30;
+        actionLockCounter = 30;
     }
     private void interactObject() {
-        int object = gp.cChecker.checkEntity(this, gp.obj);
+        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
 
         if (object != -1) {
             gp.obj[gp.currentMap][object].interact(this);
@@ -632,16 +633,16 @@ public class Player extends Entity {
         gp.cChecker.checkTile(this);
 
         // Check NPC collision
-        gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
 
         // Check enemy collision
-        gp.cChecker.checkEntity(this, gp.enemy);
+        gp.cChecker.checkMovementCollision(this, gp.enemy);
 
         // Check object collision
-        gp.cChecker.checkEntity(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
 
         // Player contacted enemy, take damage
-        Entity enemy = getEnemy(this);
+        Entity enemy = moveIntoEnemy(this);
         if (enemy != null && !enemy.invincible) {
             damagePlayer(enemy);
         }
@@ -779,7 +780,7 @@ public class Player extends Entity {
             }
         }
 
-        detectEnemyCollision();
+        detectSwordCollision();
 
         // Restore hitbox
         worldX = currentWorldX;
@@ -908,7 +909,7 @@ public class Player extends Entity {
             }
         }
 
-        detectEnemyCollision();
+        detectSwordCollision();
 
         // Reset X/Y and Hitbox
         worldX = currentWorldX;
@@ -921,13 +922,18 @@ public class Player extends Entity {
      * DETECT ENEMY COLLISION
      * Checks if an enemy collides with the player's hitbox/attackBox
      */
-    private void detectEnemyCollision() {
+    private void detectSwordCollision() {
         // Find enemy that intersects collision box
-        Entity enemy = getEnemy(this);
+        Entity enemy = overlapEnemy(this);
 
         // Sword collides with enemy, apply damage
         if (enemy != null && !enemy.invincible) {
             damageEnemy(enemy);
+        }
+
+        int projectile = gp.cChecker.checkOverlapCollision(this, gp.projectile);
+        if (projectile != -1) {
+            gp.projectile[gp.currentMap][projectile].deflect(this);
         }
     }
 
@@ -1110,7 +1116,6 @@ public class Player extends Entity {
 
             resetValues();
         }
-
     }
 
     /**
@@ -1122,8 +1127,8 @@ public class Player extends Entity {
     protected void manageValues() {
 
         // Decrease cooldown if filled
-        if (coolDownCounter > 0) {
-            coolDownCounter--;
+        if (actionLockCounter > 0) {
+            actionLockCounter--;
         }
 
         // Shield after taking damage
@@ -1142,7 +1147,7 @@ public class Player extends Entity {
     public void resetValues() {
         super.resetValues();
 
-        spinCharge = 0; coolDownCounter = 0;
+        spinCharge = 0;
         digNum = 1; digCounter = 0;
         aimNum = 1; aimCounter = 0;
         throwNum = 1; throwCounter = 0;

@@ -69,11 +69,11 @@ public class PRJ_Arrow extends Projectile {
     @Override
     protected void checkCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkOverlapCollision(this, gp.npc);
     }
     private void checkEnemyCollision() {
 
-        Entity enemy = getEnemy(this);
+        Entity enemy = overlapEnemy(this);
         if (enemy != null && enemy != user) {
 
             damageEnemy(enemy);
@@ -91,8 +91,11 @@ public class PRJ_Arrow extends Projectile {
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
         if (contactPlayer) {
-            damagePlayer(this);
             alive = false;
+            damagePlayer(this);
+        }
+        else {
+            collisionOn = false;
         }
     }
 

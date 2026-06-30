@@ -97,8 +97,8 @@ public class Entity {
     protected boolean isElevated = false;
 
     /** COMBAT VALUES */
-    public int attack;
-    public int defaultAttack;
+    protected int attack;
+    protected int defaultAttack;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
     protected int attackNum = 1, attackCounter = 0;
     protected int swingSpeed1;
@@ -207,6 +207,11 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
+        if (knockback) {
+            handleKnockback();
+            manageValues();
+            // return;
+        }
     }
 
     /**
@@ -252,7 +257,9 @@ public class Entity {
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.enemy);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         boolean canHurtPlayer = entity_type == type_enemy;
@@ -557,6 +564,20 @@ public class Entity {
 
         return withinBounds;
     }
+
+    protected boolean lookingAtPlayer(int tolerance) {
+
+        int dx = gp.player.getWorldX() - worldX;
+        int dy = gp.player.getWorldY() - worldY;
+
+        return switch (direction) {
+            case UP -> dy < 0 && Math.abs(dx) <= tolerance;
+            case DOWN -> dy > 0 && Math.abs(dx) <= tolerance;
+            case LEFT -> dx < 0 && Math.abs(dy) <= tolerance;
+            case RIGHT -> dx > 0 && Math.abs(dy) <= tolerance;
+            default -> false;
+        };
+    }
     /** END PATH FINDING*/
 
     protected void interact(Entity user) {}
@@ -691,17 +712,23 @@ public class Entity {
         }
     }
 
-    /**
-     * GET ENEMY
-     * Finds if the passed entity collides with an entity in gp.enemy
-     * @param entity Target to check for collision on
-     * @return An enemy that the target may be intersecting with
-     */
-    protected Entity getEnemy(Entity entity) {
+    protected Entity moveIntoEnemy(Entity entity) {
 
         Entity enemy = null;
 
-        int enemyIndex = gp.cChecker.checkEntity(entity, gp.enemy);
+        int enemyIndex = gp.cChecker.checkMovementCollision(entity, gp.enemy);
+        if (enemyIndex != -1) {
+            enemy = gp.enemy[gp.currentMap][enemyIndex];
+        }
+
+        return enemy;
+    }
+
+    protected Entity overlapEnemy(Entity entity) {
+
+        Entity enemy = null;
+
+        int enemyIndex = gp.cChecker.checkOverlapCollision(entity, gp.enemy);
         if (enemyIndex != -1) {
             enemy = gp.enemy[gp.currentMap][enemyIndex];
         }
@@ -823,6 +850,14 @@ public class Entity {
         // Damage player
         gp.player.health -= damage;
         gp.player.invincible = true;
+    }
+
+    public void deflect(Entity target) {
+        collisionOn = false;
+        alive = true;
+        user = target;
+        direction = target.getDirection();
+        speed = 6;
     }
     /** END COMBAT*/
 
@@ -1099,6 +1134,19 @@ public class Entity {
     }
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+    public void modifySpeed(int change) {
+        speed += change;
+    }
+
+    public int getAttack() {
+        return attack;
+    }
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+    public void modifyAttack(int change) {
+        attack += change;
     }
 
     public boolean getElevated() {

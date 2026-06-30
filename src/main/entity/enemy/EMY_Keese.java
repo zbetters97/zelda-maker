@@ -55,14 +55,10 @@ public class EMY_Keese extends Entity {
 
     @Override
     public void update() {
-        // No action if in knockback state
-        if (knockback) {
-            handleKnockback();
-        }
-        else {
-            setAction();
-            updateDirection();
-        }
+        super.update();
+
+        setAction();
+        updateDirection();
 
         manageValues();
     }

@@ -58,14 +58,14 @@ public class PRJ_Boomerang extends Projectile {
     protected void checkCollision() {
         collisionOn = false;
 
-        Entity enemy = getEnemy(this);
+        Entity enemy = overlapEnemy(this);
         if (enemy != null) {
             damageEnemy(enemy);
         }
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkEntity(this, gp.enemy);
-        int npcIndex = gp.cChecker.checkEntity(this, gp.npc);
+        gp.cChecker.checkOverlapCollision(this, gp.enemy);
+        int npcIndex = gp.cChecker.checkOverlapCollision(this, gp.npc);
 
         if (health <= 0 || npcIndex != -1 || collisionOn) {
             returning = true;

@@ -2,14 +2,16 @@ package entity.enemy;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.projectile.PRJ_Arrow;
 
 import java.awt.*;
+import java.util.Random;
 
-public class EMY_Goblin_Combat extends Entity {
+public class EMY_Goblin_Archer extends Entity {
 
-    public static final String emyName = "Combat Goblin";
+    public static final String emyName = "Archer Goblin";
 
-    public EMY_Goblin_Combat(GamePanel gp, int worldX, int worldY) {
+    public EMY_Goblin_Archer(GamePanel gp, int worldX, int worldY) {
         super(gp);
         this.worldX = worldX * gp.tileSize;
         this.worldY = worldY * gp.tileSize;
@@ -23,8 +25,8 @@ public class EMY_Goblin_Combat extends Entity {
         health = maxHealth;
         defaultSpeed = 1;
         speed = defaultSpeed;
-        animationSpeed = 10;
-        attack = 4;
+        animationSpeed = 16;
+        attack = 1;
 
         hitbox = new Rectangle(8, 16, 32, 32);
         hitboxDefaultX = hitbox.x;
@@ -32,13 +34,8 @@ public class EMY_Goblin_Combat extends Entity {
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
-        swingSpeed1 = 15;
-        swingSpeed2 = 45;
-
         attackBox.width = 48;
         attackBox.height = 48;
-
-        getAttackImages();
     }
 
     @Override
@@ -52,25 +49,10 @@ public class EMY_Goblin_Combat extends Entity {
         right1 = setupImage("/enemy/goblin_right_1");
         right2 = setupImage("/enemy/goblin_right_2");
     }
-    private void getAttackImages() {
-        attackUp1 = setupImage("/enemy/goblin_attack_up_1", gp.tileSize, gp.tileSize * 2);
-        attackUp2 = setupImage("/enemy/goblin_attack_up_2", gp.tileSize, gp.tileSize * 2);
-        attackDown1 = setupImage("/enemy/goblin_attack_down_1", gp.tileSize, gp.tileSize * 2);
-        attackDown2 = setupImage("/enemy/goblin_attack_down_2", gp.tileSize, gp.tileSize * 2);
-        attackLeft1 = setupImage("/enemy/goblin_attack_left_1", gp.tileSize * 2, gp.tileSize);
-        attackLeft2 = setupImage("/enemy/goblin_attack_left_2", gp.tileSize * 2, gp.tileSize);
-        attackRight1 = setupImage("/enemy/goblin_attack_right_1", gp.tileSize * 2, gp.tileSize);
-        attackRight2 = setupImage("/enemy/goblin_attack_right_2", gp.tileSize * 2, gp.tileSize);
-    }
 
     @Override
     public void update() {
         super.update();
-
-        if (action == Action.ATTACKING) {
-            attacking();
-        }
-
         setAction();
 
         updateDirection();
@@ -82,26 +64,22 @@ public class EMY_Goblin_Combat extends Entity {
     @Override
     public void setAction() {
 
+        // Stop moving if in range to shoot at player
+        if (lookingAtPlayer(gp.tileSize / 2)) {
+            speed = 0;
+            attack();
+        }
+        else {
+            speed = defaultSpeed;
+        }
+
         // Player found
         if (onPath) {
-            isOffPath(gp.player, 8);
+            isOffPath(gp.player, 10);
 
-            // Player still found
+            // Player still found, follow path
             if (onPath && playerWithinBounds()) {
-
-                // Follow path
                 searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-
-                // Decide to attack
-                setAttacking(60, gp.tileSize * 3, gp.tileSize);
-
-                // Stop to attack
-                if (action == Action.ATTACKING) {
-                    speed = 0;
-                }
-                else {
-                    speed = defaultSpeed;
-                }
             }
         }
         else {
@@ -110,8 +88,34 @@ public class EMY_Goblin_Combat extends Entity {
 
             // Look for player
             if (playerWithinBounds()) {
-                isOnPath(gp.player, 5);
+                isOnPath(gp.player, 8);
             }
         }
+    }
+
+    @Override
+    protected void attack() {
+        projectile = new PRJ_Arrow(gp);
+        projectile.modifySpeed(4);
+        projectile.modifyAttack(2);
+
+        // Shoot one arrow every ~2 seconds
+        int i = new Random().nextInt(120);
+        if (i == 0 && !projectile.alive && actionLockCounter == 0) {
+            projectile.set(worldX, worldY, direction, true, this);
+            addProjectile(projectile);
+
+            // Force 30 frame delay in between shots
+            actionLockCounter = 30;
+        }
+    }
+
+    @Override
+    protected void manageValues() {
+        if (actionLockCounter > 0) {
+            actionLockCounter--;
+        }
+
+        super.manageValues();
     }
 }
