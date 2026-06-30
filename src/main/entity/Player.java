@@ -25,7 +25,7 @@ public class Player extends Entity {
             aimNum = 1, aimCounter = 0,
             throwNum = 1, throwCounter = 0,
             jumpNum = 1, jumpCounter = 0,
-            fallNum = 1, fallCounter = 0;
+            damageNum = 1, damageCounter = 0;
 
     /** SPRITE IMAGES */
     private BufferedImage
@@ -52,7 +52,8 @@ public class Player extends Entity {
 
             soarUp1, soarDown1, soarLeft1, soarRight1,
 
-            fall1, fall2, fall3;
+            fall1, fall2, fall3,
+            drown1;
 
     /**
      * CONSTRUCTOR
@@ -112,6 +113,7 @@ public class Player extends Entity {
         getJumpImages();
         getSoarImages();
         getFallImages();
+        getDrownImages();
     }
     private void getAttackImages() {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
@@ -214,7 +216,7 @@ public class Player extends Entity {
         jumpRight3 = setupImage("/player/boy_jump_right_3");
     }
     private void getSoarImages() {
-        soarUp1 = setupImage("/player/boy_jump_up_1");
+        soarUp1 = setupImage("/player/boy_soar_up_1");
         soarDown1 = setupImage("/player/boy_soar_down_1");
         soarLeft1 = setupImage("/player/boy_soar_left_1");
         soarRight1 = setupImage("/player/boy_soar_right_1");
@@ -223,6 +225,9 @@ public class Player extends Entity {
         fall1 = setupImage("/player/boy_fall_1");
         fall2 = setupImage("/player/boy_fall_2");
         fall3 = setupImage("/player/boy_fall_3");
+    }
+    private void getDrownImages() {
+        drown1 = setupImage("/player/boy_drown");
     }
 
     /**
@@ -269,6 +274,9 @@ public class Player extends Entity {
      */
     @Override
     public void update() {
+
+        // Always check for collision
+        checkCollision();
 
         if (knockback) {
             handleKnockback();
@@ -535,7 +543,7 @@ public class Player extends Entity {
             case AIMING -> aiming();
             case THROWING -> throwing();
             case JUMPING, SOARING -> jumping();
-            case FALLING -> falling();
+            case FALLING, DROWNING -> takingDamage();
         }
     }
 
@@ -615,8 +623,6 @@ public class Player extends Entity {
         checkCollision();
 
         super.move(newDirection);
-
-        gp.cChecker.checkHazard(this);
     }
 
     /**
@@ -645,6 +651,8 @@ public class Player extends Entity {
         if (enemy != null && !enemy.invincible) {
             damagePlayer(enemy.attack);
         }
+
+        gp.cChecker.checkHazard(this);
     }
 
     /**
@@ -1082,28 +1090,28 @@ public class Player extends Entity {
         }
     }
 
-    private void falling() {
+    private void takingDamage() {
 
-        fallCounter++;
+        damageCounter++;
 
-        if (fallCounter <= 6) {
-            fallNum = 1;
+        if (damageCounter <= 6) {
+            damageNum = 1;
         }
-        else if (fallCounter < 18) {
-            fallNum = 2;
+        else if (damageCounter < 18) {
+            damageNum = 2;
         }
-        else if (fallCounter < 24) {
-            fallNum = 3;
+        else if (damageCounter < 24) {
+            damageNum = 3;
         }
-        else if (fallCounter < 60) {
-            fallNum = 4;
+        else if (damageCounter < 60) {
+            damageNum = 4;
         }
-        else if (80 <= fallCounter) {
-            fallNum = 1;
-            fallCounter = 0;
+        else if (80 <= damageCounter) {
+            damageNum = 1;
+            damageCounter = 0;
             health -= 2;
-            action = Action.IDLE;
 
+            action = Action.IDLE;
             worldX = safeWorldX;
             worldY = safeWorldY;
         }
@@ -1145,15 +1153,10 @@ public class Player extends Entity {
     public void draw(Graphics2D g2) {
 
         offCenter();
-        getSpriteImage();
+        getSpriteImage(g2);
 
         if (invincible) {
            playHurtAnimation(g2);
-        }
-
-        if (isElevated) {
-            g2.setColor(Color.BLACK);
-            g2.fillOval(tempScreenX + 10, tempScreenY + 70, 30, 10);
         }
 
         g2.drawImage(image, tempScreenX, tempScreenY, null);
@@ -1195,8 +1198,7 @@ public class Player extends Entity {
     }
 
     /** GET CURRENT SPRITE TO DRAW */
-    @Override
-    protected void getSpriteImage() {
+    private void getSpriteImage(Graphics2D g2) {
         image = switch (action) {
             case IDLE -> getIdleSprite();
             case ATTACKING, SPINCHARGING -> getAttackSprite();
@@ -1206,8 +1208,9 @@ public class Player extends Entity {
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
             case THROWING -> getThrowSprite();
-            case JUMPING, SOARING -> getJumpSprite();
+            case JUMPING, SOARING -> getJumpSprite(g2);
             case FALLING -> getFallSprite();
+            case DROWNING -> getDrownSprite();
         };
     }
     private BufferedImage getIdleSprite() {
@@ -1478,7 +1481,7 @@ public class Player extends Entity {
 
         return throwSprite;
     }
-    private BufferedImage getJumpSprite() {
+    private BufferedImage getJumpSprite(Graphics2D g2) {
         BufferedImage jumpSprite;
 
         tempScreenY -= 30;
@@ -1514,18 +1517,21 @@ public class Player extends Entity {
             };
         }
 
+        g2.setColor(Color.BLACK);
+        g2.fillOval(tempScreenX + 10, tempScreenY + 70, 30, 10);
+
         return jumpSprite;        
     }
     private BufferedImage getFallSprite() {
         BufferedImage fallSprite;
 
-        if (fallNum == 1) {
+        if (damageNum == 1) {
             fallSprite = fall1;
         }
-        else if (fallNum == 2) {
+        else if (damageNum == 2) {
             fallSprite = fall2;
         }
-        else if (fallNum == 3) {
+        else if (damageNum == 3) {
             fallSprite = fall3;
         }
         else {
@@ -1533,6 +1539,10 @@ public class Player extends Entity {
         }
 
         return fallSprite;
+    }
+    private BufferedImage getDrownSprite() {
+        BufferedImage drownSprite = drown1;
+        return drownSprite;
     }
 
     /** GETTERS */

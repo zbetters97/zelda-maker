@@ -113,7 +113,7 @@ public class PRJ_Claw extends Projectile {
 
     private void moveUser() {
 
-        if (user.collisionOn) {
+        if (user.getCollision()) {
             user.setElevated(false);
             alive = false;
             return;
@@ -234,6 +234,7 @@ public class PRJ_Claw extends Projectile {
         grabbedEntity = null;
         latched = false;
         health = maxHealth;
+        user.setElevated(false);
         user.setAction(Action.IDLE);
     }
 

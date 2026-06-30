@@ -3,6 +3,7 @@ package application;
 import entity.Entity;
 import tile.Tile;
 
+import static entity.Entity.Action.DROWNING;
 import static entity.Entity.Action.FALLING;
 
 public record CollisionChecker(GamePanel gp) {
@@ -118,6 +119,19 @@ public record CollisionChecker(GamePanel gp) {
                 entity.setCollision(true);
             }
         }
+        // Water
+        if (tile1.isWater || tile2.isWater) {
+
+            // Entity in air
+            if (entity.getElevated()) {
+                return;
+            }
+
+            // NPCs and enemies
+            if (entity.getType() == entity.type_npc || entity.getType() == entity.type_enemy) {
+                entity.setCollision(true);
+            }
+        }
         // Collision titles
         else if (tile1.hasCollision || tile2.hasCollision) {
             entity.setCollision(true);
@@ -130,20 +144,12 @@ public record CollisionChecker(GamePanel gp) {
         if (tile.isPit) {
             handlePit(entity);
         }
+        else if (tile.isWater) {
+            handleWater(entity);
+        }
         // Player is on ground, save safe X/Y
         else if (entity == gp.player && !gp.player.getElevated()) {
-
-            // Get current X/Y based on hitbox center
-            int centerX = gp.player.getWorldX() + gp.player.getHitbox().x + gp.player.getHitbox().width / 2;
-            int centerY = gp.player.getWorldY() + gp.player.getHitbox().y + gp.player.getHitbox().height / 2;
-
-            // Snap to tile size
-            int safeX = (centerX / gp.tileSize) * gp.tileSize;
-            int safeY = (centerY / gp.tileSize) * gp.tileSize;
-
-            // Store restore point
-            gp.player.safeWorldX = safeX;
-            gp.player.safeWorldY = safeY;
+            saveSafePoint();
         }
     }
     private Tile getCurrentTile(Entity entity) {
@@ -166,6 +172,32 @@ public record CollisionChecker(GamePanel gp) {
         else {
             entity.alive = false;
         }
+    }
+    private void handleWater(Entity entity) {
+        if (entity.getElevated()) {
+            return;
+        }
+
+        if (entity == gp.player) {
+            gp.player.setAction(DROWNING);
+        }
+        else {
+            entity.alive = false;
+        }
+    }
+    private void saveSafePoint() {
+
+        // Get current X/Y based on hitbox center
+        int centerX = gp.player.getWorldX() + gp.player.getHitbox().x + gp.player.getHitbox().width / 2;
+        int centerY = gp.player.getWorldY() + gp.player.getHitbox().y + gp.player.getHitbox().height / 2;
+
+        // Snap to tile size
+        int safeX = (centerX / gp.tileSize) * gp.tileSize;
+        int safeY = (centerY / gp.tileSize) * gp.tileSize;
+
+        // Store restore point
+        gp.player.safeWorldX = safeX;
+        gp.player.safeWorldY = safeY;
     }
 
     /**

@@ -1,6 +1,7 @@
 package ai;
 
 import application.GamePanel;
+import tile.Tile;
 
 import java.util.ArrayList;
 
@@ -77,18 +78,18 @@ public class PathFinder {
         currentNode = startNode;
         openList.add(currentNode);
 
-        // LOOP THROUGH ALL TILES
+        // Loop through entire grid
         int col = 0;
         int row = 0;
         while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
-            // CHECK TILES
-            int tileNum = gp.tileM.mapTileNum[gp.currentMap][col][row];
-            if (gp.tileM.tiles[tileNum].hasCollision) {
+            // Check tiles
+            Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
+            if (tile.hasCollision || tile.isPit) {
                 node[col][row].solid = true;
             }
 
-            // CHECK INTERACTIVE OBJECTS
+            // Check interactive objects
             for (int i = 0; i < gp.obj_i[0].length; i++) {
 
                 if (gp.obj_i[gp.currentMap][i] != null && gp.obj_i[gp.currentMap][i].getCollision()) {
@@ -98,7 +99,7 @@ public class PathFinder {
                 }
             }
 
-            // CHECK STATIONARY NPCs
+            // Check NPCs
             for (int i = 0; i < gp.npc[0].length; i++) {
 
                 if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].getSpeed() == 0) {
@@ -108,7 +109,7 @@ public class PathFinder {
                 }
             }
 
-            // SET COST ON EACH NODE
+            // Set cost of each node
             setCost(node[col][row]);
 
             col++;

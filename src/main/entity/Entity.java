@@ -31,7 +31,8 @@ public class Entity {
         THROWING(false, false, false),
         JUMPING(true, true, false),
         SOARING(true, true, false),
-        FALLING(false, false, false);
+        FALLING(false, false, false),
+        DROWNING(false, false, false);
 
         private final boolean allowsFacing;
         private final boolean allowsTranslation;
