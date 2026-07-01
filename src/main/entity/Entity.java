@@ -494,11 +494,11 @@ public class Entity {
         }
     }
     public int getGoalCol(Entity target) {
-        int goalCol = (target.worldX + target.hitbox.x) / gp.tileSize;
+        int goalCol = target.getCenterX() / gp.tileSize;
         return goalCol;
     }
     public int getGoalRow(Entity target) {
-        int goalRow = (target.worldY + target.hitbox.y) / gp.tileSize;
+        int goalRow = target.getCenterY() / gp.tileSize;
         return goalRow;
     }
 

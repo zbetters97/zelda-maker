@@ -348,13 +348,13 @@ public class UI {
         g2.setFont(new Font("Arial", Font.PLAIN, 20));
 
         // Draw coordinates
-        g2.drawString("WorldX: " + gp.player.getWorldX(), x, y);
+        g2.drawString("World X: " + gp.player.getWorldX(), x, y);
         y += lineHeight;
-        g2.drawString("WorldY: " + gp.player.getWorldY(), x, y);
+        g2.drawString("World Y: " + gp.player.getWorldY(), x, y);
         y += lineHeight;
-        g2.drawString("Column: " + (gp.player.getWorldX() + gp.player.getHitbox().x) / gp.tileSize, x, y);
+        g2.drawString("Column: " + gp.player.getCenterX() / gp.tileSize, x, y);
         y += lineHeight;
-        g2.drawString("Row: " + (gp.player.getWorldY() + gp.player.getHitbox().y) / gp.tileSize, x, y);
+        g2.drawString("Row: " + gp.player.getCenterY() / gp.tileSize, x, y);
 
         // Draw player hitbox
         g2.setColor(Color.RED);
