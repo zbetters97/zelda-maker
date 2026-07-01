@@ -93,8 +93,8 @@ public class PathFinder {
             for (int i = 0; i < gp.obj[0].length; i++) {
 
                 if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getCollision()) {
-                    int iCol = gp.obj[gp.currentMap][i].getWorldX() / gp.tileSize;
-                    int iRow = gp.obj[gp.currentMap][i].getWorldY() / gp.tileSize;
+                    int iCol = gp.obj[gp.currentMap][i].getWorldPoint().x / gp.tileSize;
+                    int iRow = gp.obj[gp.currentMap][i].getWorldPoint().y / gp.tileSize;
                     node[iCol][iRow].solid = true;
                 }
             }
@@ -103,8 +103,8 @@ public class PathFinder {
             for (int i = 0; i < gp.npc[0].length; i++) {
 
                 if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].getSpeed() == 0) {
-                    int iCol = gp.npc[gp.currentMap][i].getWorldX() / gp.tileSize;
-                    int iRow = gp.npc[gp.currentMap][i].getWorldY() / gp.tileSize;
+                    int iCol = gp.npc[gp.currentMap][i].getWorldPoint().x / gp.tileSize;
+                    int iRow = gp.npc[gp.currentMap][i].getWorldPoint().y / gp.tileSize;
                     node[iCol][iRow].solid = true;
                 }
             }

@@ -9,11 +9,7 @@ public class ITM_Bow extends Entity {
     public static final String itmName = "Hylian Bow";
 
     public ITM_Bow(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
+        super(gp, user, itmName);
     }
 
     @Override
@@ -39,7 +35,7 @@ public class ITM_Bow extends Entity {
 
         setPower();
 
-        projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);
+        projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
         addProjectile(projectile);
 
         user.arrows--;

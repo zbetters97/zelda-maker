@@ -16,28 +16,21 @@ public class EMY_Keese extends Entity {
      * @param worldY Starting coordinate
      */
     public EMY_Keese(GamePanel gp, int worldX, int worldY) {
-        super(gp);
+        super(gp, worldX, worldY, emyName);
 
-        // Coordinates
-        this.worldX = worldX * gp.tileSize;
-        this.worldY = worldY * gp.tileSize;
-        worldXStart = this.worldX;
-        worldYStart = this.worldY;
-
-        // General attributes
         entity_type = type_enemy;
-        name = emyName;
+        animationSpeed = 5;
+
+        maxHealth = 4;
+        health = maxHealth;
 
         defaultSpeed = 2;
         speed = defaultSpeed;
-        animationSpeed = 5;
-        health = 4;
         attack = 1;
 
         // Collision attributes
         hitbox = new Rectangle(2, 18, 44, 30);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }

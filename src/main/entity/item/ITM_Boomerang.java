@@ -9,12 +9,7 @@ public class ITM_Boomerang extends Entity {
     public static final String itmName = "Hylian Boomerang";
 
     public ITM_Boomerang(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
-
+        super(gp, user, itmName);
         projectile = new PRJ_Boomerang(gp);
     }
 
@@ -27,7 +22,7 @@ public class ITM_Boomerang extends Entity {
     protected void use() {
 
         if (!projectile.alive) {
-            projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);
+            projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
             addProjectile(projectile);
 
             user.setAction(Action.THROWING);

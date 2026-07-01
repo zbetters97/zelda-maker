@@ -8,11 +8,7 @@ public class ITM_Cape extends Entity {
     public static final String itmName = "Cape";
 
     public ITM_Cape(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
+        super(gp, user, itmName);
     }
 
     @Override

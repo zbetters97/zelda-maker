@@ -187,42 +187,42 @@ public class TileManager {
             int worldY = worldRow * gp.tileSize;
 
             // Player screen position X, Y Offset to Center
-            int screenX = worldX - gp.player.getWorldX() + gp.player.getScreenX();
-            int screenY = worldY - gp.player.getWorldY() + gp.player.getScreenY();
+            int screenX = worldX - gp.player.getWorldPoint().x + gp.player.getScreenPoint().x;
+            int screenY = worldY - gp.player.getWorldPoint().y + gp.player.getScreenPoint().y;
 
             // Stop camera movement at world boundary
-            if (gp.player.getScreenX() > gp.player.getWorldX()) {
+            if (gp.player.getScreenPoint().x > gp.player.getWorldPoint().x) {
                 screenX = worldX;
                 offCenter = true;
             }
-            if (gp.player.getScreenY() > gp.player.getWorldY()) {
+            if (gp.player.getScreenPoint().y > gp.player.getWorldPoint().y) {
                 screenY = worldY;
                 offCenter = true;
             }
 
             // From player right-edge to screen
-            int rightOffset = gp.screenWidth - gp.player.getScreenX();
+            int rightOffset = gp.screenWidth - gp.player.getScreenPoint().x;
 
             // From player to right-edge of world
-            if (rightOffset > gp.worldWidth - gp.player.getWorldX()) {
+            if (rightOffset > gp.worldWidth - gp.player.getWorldPoint().x) {
                 screenX = gp.screenWidth - (gp.worldWidth - worldX);
                 offCenter = true;
             }
 
             // From player to bottom-edge of screen
-            int bottomOffSet = gp.screenHeight - gp.player.getScreenY();
+            int bottomOffSet = gp.screenHeight - gp.player.getScreenPoint().y;
 
             // From player to bottom-edge of world
-            if (bottomOffSet > gp.worldHeight - gp.player.getWorldY()) {
+            if (bottomOffSet > gp.worldHeight - gp.player.getWorldPoint().y) {
                 screenY = gp.screenHeight - (gp.worldHeight - worldY);
                 offCenter = true;
             }
 
             // Draw tiles within player boundary
-            if (worldX + gp.tileSize > gp.player.getWorldX() - gp.player.getScreenX() &&
-                    worldX - gp.tileSize < gp.player.getWorldX() + gp.player.getScreenX() &&
-                    worldY + gp.tileSize > gp.player.getWorldY() - gp.player.getScreenY() &&
-                    worldY - gp.tileSize < gp.player.getWorldY() + gp.player.getScreenY()) {
+            if (worldX + gp.tileSize > gp.player.getWorldPoint().x - gp.player.getScreenPoint().x &&
+                    worldX - gp.tileSize < gp.player.getWorldPoint().x + gp.player.getScreenPoint().x &&
+                    worldY + gp.tileSize > gp.player.getWorldPoint().y - gp.player.getScreenPoint().y &&
+                    worldY - gp.tileSize < gp.player.getWorldPoint().y + gp.player.getScreenPoint().y) {
 
                 if (tileNum == oceanTile1) {
                     if (waterNum == 2) {

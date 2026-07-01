@@ -9,12 +9,7 @@ public class ITM_Hookshot extends Entity {
     public static final String itmName = "Hookshot";
 
     public ITM_Hookshot(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
-
+        super(gp, user, itmName);
         projectile = new PRJ_Claw(gp, user);
     }
 
@@ -27,7 +22,7 @@ public class ITM_Hookshot extends Entity {
     protected void use() {
 
         if (!projectile.alive) {
-            projectile.set(user.getWorldX(), user.getWorldY(), user.getDirection(), true, user);
+            projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
             addProjectile(projectile);
 
             user.setAction(Action.THROWING);

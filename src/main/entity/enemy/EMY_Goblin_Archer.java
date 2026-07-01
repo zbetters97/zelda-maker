@@ -12,25 +12,20 @@ public class EMY_Goblin_Archer extends Entity {
     public static final String emyName = "Archer Goblin";
 
     public EMY_Goblin_Archer(GamePanel gp, int worldX, int worldY) {
-        super(gp);
-        this.worldX = worldX * gp.tileSize;
-        this.worldY = worldY * gp.tileSize;
-        worldXStart = this.worldX;
-        worldYStart = this.worldY;
+        super(gp, worldX, worldY, emyName);
 
         entity_type = type_enemy;
-        name = emyName;
+        animationSpeed = 15;
 
-        maxHealth = 12;
+        maxHealth = 8;
         health = maxHealth;
+
         defaultSpeed = 1;
         speed = defaultSpeed;
-        animationSpeed = 16;
         attack = 1;
 
         hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
@@ -112,7 +107,7 @@ public class EMY_Goblin_Archer extends Entity {
         // Shoot one arrow every ~2 seconds
         int i = new Random().nextInt(120);
         if (i == 0 && !projectile.alive && actionLockCounter == 0) {
-            projectile.set(worldX, worldY, direction, true, this);
+            projectile.set(worldPoint, direction, true, this);
             addProjectile(projectile);
 
             // Force 30 frame delay in between shots

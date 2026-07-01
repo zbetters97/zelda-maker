@@ -15,10 +15,7 @@ public class PRJ_Claw extends Projectile {
     private BufferedImage grabUp1, grabDown1, grabLeft1, grabRight1, chainHor, chainVer;
 
     public PRJ_Claw(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_projectile;
-        name = prjName;
+        super(gp, prjName);
 
         speed = 10;
 
@@ -29,8 +26,7 @@ public class PRJ_Claw extends Projectile {
         this.user = user;
 
         hitbox = new Rectangle(12, 16, 24, 24);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
@@ -101,7 +97,7 @@ public class PRJ_Claw extends Projectile {
     private void checkLatchableCollision() {
         int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
 
-        if (object != -1) {
+        if (object != -1 && gp.obj[gp.currentMap][object].isLatchable()) {
             latched = true;
             grabbedEntity = gp.obj[gp.currentMap][object];
             health = 0;
@@ -121,42 +117,39 @@ public class PRJ_Claw extends Projectile {
         }
 
         user.setElevated(true);
-
-        int stopX = grabbedEntity.getWorldX() + gp.tileSize;
-        int stopY = grabbedEntity.getWorldY() + gp.tileSize;
-
-        int userWorldX = user.getWorldX();
-        int userWorldY = user.getWorldY();
+        
+        Point stopPoint = new Point(grabbedEntity.getWorldPoint().x + gp.tileSize, grabbedEntity.getWorldPoint().y + gp.tileSize);
+        Point userPoint = new Point(user.getWorldPoint().x, user.getWorldPoint().y);
 
         // Move user towards latched
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (userWorldY > stopY) {
-                    user.setWorldY(userWorldY - 5);
+                if (userPoint.y > stopPoint.y) {
+                    user.setWorldPointY(userPoint.y - 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (userWorldY < stopY) {
-                    user.setWorldY(userWorldY + 5);
+                if (userPoint.y < stopPoint.y) {
+                    user.setWorldPointY(userPoint.y + 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case LEFT -> {
-                if (userWorldX > stopX) {
-                    user.setWorldX(userWorldX - 5);
+                if (userPoint.x > stopPoint.x) {
+                    user.setWorldPointX(userPoint.x - 5);
                 }
                 else {
                     alive = false;
                 }
             }
             case RIGHT -> {
-                if (userWorldX < stopX) {
-                    user.setWorldX(userWorldX + 5);
+                if (userPoint.x < stopPoint.x) {
+                    user.setWorldPointX(userPoint.x + 5);
                 }
                 else {
                     alive = false;
@@ -170,32 +163,32 @@ public class PRJ_Claw extends Projectile {
         // Move backwards to user
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (worldY + gp.tileSize / 2 <= gp.player.getWorldY()) {
-                    worldY += 5;
+                if (worldPoint.y + gp.tileSize / 2 <= gp.player.getWorldPoint().y) {
+                    worldPoint.y += 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldY - gp.tileSize / 2 >= gp.player.getWorldY()) {
-                    worldY -= 5;
+                if (worldPoint.y - gp.tileSize / 2 >= gp.player.getWorldPoint().y) {
+                    worldPoint.y -= 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case LEFT -> {
-                if (worldX + gp.tileSize / 2 <= gp.player.getWorldX()) {
-                    worldX += 5;
+                if (worldPoint.x + gp.tileSize / 2 <= gp.player.getWorldPoint().x) {
+                    worldPoint.x += 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case RIGHT -> {
-                if (worldX - gp.tileSize / 2 >= gp.player.getWorldX()) {
-                    worldX -= 5;
+                if (worldPoint.x - gp.tileSize / 2 >= gp.player.getWorldPoint().x) {
+                    worldPoint.x -= 5;
                 }
                 else {
                     alive = false;
@@ -216,10 +209,10 @@ public class PRJ_Claw extends Projectile {
 
         // Offset X/Y so entity isn't on top of player
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldY(worldY - gp.tileSize / 2);
-            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldY(worldY + gp.tileSize / 2);
-            case LEFT -> grabbedEntity.setWorldX(worldX - gp.tileSize / 2);
-            case RIGHT -> grabbedEntity.setWorldX(worldX + gp.tileSize / 2);
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y - gp.tileSize / 2);
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y + gp.tileSize / 2);
+            case LEFT -> grabbedEntity.setWorldPointX(worldPoint.x - gp.tileSize / 2);
+            case RIGHT -> grabbedEntity.setWorldPointX(worldPoint.x + gp.tileSize / 2);
         }
     }
 
@@ -255,25 +248,22 @@ public class PRJ_Claw extends Projectile {
 
     private void drawChain(Graphics2D g2) {
 
-        int startX = user.getScreenX() + gp.tileSize / 2;
-        int startY = user.getScreenY() + gp.tileSize / 2;
-
-        int endX = getScreenX() + gp.tileSize / 2;
-        int endY = getScreenY() + gp.tileSize / 2;
+        Point startPoint = new Point(user.getScreenPoint().x + gp.tileSize / 2, user.getScreenPoint().y + gp.tileSize / 2);
+        Point endPoint = new Point(getScreenPoint().x + gp.tileSize / 2, getScreenPoint().y + gp.tileSize / 2);
 
         switch (direction) {
             case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> {
                 int step = chainVer.getHeight();
-                for (int y = startY; Math.abs(y - endY) > step;) {
-                    y += (endY > y) ? step : -step;
-                    g2.drawImage(chainVer, startX - chainVer.getWidth() / 2, y - chainVer.getHeight() / 2, null);
+                for (int y = startPoint.y; Math.abs(y - endPoint.y) > step;) {
+                    y += (endPoint.y > y) ? step : -step;
+                    g2.drawImage(chainVer, startPoint.x - chainVer.getWidth() / 2, y - chainVer.getHeight() / 2, null);
                 }
             }
             case LEFT, RIGHT -> {
                 int step = chainHor.getWidth();
-                for (int x = startX; Math.abs(x - endX) > step;) {
-                    x += (endX > x) ? step : -step;
-                    g2.drawImage(chainHor, x - chainHor.getWidth() / 2, startY - chainHor.getHeight() / 2, null);
+                for (int x = startPoint.x; Math.abs(x - endPoint.x) > step;) {
+                    x += (endPoint.x > x) ? step : -step;
+                    g2.drawImage(chainHor, x - chainHor.getWidth() / 2, startPoint.y - chainHor.getHeight() / 2, null);
                 }
             }
         }

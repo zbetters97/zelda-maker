@@ -10,25 +10,20 @@ public class EMY_Goblin_Combat extends Entity {
     public static final String emyName = "Combat Goblin";
 
     public EMY_Goblin_Combat(GamePanel gp, int worldX, int worldY) {
-        super(gp);
-        this.worldX = worldX * gp.tileSize;
-        this.worldY = worldY * gp.tileSize;
-        worldXStart = this.worldX;
-        worldYStart = this.worldY;
+        super(gp, worldX, worldY, emyName);
 
         entity_type = type_enemy;
-        name = emyName;
+        animationSpeed = 15;
 
         maxHealth = 12;
         health = maxHealth;
+
         defaultSpeed = 1;
         speed = defaultSpeed;
-        animationSpeed = 10;
         attack = 4;
 
         hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 

@@ -58,17 +58,25 @@ public class Entity {
     protected GamePanel gp;
 
     /** GENERAL ATTRIBUTES */
-    protected int worldX, worldY;
-    protected int screenX, screenY;
-    protected int worldXStart, worldYStart;
-    protected int tempScreenX, tempScreenY;
+    protected Point worldPoint = new Point(),
+            screenPoint = new Point(),
+            startPoint = new Point(),
+            tempScreenPoint = new Point();
     private final int bounds = 999;
+
+    /** COLLISION VALUES */
+    protected boolean collisionOn = true;
+    protected Rectangle hitbox = new Rectangle(0, 0, 48, 48);
+    protected Point hitboxDefaultPoint = new Point();
+    protected int hitboxDefaultWidth = hitbox.width;
+    protected int hitboxDefaultHeight = hitbox.height;
 
     /** MOVEMENT VALUES */
     protected Direction direction = DOWN;
     protected Action action = IDLE;
     protected int speed = 1;
     protected int defaultSpeed;
+    protected boolean canMove = true;
     protected boolean moving = false;
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
@@ -91,6 +99,8 @@ public class Entity {
     protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
+    protected boolean stunned = false;
+    protected int stunnedCounter = 0;
     public boolean dying = false;
     private int dyingCounter = 0;
     protected boolean opened = false;
@@ -108,15 +118,6 @@ public class Entity {
     protected GamePanel.Direction knockbackDirection;
     protected int knockbackCounter = 0;
 
-    /** COLLISION VALUES */
-    protected boolean collisionOn = true;
-    protected boolean canMove = true;
-    protected Rectangle hitbox = new Rectangle(0, 0, 48, 48);
-    protected int hitboxDefaultX;
-    protected int hitboxDefaultY;
-    protected int hitboxDefaultWidth = hitbox.width;
-    protected int hitboxDefaultHeight = hitbox.height;
-
     /** INVENTORY VALUES */
     public int arrows = 0;
 
@@ -124,7 +125,7 @@ public class Entity {
     public Projectile projectile;
     public Entity user;
     public int charge = 0;
-    protected boolean grabbable = false;
+    protected boolean latchable = false;
 
     /** SPRITE ATTRIBUTES */
     protected int spriteNum = 1;
@@ -145,12 +146,32 @@ public class Entity {
     public final int type_object = 4;
     public final int type_projectile = 5;
 
-    /**
-     * CONSTRUCTOR
-     * @param gp GamePanel
-     */
+    /** CONSTRUCTORS */
     public Entity(GamePanel gp) {
         this.gp = gp;
+        getImages();
+    }
+    public Entity(GamePanel gp, String name) {
+        this.gp = gp;
+        this.name = name;
+        getImages();
+    }
+    public Entity(GamePanel gp, int worldX, int worldY, String name) {
+        this.gp = gp;
+        this.name = name;
+
+        worldPoint.setLocation(worldX * gp.tileSize, worldY * gp.tileSize);
+        startPoint.setLocation(worldX * gp.tileSize, worldY * gp.tileSize);
+
+        getImages();
+    }
+    public Entity(GamePanel gp, Entity user, String name) {
+        this.gp = gp;
+        this.user = user;
+        this.name = name;
+
+        entity_type = type_item;
+
         getImages();
     }
 
@@ -289,26 +310,26 @@ public class Entity {
         moving = true;
 
         switch (direction) {
-            case UP -> worldY -= speed;
+            case UP -> worldPoint.y -= speed;
             case UPLEFT -> {
-                worldY -= (int) (speed - 0.5);
-                worldX -= (int) (speed - 0.5);
+                worldPoint.y -= (int) (speed - 0.5);
+                worldPoint.x -= (int) (speed - 0.5);
             }
             case UPRIGHT -> {
-                worldY -= (int) (speed - 0.5);
-                worldX += (int) (speed - 0.5);
+                worldPoint.y -= (int) (speed - 0.5);
+                worldPoint.x += (int) (speed - 0.5);
             }
-            case DOWN -> worldY += speed;
+            case DOWN -> worldPoint.y += speed;
             case DOWNLEFT -> {
-                worldY += (int) (speed - 0.5);
-                worldX -= (int) (speed - 0.5);
+                worldPoint.y += (int) (speed - 0.5);
+                worldPoint.x -= (int) (speed - 0.5);
             }
             case DOWNRIGHT -> {
-                worldY += speed;
-                worldX += (int) (speed - 0.5);
+                worldPoint.y += speed;
+                worldPoint.x += (int) (speed - 0.5);
             }
-            case LEFT -> worldX -= speed;
-            case RIGHT-> worldX += speed;
+            case LEFT -> worldPoint.x -= speed;
+            case RIGHT-> worldPoint.x += speed;
         }
     }
 
@@ -378,8 +399,8 @@ public class Entity {
             return;
         }
 
-        int startCol = (worldX + hitbox.x) / gp.tileSize;
-        int startRow = (worldY + hitbox.y) / gp.tileSize;
+        int startCol = (worldPoint.x + hitbox.x) / gp.tileSize;
+        int startRow = (worldPoint.y + hitbox.y) / gp.tileSize;
 
         // SET PATH
         gp.pFinder.setNodes(startCol, startRow, goalCol, goalRow);
@@ -392,10 +413,10 @@ public class Entity {
             int nextY = gp.pFinder.pathList.getFirst().row * gp.tileSize;
 
             // ENTITY hitbox
-            int eLeftX = worldX + hitbox.x;
-            int eRightX = worldX + hitbox.x + hitbox.width;
-            int eTopY = worldY + hitbox.y;
-            int eBottomY = worldY + hitbox.y + hitbox.height;
+            int eLeftX = worldPoint.x + hitbox.x;
+            int eRightX = worldPoint.x + hitbox.x + hitbox.width;
+            int eTopY = worldPoint.y + hitbox.y;
+            int eBottomY = worldPoint.y + hitbox.y + hitbox.height;
 
             // FIND DIRECTION TO NEXT NODE
             // UP OR DOWN
@@ -475,7 +496,7 @@ public class Entity {
 
         boolean playerWithinBounds = true;
 
-        int tileDistance = (Math.abs(worldXStart - gp.player.worldX) + Math.abs(worldYStart - gp.player.worldY)) / gp.tileSize;
+        int tileDistance = (Math.abs(startPoint.x - gp.player.worldPoint.x) + Math.abs(startPoint.y - gp.player.worldPoint.y)) / gp.tileSize;
 
         if (tileDistance > bounds) {
             playerWithinBounds = false;
@@ -515,11 +536,11 @@ public class Entity {
         return yDistance;
     }
     public int getCenterX() {
-        int centerX = worldX + left1.getWidth() / 2;
+        int centerX = worldPoint.x + left1.getWidth() / 2;
         return centerX;
     }
     public int getCenterY() {
-        int centerY = worldY + up1.getHeight() / 2;
+        int centerY = worldPoint.y + up1.getHeight() / 2;
         return centerY;
     }
 
@@ -528,8 +549,8 @@ public class Entity {
         boolean withinBounds = true;
 
         Direction tempDirection;
-        int tempWorldX = worldX;
-        int tempWorldY = worldY;
+        int tempWorldX = worldPoint.x;
+        int tempWorldY = worldPoint.y;
 
         if (lockedOn) {
             tempDirection = lockonDirection;
@@ -561,7 +582,7 @@ public class Entity {
             case RIGHT -> tempWorldX += speed;
         }
 
-        int tileDistance = (Math.abs(worldXStart - tempWorldX) + Math.abs(worldYStart - tempWorldY)) / gp.tileSize;
+        int tileDistance = (Math.abs(startPoint.x - tempWorldX) + Math.abs(startPoint.y - tempWorldY)) / gp.tileSize;
 
         if (tileDistance > bounds) {
             withinBounds = false;
@@ -572,8 +593,8 @@ public class Entity {
 
     protected boolean lookingAtPlayer(int tolerance) {
 
-        int dx = gp.player.getWorldX() - worldX;
-        int dy = gp.player.getWorldY() - worldY;
+        int dx = gp.player.worldPoint.x - worldPoint.x;
+        int dy = gp.player.worldPoint.y - worldPoint.y;
 
         return switch (direction) {
             case UP -> dy < 0 && Math.abs(dx) <= tolerance;
@@ -675,25 +696,24 @@ public class Entity {
             attackNum = 2;
 
             // Save current X/Y
-            int currentWorldX = worldX;
-            int currentWorldY = worldY;
+            Point currentWorldPoint = new Point(worldPoint);
 
             // Adjust X/Y
             switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    worldY -= attackBox.height + hitbox.y;
+                    worldPoint.y -= attackBox.height + hitbox.y;
                     hitbox.height = attackBox.height;
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    worldY += attackBox.height - hitbox.y;
+                    worldPoint.y += attackBox.height - hitbox.y;
                     hitbox.height = attackBox.height;
                 }
                 case LEFT -> {
-                    worldX -= attackBox.width;
+                    worldPoint.x -= attackBox.width;
                     hitbox.width = attackBox.width;
                 }
                 case RIGHT -> {
-                    worldX += attackBox.width - hitbox.y;
+                    worldPoint.x += attackBox.width - hitbox.y;
                     hitbox.width = attackBox.width;
                 }
             }
@@ -703,8 +723,7 @@ public class Entity {
             }
 
             // Restore hitbox
-            worldX = currentWorldX;
-            worldY = currentWorldY;
+            worldPoint.setLocation(currentWorldPoint);
             hitbox.width = hitboxDefaultWidth;
             hitbox.height = hitboxDefaultHeight;
         }
@@ -746,17 +765,18 @@ public class Entity {
      * Useful for Pit/Water tile handling
      */
     public void shiftToCenter() {
+        Point center = getCenterPoint();
 
-        // Get current X/Y based on hitbox center
-        int centerX = worldX + hitbox.x + hitbox.width / 2;
-        int centerY = worldY + hitbox.y + hitbox.height / 2;
-
-        // Snap to tile size
-        int newWorldX = (centerX / gp.tileSize) * gp.tileSize;
-        int newWorldY = (centerY / gp.tileSize) * gp.tileSize;
-
-        worldX = newWorldX;
-        worldY = newWorldY;
+        worldPoint.setLocation(
+                (center.x / gp.tileSize) * gp.tileSize,
+                (center.y / gp.tileSize) * gp.tileSize
+        );
+    }
+    public Point getCenterPoint() {
+        return new Point(
+                worldPoint.x + hitbox.x + hitbox.width / 2,
+                worldPoint.y + hitbox.y + hitbox.height / 2
+        );
     }
 
     /**
@@ -827,10 +847,10 @@ public class Entity {
 
         // Move in knockback direction
         switch (knockbackDirection) {
-            case UP, UPLEFT, UPRIGHT -> worldY -= speed;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY += speed;
-            case LEFT -> worldX -= speed;
-            case RIGHT -> worldX += speed;
+            case UP, UPLEFT, UPRIGHT -> worldPoint.y -= speed;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y += speed;
+            case LEFT -> worldPoint.x -= speed;
+            case RIGHT -> worldPoint.x += speed;
         }
 
         // Run for 10 frames
@@ -910,6 +930,14 @@ public class Entity {
                 invincible = false;
             }
         }
+        else if (stunned) {
+            stunnedCounter++;
+
+            if (stunnedCounter > 45) {
+                stunnedCounter = 0;
+                stunned = false;
+            }
+        }
     }
 
     /**
@@ -924,6 +952,7 @@ public class Entity {
         attackNum = 1; attackCounter = 0;
         knockback = false; knockbackCounter = 0;
         invincible = false; invincibleCounter = 0;
+        stunned = false; stunnedCounter = 0;
         dying = false; dyingCounter = 0;
 
         speed = defaultSpeed;
@@ -939,16 +968,6 @@ public class Entity {
 
         opened = false;
         isElevated = false;
-    }
-
-    /**
-     * RESURRECT
-     * Brings entity back to life
-     */
-    public void resurrect() {
-        resetValues();
-        alive = true;
-        health = maxHealth;
     }
 
     /**
@@ -972,10 +991,10 @@ public class Entity {
         }
 
         // Draw sprite
-        g2.drawImage(image, tempScreenX, tempScreenY, null);
+        g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
 
         // Draw hitbox (debug)
-        g2.drawRect(tempScreenX + hitbox.x, tempScreenY + hitbox.y, hitbox.width, hitbox.height);
+        g2.drawRect(tempScreenPoint.x + hitbox.x, tempScreenPoint.y + hitbox.y, hitbox.width, hitbox.height);
 
         // Reset opacity
         changeAlpha(g2, 1f);
@@ -986,30 +1005,30 @@ public class Entity {
      * Adjusts X, Y if near edge
      */
     public void adjustOffCenter() {
-        tempScreenX = getScreenX();
-        tempScreenY = getScreenY();
 
-        if (gp.player.worldX < gp.player.screenX) {
-            tempScreenX = worldX;
+        tempScreenPoint = new Point(getScreenPoint());
+
+        if (gp.player.worldPoint.x < gp.player.screenPoint.x) {
+            tempScreenPoint.x = worldPoint.x;
         }
-        if (gp.player.worldY < gp.player.screenY) {
-            tempScreenY = worldY;
+        if (gp.player.worldPoint.y < gp.player.screenPoint.y) {
+            tempScreenPoint.y = worldPoint.y;
         }
 
         // From player to right-edge of screen
-        int rightOffset = gp.screenWidth - gp.player.screenX;
+        int rightOffset = gp.screenWidth - gp.player.screenPoint.x;
 
         //  From player to right-edge of world
-        if (rightOffset > gp.worldWidth - gp.player.worldX) {
-            tempScreenX = gp.screenWidth - (gp.worldWidth - worldX);
+        if (rightOffset > gp.worldWidth - gp.player.worldPoint.x) {
+            tempScreenPoint.x = gp.screenWidth - (gp.worldWidth - worldPoint.x);
         }
 
         //  From player to bottom-edge of screen
-        int bottomOffSet = gp.screenHeight - gp.player.screenY;
+        int bottomOffSet = gp.screenHeight - gp.player.screenPoint.y;
 
         //  From player to bottom-edge of world
-        if (bottomOffSet > gp.worldHeight - gp.player.worldY) {
-            tempScreenY = gp.screenHeight - (gp.worldHeight - worldY);
+        if (bottomOffSet > gp.worldHeight - gp.player.worldPoint.y) {
+            tempScreenPoint.y = gp.screenHeight - (gp.worldHeight - worldPoint.y);
         }
     }
 
@@ -1043,12 +1062,12 @@ public class Entity {
         if (attackNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenY -= up1.getHeight();
+                    tempScreenPoint.y -= up1.getHeight();
                     yield attackUp1;
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown1;
                 case LEFT -> {
-                    tempScreenX -= left1.getWidth();
+                    tempScreenPoint.x -= left1.getWidth();
                     yield attackLeft1;
                 }
                 case RIGHT -> attackRight1;
@@ -1056,12 +1075,12 @@ public class Entity {
         } else if (attackNum == 2) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenY -= up1.getHeight();
+                    tempScreenPoint.y -= up1.getHeight();
                     yield attackUp2;
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown2;
                 case LEFT -> {
-                    tempScreenX -= left1.getWidth();
+                    tempScreenPoint.x -= left1.getWidth();
                     yield attackLeft2;
                 }
                 case RIGHT -> attackRight2;
@@ -1100,39 +1119,42 @@ public class Entity {
     }
 
     /** GETTERS and SETTERS */
-    public int getScreenX() {
-        return worldX - gp.player.worldX + gp.player.screenX;
+    public Point getScreenPoint() {
+        return new Point(
+                worldPoint.x - gp.player.worldPoint.x + gp.player.screenPoint.x,
+                worldPoint.y - gp.player.worldPoint.y + gp.player.screenPoint.y
+        );
     }
-    public int getScreenY() {
-        return worldY - gp.player.worldY + gp.player.screenY;
-    }
-
-    public int getTempScreenX() {
-        return tempScreenX;
-    }
-    public int getTempScreenY() {
-        return tempScreenY;
+    public Point getTempScreenPoint() {
+        return tempScreenPoint;
     }
 
-    public int getWorldX() {
-        return worldX;
+    public Point getWorldPoint() {
+        return worldPoint;
     }
-    public void setWorldX(int worldX) {
-        this.worldX = worldX;
+    public int getWorldPointY() {
+        return worldPoint.y;
     }
-    public int getWorldY() {
-        return worldY;
+    public void setWorldPointX(int x) {
+        this.worldPoint.x = x;
     }
-    public void setWorldY(int worldY) {
-        this.worldY = worldY;
+    public void setWorldPointY(int y) {
+        this.worldPoint.y = y;
+    }
+
+    public Rectangle getHitbox() {
+        return hitbox;
+    }
+    public Rectangle getWorldHitbox() {
+        return new Rectangle(
+                worldPoint.x + hitboxDefaultPoint.x,
+                worldPoint.y + hitboxDefaultPoint.y,
+                hitbox.width,
+                hitbox.height);
     }
 
     public int getType() {
         return entity_type;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Direction getDirection() {
@@ -1159,29 +1181,14 @@ public class Entity {
     public int getSpeed() {
         return speed;
     }
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
     public void modifySpeed(int change) {
         speed += change;
     }
 
-    public int getAttack() {
-        return attack;
-    }
-    public void setAttack(int attack) {
-        this.attack = attack;
-    }
     public void modifyAttack(int change) {
         attack += change;
     }
 
-    public boolean getInvincible() {
-        return invincible;
-    }
-    public boolean getCanMove() {
-        return canMove;
-    }
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
     }
@@ -1200,13 +1207,7 @@ public class Entity {
         return item;
     }
 
-    public Rectangle getHitbox() {
-        return hitbox;
-    }
-    public int getHitboxDefaultX() {
-        return hitboxDefaultX;
-    }
-    public int getHitboxDefaultY() {
-        return hitboxDefaultY;
+    public boolean isLatchable() {
+        return latchable;
     }
 }

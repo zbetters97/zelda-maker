@@ -12,19 +12,13 @@ public class OBJ_Chest extends Entity {
     public static final String objName = "Chest";
 
     public OBJ_Chest(GamePanel gp, int worldX, int worldY) {
-        super(gp);
-        this.worldX = worldX * gp.tileSize;
-        this.worldY = worldY * gp.tileSize;
+        super(gp, worldX, worldY, objName);
 
         entity_type = type_object;
-        name = objName;
-
-        grabbable = true;
-        direction = GamePanel.Direction.DOWN;
+        latchable = true;
 
         hitbox = new Rectangle(4, 16, 40, 32);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }

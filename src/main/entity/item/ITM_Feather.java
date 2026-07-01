@@ -8,11 +8,7 @@ public class ITM_Feather extends Entity {
     public static final String itmName = "Feather";
 
     public ITM_Feather(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
+        super(gp, user, itmName);
     }
 
     @Override

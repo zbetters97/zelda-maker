@@ -3,12 +3,15 @@ package entity.projectile;
 import application.GamePanel;
 import entity.Entity;
 
+import java.awt.*;
+
 public class Projectile extends Entity {
 
     protected boolean canPickup = false;
 
-    public Projectile(GamePanel gp) {
-        super(gp);
+    public Projectile(GamePanel gp, String name) {
+        super(gp, name);
+        entity_type = type_projectile;
     }
 
     @Override
@@ -18,20 +21,29 @@ public class Projectile extends Entity {
         }
     }
 
-    public void set(int worldX, int worldY, GamePanel.Direction direction, boolean alive, Entity user) {
-        this.worldX = worldX;
-        this.worldY = worldY;
+    public void set(Point worldPoint, GamePanel.Direction direction, boolean alive, Entity user) {
+        this.worldPoint.setLocation(worldPoint);
         this.direction = direction;
         this.alive = alive;
         this.user = user;
+
+        shiftPosition();
+    }
+    private void shiftPosition() {
+
+        // Avoids potential collision issue
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> this.worldPoint.x += 3;
+            case LEFT, RIGHT -> this.worldPoint.y += 3;
+        }
     }
 
     protected void move() {
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> worldY -= speed;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY += speed;
-            case LEFT -> worldX -= speed;
-            case RIGHT -> worldX += speed;
+            case UP, UPLEFT, UPRIGHT -> worldPoint.y -= speed;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y += speed;
+            case LEFT -> worldPoint.x -= speed;
+            case RIGHT -> worldPoint.x += speed;
         }
     }
 

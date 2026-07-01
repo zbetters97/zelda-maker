@@ -8,11 +8,7 @@ public class ITM_Shovel extends Entity {
     public static final String itmName = "Wooden Shovel";
 
     public ITM_Shovel(GamePanel gp, Entity user) {
-        super(gp);
-
-        entity_type = type_item;
-        name = itmName;
-        this.user = user;
+        super(gp, user, itmName);
     }
 
     @Override

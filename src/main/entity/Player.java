@@ -15,8 +15,7 @@ import static application.GamePanel.Direction.*;
 public class Player extends Entity {
 
     /* X/Y VALUES */
-    public int safeWorldX = 0;
-    public int safeWorldY = 0;
+    public Point safePoint;
 
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
@@ -69,13 +68,11 @@ public class Player extends Entity {
         attack = 2;
 
         // Player position locked to center of screen
-        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
-        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+        screenPoint = new Point(gp.screenWidth / 2 - (gp.tileSize / 2), gp.screenHeight / 2 - (gp.tileSize / 2));
 
         // Hitbox
         hitbox = new Rectangle(8, 12, 32, 34);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint = new Point(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
@@ -239,7 +236,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        item = new ITM_Hookshot(gp, this);
+        item = new ITM_Bow(gp, this);
     }
 
     /**
@@ -256,11 +253,8 @@ public class Player extends Entity {
      * SET DEFAULT POSITON
      */
     private void setDefaultPosition() {
-        worldX = gp.tileSize * 23;
-        worldY = gp.tileSize * 21;
-
-        safeWorldX = worldX;
-        safeWorldY = worldY;
+        worldPoint = new Point(gp.tileSize * 23, gp.tileSize * 21);
+        safePoint = new Point(worldPoint.x, worldPoint.y);
 
         gp.currentMap = 0;
         gp.currentArea = gp.outside;
@@ -463,12 +457,12 @@ public class Player extends Entity {
         Direction zDirection = direction;
 
         // Player X/Y
-        int px = (worldX + (gp.tileSize / 2));
-        int py = (worldY + (gp.tileSize / 2));
+        int px = (worldPoint.x + (gp.tileSize / 2));
+        int py = (worldPoint.y + (gp.tileSize / 2));
 
         // Target X/Y
-        int ex = (target.worldX + (gp.tileSize / 2));
-        int ey = (target.worldY + (gp.tileSize / 2));
+        int ex = (target.worldPoint.x + (gp.tileSize / 2));
+        int ey = (target.worldPoint.y + (gp.tileSize / 2));
 
         if (py > ey && py - ey >= Math.abs(px - ex)) // SOUTH
         {
@@ -755,25 +749,24 @@ public class Player extends Entity {
     private void adjustSwingHitbox() {
 
         // Save X/Y
-        int currentWorldX = worldX;
-        int currentWorldY = worldY;
+        Point currentWorldPoint = new Point(worldPoint.x, worldPoint.y);
 
         // Reposition X/Y and hitbox for slash
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                worldY -= attackBox.height + hitbox.y;
+                worldPoint.y -= attackBox.height + hitbox.y;
                 hitbox.height = attackBox.height;
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                worldY += attackBox.height - hitbox.y;
+                worldPoint.y += attackBox.height - hitbox.y;
                 hitbox.height = attackBox.height;
             }
             case LEFT -> {
-                worldX -= attackBox.width;
+                worldPoint.x -= attackBox.width;
                 hitbox.width = attackBox.width;
             }
             case RIGHT -> {
-                worldX += attackBox.width - hitbox.y;
+                worldPoint.x += attackBox.width - hitbox.y;
                 hitbox.width = attackBox.width;
             }
         }
@@ -781,8 +774,7 @@ public class Player extends Entity {
         detectSwordCollision();
 
         // Restore hitbox
-        worldX = currentWorldX;
-        worldY = currentWorldY;
+        worldPoint.setLocation(currentWorldPoint);
         hitbox.width = hitboxDefaultWidth;
         hitbox.height = hitboxDefaultHeight;
     }
@@ -878,30 +870,29 @@ public class Player extends Entity {
     private void adjustSpinHitbox() {
 
         // Save current X/Y
-        int currentWorldX = worldX;
-        int currentWorldY = worldY;
+        Point currentWorldPoint = new Point(worldPoint.x, worldPoint.y);
 
         // Reposition X/Y and hitbox for spinning slash
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                worldY -= attackBox.height + hitbox.y;
+                worldPoint.y -= attackBox.height + hitbox.y;
                 hitbox.height = attackBox.height;
                 hitbox.width *= 2;
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                worldX -= attackBox.width;
-                worldY += attackBox.height - hitbox.y;
+                worldPoint.x -= attackBox.width;
+                worldPoint.y += attackBox.height - hitbox.y;
                 hitbox.height = attackBox.height;
                 hitbox.width *= 2;
             }
             case LEFT -> {
-                worldX -= attackBox.width;
-                worldY -= attackBox.height;
+                worldPoint.x -= attackBox.width;
+                worldPoint.y -= attackBox.height;
                 hitbox.width = attackBox.width;
                 hitbox.height *= 2;
             }
             case RIGHT -> {
-                worldX += attackBox.width - hitbox.y;
+                worldPoint.x += attackBox.width - hitbox.y;
                 hitbox.width = attackBox.width;
                 hitbox.height *= 2;
             }
@@ -910,8 +901,7 @@ public class Player extends Entity {
         detectSwordCollision();
 
         // Reset X/Y and Hitbox
-        worldX = currentWorldX;
-        worldY = currentWorldY;
+        worldPoint.setLocation(currentWorldPoint);
         hitbox.width = hitboxDefaultWidth;
         hitbox.height = hitboxDefaultHeight;
     }
@@ -1081,10 +1071,10 @@ public class Player extends Entity {
         if (collisionOn) return;
 
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> worldY--;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> worldY++;
-            case LEFT -> worldX--;
-            case RIGHT -> worldX++;
+            case UP, UPLEFT, UPRIGHT -> worldPoint.y--;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y++;
+            case LEFT -> worldPoint.x--;
+            case RIGHT -> worldPoint.x++;
         }
     }
 
@@ -1111,9 +1101,8 @@ public class Player extends Entity {
             damageCounter = 0;
             health -= 2;
             invincible = true;
-
-            worldX = safeWorldX;
-            worldY = safeWorldY;
+            
+            worldPoint.setLocation(safePoint);
             action = IDLE;
 
             resetHandlers();
@@ -1189,7 +1178,7 @@ public class Player extends Entity {
            playHurtAnimation(g2);
         }
 
-        g2.drawImage(image, tempScreenX, tempScreenY, null);
+        g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
 
         // Reset opacity
         changeAlpha(g2, 1f);
@@ -1200,30 +1189,29 @@ public class Player extends Entity {
      * Adjusts X, Y if near edge
      */
     private void offCenter() {
-        tempScreenX = screenX;
-        tempScreenY = screenY;
+        tempScreenPoint.setLocation(screenPoint);
 
-        if (worldX < screenX) {
-            tempScreenX = worldX;
+        if (worldPoint.x < screenPoint.x) {
+            tempScreenPoint.x = worldPoint.x;
         }
-        if (worldY < screenY) {
-            tempScreenY = worldY;
+        if (worldPoint.y < screenPoint.y) {
+            tempScreenPoint.y = worldPoint.y;
         }
 
         // From player to right-edge of screen
-        int rightOffset = gp.screenWidth - screenX;
+        int rightOffset = gp.screenWidth - screenPoint.x;
 
         //  From player to right-edge of world
-        if (rightOffset > gp.worldWidth - worldX) {
-            tempScreenX = gp.screenWidth - (gp.worldWidth - worldX);
+        if (rightOffset > gp.worldWidth - worldPoint.x) {
+            tempScreenPoint.x = gp.screenWidth - (gp.worldWidth - worldPoint.x);
         }
 
         // From player to bottom-edge of screen
-        int bottomOffSet = gp.screenHeight - screenY;
+        int bottomOffSet = gp.screenHeight - screenPoint.y;
 
         //  From player to bottom-edge of world
-        if (bottomOffSet > gp.worldHeight - worldY) {
-            tempScreenY = gp.screenHeight - (gp.worldHeight - worldY);
+        if (bottomOffSet > gp.worldHeight - worldPoint.y) {
+            tempScreenPoint.y = gp.screenHeight - (gp.worldHeight - worldPoint.y);
         }
     }
 
@@ -1328,7 +1316,7 @@ public class Player extends Entity {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 if (attackNum > 1) {
-                    tempScreenY -= gp.tileSize;
+                    tempScreenPoint.y -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackUp1;
@@ -1346,7 +1334,7 @@ public class Player extends Entity {
             }
             case DOWN, DOWNLEFT, DOWNRIGHT-> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenX -= gp.tileSize;
+                    tempScreenPoint.x -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackDown1;
@@ -1364,10 +1352,10 @@ public class Player extends Entity {
             }
             case LEFT -> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenY -= gp.tileSize;
+                    tempScreenPoint.y -= gp.tileSize;
                 }
                 if (attackNum == 2 || attackNum == 3) {
-                    tempScreenX -= gp.tileSize;
+                    tempScreenPoint.x -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackLeft1;
@@ -1385,7 +1373,7 @@ public class Player extends Entity {
             }
             case RIGHT -> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenY -= gp.tileSize;
+                    tempScreenPoint.y -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackRight1;
@@ -1410,7 +1398,7 @@ public class Player extends Entity {
 
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                tempScreenY -= gp.tileSize;
+                tempScreenPoint.y -= gp.tileSize;
                 spinSprite = switch (attackNum) {
                     case 1 -> spinUp1;
                     case 2 -> spinUp2;
@@ -1419,7 +1407,7 @@ public class Player extends Entity {
             }
             case DOWN, DOWNLEFT, DOWNRIGHT-> {
                 if (attackNum == 1) {
-                    tempScreenX -= gp.tileSize;
+                    tempScreenPoint.x -= gp.tileSize;
                 }
                 spinSprite = switch (attackNum) {
                     case 1 -> spinDown1;
@@ -1428,9 +1416,9 @@ public class Player extends Entity {
                 };
             }
             case LEFT -> {
-                 tempScreenX -= gp.tileSize;
+                 tempScreenPoint.x -= gp.tileSize;
                 if (attackNum == 1) {
-                    tempScreenY -= gp.tileSize;
+                    tempScreenPoint.y -= gp.tileSize;
                 }
                 spinSprite = switch (attackNum) {
                     case 1 -> spinLeft1;
@@ -1514,7 +1502,7 @@ public class Player extends Entity {
     private BufferedImage getJumpSprite(Graphics2D g2) {
         BufferedImage jumpSprite;
 
-        tempScreenY -= 30;
+        tempScreenPoint.y -= 30;
 
         if (jumpNum == 1) {
             jumpSprite = switch (direction) {
@@ -1548,7 +1536,7 @@ public class Player extends Entity {
         }
 
         g2.setColor(Color.BLACK);
-        g2.fillOval(tempScreenX + 10, tempScreenY + 70, 30, 10);
+        g2.fillOval(tempScreenPoint.x + 10, tempScreenPoint.y + 70, 30, 10);
 
         return jumpSprite;        
     }

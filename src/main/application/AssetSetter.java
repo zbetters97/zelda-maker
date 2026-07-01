@@ -35,6 +35,6 @@ public record AssetSetter(GamePanel gp) {
         int mapNum = 0;
         int i = 0;
 
-        gp.obj[mapNum][i] = new OBJ_Chest(gp, 12, 21);
+        gp.obj[mapNum][i] = new OBJ_Chest(gp, 14, 21);
     }
 }

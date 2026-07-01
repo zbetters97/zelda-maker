@@ -200,8 +200,8 @@ public class UI {
         if (gp.player.charge > 0) {
 
             // Position above player's head
-            int x = gp.player.getScreenX() - 7;
-            int y = gp.player.getScreenY() - 20;
+            int x = gp.player.getScreenPoint().x - 7;
+            int y = gp.player.getScreenPoint().y - 20;
             int width = 62;
             int height = 10;
 
@@ -305,8 +305,8 @@ public class UI {
             zTargetDirection = 0;
         }
 
-        int x = newTarget.getTempScreenX() - 10;
-        int y = newTarget.getTempScreenY() - 30 + zTargetCounter;
+        int x = newTarget.getTempScreenPoint().x - 10;
+        int y = newTarget.getTempScreenPoint().y - 30 + zTargetCounter;
 
         g2.drawImage(ztarget_arrow, x, y, null);
     }
@@ -320,7 +320,7 @@ public class UI {
 
         BufferedImage img = rotateImage(ztarget_circle, zTargetRotation);
 
-        g2.drawImage(img, target.getTempScreenX() - 10, target.getTempScreenY() - 10, null);
+        g2.drawImage(img, target.getTempScreenPoint().x - 10, target.getTempScreenPoint().y - 10, null);
     }
     private BufferedImage rotateImage(BufferedImage img, int degrees) {
 
@@ -348,9 +348,9 @@ public class UI {
         g2.setFont(new Font("Arial", Font.PLAIN, 20));
 
         // Draw coordinates
-        g2.drawString("World X: " + gp.player.getWorldX(), x, y);
+        g2.drawString("World X: " + gp.player.getWorldPoint().x, x, y);
         y += lineHeight;
-        g2.drawString("World Y: " + gp.player.getWorldY(), x, y);
+        g2.drawString("World Y: " + gp.player.getWorldPoint().y, x, y);
         y += lineHeight;
         g2.drawString("Column: " + gp.player.getCenterX() / gp.tileSize, x, y);
         y += lineHeight;
@@ -358,8 +358,11 @@ public class UI {
 
         // Draw player hitbox
         g2.setColor(Color.RED);
-        g2.drawRect(gp.player.getScreenX() + gp.player.getHitbox().x, gp.player.getScreenY() + gp.player.getHitbox().y,
-                gp.player.getHitbox().width, gp.player.getHitbox().height);
+        g2.drawRect(
+                gp.player.getScreenPoint().x + gp.player.getHitbox().x,
+                gp.player.getScreenPoint().y + gp.player.getHitbox().y,
+                gp.player.getHitbox().width,
+                gp.player.getHitbox().height);
     }
 
     /**

@@ -289,7 +289,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // Sort draw order by Y coordinate
-        entityList.sort(Comparator.comparingInt(Entity::getWorldY));
+        entityList.sort(Comparator.comparingInt(Entity::getWorldPointY));
 
         // Draw all entities
         for (Entity e : entityList) {

@@ -10,10 +10,7 @@ public class PRJ_Arrow extends Projectile {
     public static final String prjName = "Arrow Projectile";
 
     public PRJ_Arrow(GamePanel gp) {
-        super(gp);
-
-        entity_type = type_projectile;
-        name = prjName;
+        super(gp, prjName);
 
         defaultSpeed = 5;
         speed = defaultSpeed;
@@ -26,8 +23,7 @@ public class PRJ_Arrow extends Projectile {
         alive = false;
 
         hitbox = new Rectangle(4, 8, 24, 24);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }
@@ -70,7 +66,8 @@ public class PRJ_Arrow extends Projectile {
     @Override
     protected void checkCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkOverlapCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
     }
     private void checkEnemyCollision() {
 

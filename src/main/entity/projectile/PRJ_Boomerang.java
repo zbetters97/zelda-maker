@@ -12,10 +12,7 @@ public class PRJ_Boomerang extends Projectile {
     private boolean returning = false;
 
     public PRJ_Boomerang(GamePanel gp) {
-        super(gp);
-
-        entity_type = type_projectile;
-        name = prjName;
+        super(gp, prjName);
 
         speed = 8;
         animationSpeed = 3;
@@ -25,8 +22,7 @@ public class PRJ_Boomerang extends Projectile {
         alive = false;
 
         hitbox = new Rectangle(12, 12, 24, 24);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }
@@ -76,32 +72,32 @@ public class PRJ_Boomerang extends Projectile {
     private void returnToUser() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (worldY + gp.tileSize / 2 <= gp.player.getWorldY()) {
-                    worldY += 5;
+                if (worldPoint.y + gp.tileSize / 2 <= gp.player.getWorldPoint().y) {
+                    worldPoint.y += 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldY - gp.tileSize / 2 >= gp.player.getWorldY()) {
-                    worldY -= 5;
+                if (worldPoint.y - gp.tileSize / 2 >= gp.player.getWorldPoint().y) {
+                    worldPoint.y -= 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case LEFT -> {
-                if (worldX + gp.tileSize / 2 <= gp.player.getWorldX()) {
-                    worldX += 5;
+                if (worldPoint.x + gp.tileSize / 2 <= gp.player.getWorldPoint().x) {
+                    worldPoint.x += 5;
                 }
                 else {
                     alive = false;
                 }
             }
             case RIGHT -> {
-                if (worldX - gp.tileSize / 2 >= gp.player.getWorldX()) {
-                    worldX -= 5;
+                if (worldPoint.x - gp.tileSize / 2 >= gp.player.getWorldPoint().x) {
+                    worldPoint.x -= 5;
                 }
                 else {
                     alive = false;

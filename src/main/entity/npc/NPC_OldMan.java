@@ -9,41 +9,21 @@ public class NPC_OldMan extends Entity {
 
     public static final String npcName = "Old Man";
 
-    /**
-     * CONSTRUCTOR
-     * @param gp GamePanel
-     * @param worldX Starting coordinate
-     * @param worldY Starting coordinate
-     */
     public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
-        super(gp);
+        super(gp, worldX, worldY, npcName);
 
-        // Coordinates
-        this.worldX = worldX * gp.tileSize;
-        this.worldY = worldY * gp.tileSize;
-        worldXStart = this.worldX;
-        worldYStart = this.worldY;
-
-        // General attributes
         entity_type = type_npc;
-        name = npcName;
+
         speed = 1;
         defaultSpeed = speed;
         animationSpeed = 15;
 
-        // Collision attributes
         hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultX = hitbox.x;
-        hitboxDefaultY = hitbox.y;
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }
 
-    /**
-     * GET IMAGES
-     * Fetches sprites
-     * Called by constructor in Entity parent class
-     */
     @Override
     protected void getImages() {
         up1 = setupImage("/npc/oldman_up_1");
@@ -56,11 +36,6 @@ public class NPC_OldMan extends Entity {
         right2 = setupImage("/npc/oldman_right_2");
     }
 
-    /**
-     * SET ACTION
-     * Updates the actions the entity will take
-     * Called by update() in Entity parent class
-     */
     @Override
     protected void setAction() {
         setDirection(60);
