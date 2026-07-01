@@ -468,6 +468,11 @@ public class Entity {
 
     public boolean playerWithinBounds() {
 
+        // Don't search for player if not available
+        if (gp.player.isNotAvailable()) {
+            return false;
+        }
+
         boolean playerWithinBounds = true;
 
         int tileDistance = (Math.abs(worldXStart - gp.player.worldX) + Math.abs(worldYStart - gp.player.worldY)) / gp.tileSize;
@@ -827,7 +832,7 @@ public class Entity {
     protected void damagePlayer(Entity enemy) {
 
         // Player can't be damaged
-        if (gp.player.invincible) {
+        if (gp.player.invincible || gp.player.isNotAvailable()) {
             return;
         }
 
@@ -860,6 +865,10 @@ public class Entity {
         speed = 6;
     }
     /** END COMBAT*/
+
+    public boolean isNotAvailable() {
+        return !alive || dying || action == FALLING || action == DROWNING;
+    }
 
     /**
      * CHECK DEATH
@@ -1151,6 +1160,12 @@ public class Entity {
 
     public boolean getInvincible() {
         return invincible;
+    }
+    public boolean getCanMove() {
+        return canMove;
+    }
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
     }
 
     public boolean getElevated() {

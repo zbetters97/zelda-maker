@@ -67,6 +67,11 @@ public class EMY_Goblin_Combat extends Entity {
     public void update() {
         super.update();
 
+        if (!canMove) {
+            manageValues();
+            return;
+        }
+
         if (action == Action.ATTACKING) {
             attacking();
         }

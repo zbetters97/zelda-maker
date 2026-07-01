@@ -42,6 +42,7 @@ public class PRJ_Arrow extends Projectile {
 
     @Override
     public void update() {
+
         collisionOn = false;
 
         if (user == gp.player) {

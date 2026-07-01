@@ -57,6 +57,11 @@ public class EMY_Keese extends Entity {
     public void update() {
         super.update();
 
+        if (!canMove) {
+            manageValues();
+            return;
+        }
+
         setAction();
         updateDirection();
 

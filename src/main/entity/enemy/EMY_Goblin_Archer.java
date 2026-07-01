@@ -53,6 +53,13 @@ public class EMY_Goblin_Archer extends Entity {
     @Override
     public void update() {
         super.update();
+
+        if (!canMove) {
+            manageValues();
+            return;
+        }
+
+        handleLookingAtPlayer();
         setAction();
 
         updateDirection();
@@ -61,8 +68,7 @@ public class EMY_Goblin_Archer extends Entity {
         manageValues();
     }
 
-    @Override
-    public void setAction() {
+    private void handleLookingAtPlayer() {
 
         // Stop moving if in range to shoot at player
         if (lookingAtPlayer(gp.tileSize / 2)) {
@@ -72,6 +78,10 @@ public class EMY_Goblin_Archer extends Entity {
         else {
             speed = defaultSpeed;
         }
+    }
+
+    @Override
+    public void setAction() {
 
         // Player found
         if (onPath) {

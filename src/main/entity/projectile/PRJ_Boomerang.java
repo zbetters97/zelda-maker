@@ -39,6 +39,7 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     public void update() {
+        super.update();
 
         checkCollision();
 

@@ -56,6 +56,7 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void update() {
+        super.update();
 
         // Max length reached or Entity hit
         if (health <= 0) {
@@ -209,6 +210,7 @@ public class PRJ_Claw extends Projectile {
     private void pullEntity() {
 
         grabbedEntity.resetValues();
+        grabbedEntity.setCanMove(false);
         grabbedEntity.setDirection(getOppositeDirection(direction));
         grabbedEntity.setElevated(true);
 
@@ -239,6 +241,7 @@ public class PRJ_Claw extends Projectile {
 
         if (grabbedEntity != null) {
             grabbedEntity.setElevated(false);
+            grabbedEntity.setCanMove(true);
             grabbedEntity = null;
         }
     }

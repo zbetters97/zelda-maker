@@ -11,6 +11,13 @@ public class Projectile extends Entity {
         super(gp);
     }
 
+    @Override
+    public void update() {
+        if (user != null && user.isNotAvailable()) {
+            alive = false;
+        }
+    }
+
     public void set(int worldX, int worldY, GamePanel.Direction direction, boolean alive, Entity user) {
         this.worldX = worldX;
         this.worldY = worldY;
