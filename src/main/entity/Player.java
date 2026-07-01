@@ -635,9 +635,6 @@ public class Player extends Entity {
         // Check NPC collision
         gp.cChecker.checkMovementCollision(this, gp.npc);
 
-        // Check enemy collision
-        gp.cChecker.checkMovementCollision(this, gp.enemy);
-
         // Check object collision
         gp.cChecker.checkMovementCollision(this, gp.obj);
 
@@ -647,6 +644,7 @@ public class Player extends Entity {
             damagePlayer(enemy);
         }
 
+        // Check tile hazards
         gp.cChecker.checkHazard(this);
     }
 
@@ -1110,12 +1108,36 @@ public class Player extends Entity {
             damageNum = 1;
             damageCounter = 0;
             health -= 2;
+            invincible = true;
 
             worldX = safeWorldX;
             worldY = safeWorldY;
+            action = IDLE;
 
-            resetValues();
+            resetHandlers();
         }
+    }
+
+    private void resetHandlers() {
+
+        speed = defaultSpeed;
+        collisionOn = false; canMove = true;
+        isElevated = false;
+
+        charge = 0;
+        actionLockCounter = 0;
+        spriteNum = 1; spriteCounter = 0;
+        attackNum = 1; attackCounter = 0;
+
+        knockback = false; knockbackCounter = 0;
+        lockedOn = false; lockedOnTarget = null;
+
+        spinCharge = 0;
+        digNum = 1; digCounter = 0;
+        aimNum = 1; aimCounter = 0;
+        throwNum = 1; throwCounter = 0;
+        jumpNum = 1; jumpCounter = 0;
+        damageNum = 1; damageCounter = 0;
     }
 
     /**
@@ -1146,13 +1168,7 @@ public class Player extends Entity {
     @Override
     public void resetValues() {
         super.resetValues();
-
-        spinCharge = 0;
-        digNum = 1; digCounter = 0;
-        aimNum = 1; aimCounter = 0;
-        throwNum = 1; throwCounter = 0;
-        jumpNum = 1; jumpCounter = 0;
-        damageNum = 1; damageCounter = 0;
+        resetHandlers();
     }
 
     /**

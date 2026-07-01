@@ -1149,6 +1149,10 @@ public class Entity {
         attack += change;
     }
 
+    public boolean getInvincible() {
+        return invincible;
+    }
+
     public boolean getElevated() {
         return isElevated;
     }
