@@ -1090,6 +1090,8 @@ public class Player extends Entity {
 
     private void takingDamage() {
 
+        speed = 0;
+        knockback = false;
         damageCounter++;
 
         if (damageCounter <= 6) {

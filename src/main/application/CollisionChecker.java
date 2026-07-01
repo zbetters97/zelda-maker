@@ -142,16 +142,15 @@ public record CollisionChecker(GamePanel gp) {
     public void checkHazard(Entity entity) {
         Tile tile = getCurrentTile(entity);
 
-
         if (tile.isPit) {
             handlePit(entity);
         }
         else if (tile.isWater) {
             handleWater(entity);
         }
-        // Player is on ground, save safe X/Y
+        // Player is on ground, set safe X/Y
         else if (entity == gp.player && !gp.player.getElevated()) {
-            saveSafePoint();
+            setSafePoint();
         }
     }
     private Tile getCurrentTile(Entity entity) {
@@ -170,6 +169,7 @@ public record CollisionChecker(GamePanel gp) {
 
         if (entity == gp.player) {
             gp.player.setAction(FALLING);
+            gp.player.shiftToCenter();
         }
         else {
             entity.alive = false;
@@ -182,12 +182,13 @@ public record CollisionChecker(GamePanel gp) {
 
         if (entity == gp.player) {
             gp.player.setAction(DROWNING);
+            gp.player.shiftToCenter();
         }
         else {
             entity.alive = false;
         }
     }
-    private void saveSafePoint() {
+    private void setSafePoint() {
 
         // Get current X/Y based on hitbox center
         int centerX = gp.player.getWorldX() + gp.player.getHitbox().x + gp.player.getHitbox().width / 2;

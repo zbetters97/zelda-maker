@@ -728,7 +728,6 @@ public class Entity {
 
         return enemy;
     }
-
     protected Entity overlapEnemy(Entity entity) {
 
         Entity enemy = null;
@@ -739,6 +738,25 @@ public class Entity {
         }
 
         return enemy;
+    }
+
+    /**
+     * SHIFT TO CENTER
+     * Moves the current entity to the center of the current tile
+     * Useful for Pit/Water tile handling
+     */
+    public void shiftToCenter() {
+
+        // Get current X/Y based on hitbox center
+        int centerX = worldX + hitbox.x + hitbox.width / 2;
+        int centerY = worldY + hitbox.y + hitbox.height / 2;
+
+        // Snap to tile size
+        int newWorldX = (centerX / gp.tileSize) * gp.tileSize;
+        int newWorldY = (centerY / gp.tileSize) * gp.tileSize;
+
+        worldX = newWorldX;
+        worldY = newWorldY;
     }
 
     /**
