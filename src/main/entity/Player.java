@@ -144,19 +144,15 @@ public class Player extends Entity {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
         attackUp2 = setupImage("/player/boy_attack_kokiri_up_2", gp.tileSize * 2, gp.tileSize * 2);
         attackUp3 = setupImage("/player/boy_attack_kokiri_up_3", gp.tileSize, gp.tileSize * 2);
-        attackUp4 = setupImage("/player/boy_attack_kokiri_up_4", gp.tileSize, gp.tileSize * 2);
         attackDown1 = setupImage("/player/boy_attack_kokiri_down_1", gp.tileSize * 2, gp.tileSize);
         attackDown2 = setupImage("/player/boy_attack_kokiri_down_2", gp.tileSize * 2, gp.tileSize * 2);
         attackDown3 = setupImage("/player/boy_attack_kokiri_down_3", gp.tileSize, gp.tileSize * 2);
-        attackDown4 = setupImage("/player/boy_attack_kokiri_down_4", gp.tileSize, gp.tileSize * 2);
         attackLeft1 = setupImage("/player/boy_attack_kokiri_left_1", gp.tileSize, gp.tileSize * 2);
         attackLeft2 = setupImage("/player/boy_attack_kokiri_left_2", gp.tileSize * 2, gp.tileSize * 2);
         attackLeft3 = setupImage("/player/boy_attack_kokiri_left_3", gp.tileSize * 2, gp.tileSize);
-        attackLeft4 = setupImage("/player/boy_attack_kokiri_left_4", gp.tileSize * 2, gp.tileSize);
         attackRight1 = setupImage("/player/boy_attack_kokiri_right_1", gp.tileSize, gp.tileSize * 2);
         attackRight2 = setupImage("/player/boy_attack_kokiri_right_2", gp.tileSize * 2, gp.tileSize * 2);
         attackRight3 = setupImage("/player/boy_attack_kokiri_right_3", gp.tileSize * 2, gp.tileSize);
-        attackRight4 = setupImage("/player/boy_attack_kokiri_right_4", gp.tileSize * 2, gp.tileSize);
     }
     private void getSpinImages() {
         spinUp1 = setupImage("/player/boy_spin_kokiri_up_1", gp.tileSize * 2, gp.tileSize * 2);
@@ -491,7 +487,7 @@ public class Player extends Entity {
 
         return zDirection;
     }
-    /** END Z-TARGETING */
+    /* END Z-TARGETING */
 
     /**
      * USE ITEM
@@ -717,6 +713,7 @@ public class Player extends Entity {
         }
 
         attackCounter++;
+
         if (attackCounter <= swingSpeed1) {
             attackNum = 1;
         }
@@ -739,44 +736,6 @@ public class Player extends Entity {
             attackCounter = 0;
             spinCharge = 0;
         }
-    }
-
-    /**
-     * ADJUST SWING HITBOX
-     * Modifies hitbox to accommodate for slash attack
-     * Called by attacking()
-     */
-    private void adjustSwingHitbox() {
-
-        // Save X/Y
-        Point currentWorldPoint = new Point(worldPoint.x, worldPoint.y);
-
-        // Reposition X/Y and hitbox for slash
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> {
-                worldPoint.y -= attackBox.height + hitbox.y;
-                hitbox.height = attackBox.height;
-            }
-            case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                worldPoint.y += attackBox.height - hitbox.y;
-                hitbox.height = attackBox.height;
-            }
-            case LEFT -> {
-                worldPoint.x -= attackBox.width;
-                hitbox.width = attackBox.width;
-            }
-            case RIGHT -> {
-                worldPoint.x += attackBox.width - hitbox.y;
-                hitbox.width = attackBox.width;
-            }
-        }
-
-        detectSwordCollision();
-
-        // Restore hitbox
-        worldPoint.setLocation(currentWorldPoint);
-        hitbox.width = hitboxDefaultWidth;
-        hitbox.height = hitboxDefaultHeight;
     }
 
     /**
@@ -872,7 +831,15 @@ public class Player extends Entity {
         // Save current X/Y
         Point currentWorldPoint = new Point(worldPoint.x, worldPoint.y);
 
-        // Reposition X/Y and hitbox for spinning slash
+        adjustSpinAttackBox();
+        detectPlayerSwordCollision();
+
+        // Reset X/Y and Hitbox
+        worldPoint.setLocation(currentWorldPoint);
+        hitbox.width = hitboxDefaultWidth;
+        hitbox.height = hitboxDefaultHeight;
+    }
+    private void adjustSpinAttackBox() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 worldPoint.y -= attackBox.height + hitbox.y;
@@ -896,32 +863,6 @@ public class Player extends Entity {
                 hitbox.width = attackBox.width;
                 hitbox.height *= 2;
             }
-        }
-
-        detectSwordCollision();
-
-        // Reset X/Y and Hitbox
-        worldPoint.setLocation(currentWorldPoint);
-        hitbox.width = hitboxDefaultWidth;
-        hitbox.height = hitboxDefaultHeight;
-    }
-
-    /**
-     * DETECT ENEMY COLLISION
-     * Checks if an enemy collides with the player's hitbox/attackBox
-     */
-    private void detectSwordCollision() {
-        // Find enemy that intersects collision box
-        Entity enemy = overlapEnemy(this);
-
-        // Sword collides with enemy, apply damage
-        if (enemy != null && !enemy.invincible) {
-            damageEnemy(enemy);
-        }
-
-        int projectile = gp.cChecker.checkOverlapCollision(this, gp.projectile);
-        if (projectile != -1) {
-            gp.projectile[gp.currentMap][projectile].deflect(this);
         }
     }
 
@@ -1559,8 +1500,7 @@ public class Player extends Entity {
         return fallSprite;
     }
     private BufferedImage getDrownSprite() {
-        BufferedImage drownSprite = drown1;
-        return drownSprite;
+        return drown1;
     }
 
     /** GETTERS */

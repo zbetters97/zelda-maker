@@ -309,7 +309,10 @@ public class Entity {
 
         moving = true;
 
-        switch (direction) {
+        moveInDirection(direction);
+    }
+    protected void moveInDirection(Direction movingDirection) {
+        switch (movingDirection) {
             case UP -> worldPoint.y -= speed;
             case UPLEFT -> {
                 worldPoint.y -= (int) (speed - 0.5);
@@ -381,15 +384,12 @@ public class Entity {
     }
 
     protected Direction getOppositeDirection(Direction direction) {
-
-        Direction oppositeDirection = switch (direction) {
+        return switch (direction) {
             case UP, UPLEFT, UPRIGHT -> DOWN;
             case DOWN, DOWNLEFT, DOWNRIGHT -> UP;
             case LEFT -> RIGHT;
             case RIGHT -> LEFT;
         };
-
-        return oppositeDirection;
     }
 
     /** PATH FINDING */
@@ -515,33 +515,26 @@ public class Entity {
         }
     }
     public int getGoalCol(Entity target) {
-        int goalCol = target.getCenterX() / gp.tileSize;
-        return goalCol;
+        return target.getCenterX() / gp.tileSize;
     }
     public int getGoalRow(Entity target) {
-        int goalRow = target.getCenterY() / gp.tileSize;
-        return goalRow;
+        return target.getCenterY() / gp.tileSize;
     }
 
     public int getTileDistance(Entity target) {
-        int tileDistance = (getXDistance(target) + getYDistance(target)) / gp.tileSize;
-        return tileDistance;
+        return (getXDistance(target) + getYDistance(target)) / gp.tileSize;
     }
     public int getXDistance(Entity target) {
-        int xDistance = Math.abs(getCenterX() - target.getCenterX());
-        return xDistance;
+        return Math.abs(getCenterX() - target.getCenterX());
     }
     public int getYDistance(Entity target) {
-        int yDistance = Math.abs(getCenterY() - target.getCenterY());
-        return yDistance;
+        return Math.abs(getCenterY() - target.getCenterY());
     }
     public int getCenterX() {
-        int centerX = worldPoint.x + left1.getWidth() / 2;
-        return centerX;
+        return worldPoint.x + left1.getWidth() / 2;
     }
     public int getCenterY() {
-        int centerY = worldPoint.y + up1.getHeight() / 2;
-        return centerY;
+        return worldPoint.y + up1.getHeight() / 2;
     }
 
     public boolean withinBounds() {
@@ -688,51 +681,76 @@ public class Entity {
             swingSpeed2 = 15;
         }
 
-        if (swingSpeed1 >= attackCounter) {
+        if (attackCounter <= swingSpeed1) {
             attackNum = 1;
         }
-        if (swingSpeed2 >= attackCounter && attackCounter > swingSpeed1) {
-
+        if (attackCounter <= swingSpeed2 && swingSpeed1 < attackCounter) {
             attackNum = 2;
-
-            // Save current X/Y
-            Point currentWorldPoint = new Point(worldPoint);
-
-            // Adjust X/Y
-            switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> {
-                    worldPoint.y -= attackBox.height + hitbox.y;
-                    hitbox.height = attackBox.height;
-                }
-                case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    worldPoint.y += attackBox.height - hitbox.y;
-                    hitbox.height = attackBox.height;
-                }
-                case LEFT -> {
-                    worldPoint.x -= attackBox.width;
-                    hitbox.width = attackBox.width;
-                }
-                case RIGHT -> {
-                    worldPoint.x += attackBox.width - hitbox.y;
-                    hitbox.width = attackBox.width;
-                }
-            }
-
-            if (gp.cChecker.checkPlayer(this)) {
-                damagePlayer(this);
-            }
-
-            // Restore hitbox
-            worldPoint.setLocation(currentWorldPoint);
-            hitbox.width = hitboxDefaultWidth;
-            hitbox.height = hitboxDefaultHeight;
+            adjustSwingHitbox();
         }
 
         // Reset values
-        if (attackCounter > swingSpeed2) {
+        if (swingSpeed2 < attackCounter) {
             attackNum = 1;
             attackCounter = 0;
             action = IDLE;
+        }
+    }
+    protected void adjustSwingHitbox() {
+        // Save current X/Y
+        Point currentWorldPoint = new Point(worldPoint);
+
+        adjustAttackBox();
+
+        if (this == gp.player) {
+            detectPlayerSwordCollision();
+        }
+        else {
+            detectEnemySwordCollision();
+        }
+
+        // Restore hitbox
+        worldPoint.setLocation(currentWorldPoint);
+        hitbox.width = hitboxDefaultWidth;
+        hitbox.height = hitboxDefaultHeight;
+    }
+    private void adjustAttackBox() {
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                worldPoint.y -= attackBox.height + hitbox.y;
+                hitbox.height = attackBox.height;
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                worldPoint.y += attackBox.height - hitbox.y;
+                hitbox.height = attackBox.height;
+            }
+            case LEFT -> {
+                worldPoint.x -= attackBox.width;
+                hitbox.width = attackBox.width;
+            }
+            case RIGHT -> {
+                worldPoint.x += attackBox.width - hitbox.y;
+                hitbox.width = attackBox.width;
+            }
+        }
+    }
+    protected void detectPlayerSwordCollision() {
+        // Find enemy that intersects collision box
+        Entity enemy = overlapEnemy(this);
+
+        // Sword collides with enemy, apply damage
+        if (enemy != null && !enemy.invincible) {
+            damageEnemy(enemy);
+        }
+
+        int projectile = gp.cChecker.checkOverlapCollision(this, gp.projectile);
+        if (projectile != -1) {
+            gp.projectile[gp.currentMap][projectile].deflect(this);
+        }
+    }
+    private void detectEnemySwordCollision() {
+        if (gp.cChecker.checkPlayer(this)) {
+            damagePlayer(this);
         }
     }
 
@@ -845,13 +863,7 @@ public class Entity {
             return;
         }
 
-        // Move in knockback direction
-        switch (knockbackDirection) {
-            case UP, UPLEFT, UPRIGHT -> worldPoint.y -= speed;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y += speed;
-            case LEFT -> worldPoint.x -= speed;
-            case RIGHT -> worldPoint.x += speed;
-        }
+        moveInDirection(knockbackDirection);
 
         // Run for 10 frames
         knockbackCounter++;

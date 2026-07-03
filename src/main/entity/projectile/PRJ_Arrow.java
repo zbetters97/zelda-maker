@@ -50,7 +50,7 @@ public class PRJ_Arrow extends Projectile {
         }
 
         if (!canPickup) {
-            move();
+            moveInDirection(direction);
         }
 
         if (collisionOn && alive) {

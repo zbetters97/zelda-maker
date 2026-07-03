@@ -65,7 +65,7 @@ public class PRJ_Claw extends Projectile {
         }
         // No object hit
         else {
-            move();
+            moveInDirection(direction);
             health--;
 
             collisionOn = false;

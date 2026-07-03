@@ -38,15 +38,6 @@ public class Projectile extends Entity {
         }
     }
 
-    protected void move() {
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> worldPoint.y -= speed;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y += speed;
-            case LEFT -> worldPoint.x -= speed;
-            case RIGHT -> worldPoint.x += speed;
-        }
-    }
-
     @Override
     public boolean canCollideWith(Entity target) {
 

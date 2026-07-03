@@ -43,7 +43,7 @@ public class PRJ_Boomerang extends Projectile {
             returnToUser();
         }
         else {
-            move();
+            moveInDirection(direction);
             health--;
         }
 
