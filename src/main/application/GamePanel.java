@@ -3,6 +3,7 @@ package application;
 import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
+import entity.collectable.Collectable;
 import entity.object.Object;
 import entity.projectile.Projectile;
 import tile.TileManager;
@@ -81,7 +82,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final Entity[][] npc = new Entity[maxMap][10];
     public final Entity[][] enemy = new Entity[maxMap][10];
     public final Object[][] obj = new Object[maxMap][10];
-    public final Projectile[][] projectile = new Projectile[maxMap][10];
+    public final Collectable[][] col = new Collectable[maxMap][10];
+    public final Projectile[][] proj = new Projectile[maxMap][10];
 
     /**
      * CONSTRUCTOR
@@ -197,6 +199,7 @@ public class GamePanel extends JPanel implements Runnable {
         updateNPCs();
         updateEnemies();
         updateObjects();
+        updateCollectables();
         updateProjectiles();
     }
 
@@ -232,12 +235,22 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+    private void updateCollectables() {
+        for (int i = 0; i < col[0].length; i++) {
+            if (col[currentMap][i] != null) {
+                col[currentMap][i].update();
+                if (!col[currentMap][i].alive) {
+                    col[currentMap][i] = null;
+                }
+            }
+        }
+    }
     private void updateProjectiles() {
-        for (int i = 0; i < projectile[0].length; i++) {
-            if (projectile[currentMap][i] != null) {
-                projectile[currentMap][i].update();
-                if (!projectile[currentMap][i].alive) {
-                    projectile[currentMap][i] = null;
+        for (int i = 0; i < proj[0].length; i++) {
+            if (proj[currentMap][i] != null) {
+                proj[currentMap][i].update();
+                if (!proj[currentMap][i].alive) {
+                    proj[currentMap][i] = null;
                 }
             }
         }
@@ -277,14 +290,21 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // Objects
-        for (Entity objI : obj[currentMap]) {
-            if (objI != null) {
-                entityList.add(objI);
+        for (Entity obj : obj[currentMap]) {
+            if (obj != null) {
+                entityList.add(obj);
+            }
+        }
+
+        // Collectables
+        for (Entity col : col[currentMap]) {
+            if (col != null) {
+                entityList.add(col);
             }
         }
 
         // Projectiles
-        for (Entity pr : projectile[currentMap]) {
+        for (Entity pr : proj[currentMap]) {
             if (pr != null) {
                 entityList.add(pr);
             }

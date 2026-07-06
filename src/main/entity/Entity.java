@@ -2,6 +2,7 @@ package entity;
 
 import application.GamePanel;
 import application.GamePanel.Direction;
+import entity.collectable.Collectable;
 import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
@@ -143,8 +144,10 @@ public class Entity {
     public final int type_item = 3;
 
     /** OBJECT TYPES */
-    public final int type_object = 4;
-    public final int type_projectile = 5;
+    public final int type_collectable = 4;
+    public final int type_object = 5;
+    public final int type_projectile = 6;
+
 
     /** CONSTRUCTORS */
     public Entity(GamePanel gp) {
@@ -154,6 +157,14 @@ public class Entity {
     public Entity(GamePanel gp, String name) {
         this.gp = gp;
         this.name = name;
+        getImages();
+    }
+    public Entity(GamePanel gp, int worldX, int worldY) {
+        this.gp = gp;
+
+        worldPoint.setLocation(worldX * gp.tileSize, worldY * gp.tileSize);
+        startPoint.setLocation(worldX * gp.tileSize, worldY * gp.tileSize);
+
         getImages();
     }
     public Entity(GamePanel gp, int worldX, int worldY, String name) {
@@ -611,9 +622,9 @@ public class Entity {
      * @param projectile Projectile to be added
      */
     protected void addProjectile(Projectile projectile) {
-        for (int i = 0; i < gp.projectile[0].length; i++) {
-            if (gp.projectile[gp.currentMap][i] == null) {
-                gp.projectile[gp.currentMap][i] = projectile;
+        for (int i = 0; i < gp.proj[0].length; i++) {
+            if (gp.proj[gp.currentMap][i] == null) {
+                gp.proj[gp.currentMap][i] = projectile;
                 break;
             }
         }
@@ -741,9 +752,9 @@ public class Entity {
             damageEnemy(enemy);
         }
 
-        int projectile = gp.cChecker.checkOverlapCollision(this, gp.projectile);
+        int projectile = gp.cChecker.checkOverlapCollision(this, gp.proj);
         if (projectile != -1) {
-            gp.projectile[gp.currentMap][projectile].deflect(this);
+            gp.proj[gp.currentMap][projectile].deflect(this);
         }
 
         int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
@@ -928,6 +939,16 @@ public class Entity {
      * Checks if the entity has died
      */
     protected void checkDeath() { }
+
+    protected void dropItem(Collectable droppedItem) {
+        for (int i = 0; i < gp.col[0].length; i++) {
+            if (gp.col[gp.currentMap][i] == null) {
+                gp.col[gp.currentMap][i] = droppedItem;
+                gp.col[gp.currentMap][i].setWorldPoint(worldPoint);
+                break;
+            }
+        }
+    }
 
     /**
      * MANAGE VALUES
@@ -1149,6 +1170,9 @@ public class Entity {
     }
     public int getWorldPointY() {
         return worldPoint.y;
+    }
+    public void setWorldPoint(Point worldPoint) {
+        this.worldPoint.setLocation(worldPoint);
     }
     public void setWorldPointX(int x) {
         this.worldPoint.x = x;

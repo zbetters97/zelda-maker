@@ -629,25 +629,34 @@ public class Player extends Entity {
      */
     @Override
     protected void checkCollision() {
+
         collisionOn = false;
 
-        // Check tile collision
+        checkObstacleCollision();
+        checkHarmfulCollision();
+        checkInteractiveCollision();
+    }
+    private void checkObstacleCollision() {
+
         gp.cChecker.checkTile(this);
-
-        // Check NPC collision
         gp.cChecker.checkMovementCollision(this, gp.npc);
-
-        // Check object collision
         gp.cChecker.checkMovementCollision(this, gp.obj);
+    }
+    private void checkHarmfulCollision() {
 
-        // Player contacted enemy, take damage
+        gp.cChecker.checkHazard(this);
+
         Entity enemy = moveIntoEnemy(this);
         if (enemy != null && !enemy.invincible) {
             damagePlayer(enemy);
         }
+    }
+    private void checkInteractiveCollision() {
 
-        // Check tile hazards
-        gp.cChecker.checkHazard(this);
+        int col = gp.cChecker.checkOverlapCollision(this, gp.col);
+        if (col != -1) {
+            gp.col[gp.currentMap][col].use(this);
+        }
     }
 
     /**

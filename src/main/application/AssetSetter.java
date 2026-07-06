@@ -4,6 +4,7 @@ import entity.enemy.EMY_Goblin_Combat;
 import entity.enemy.EMY_Keese;
 import entity.npc.NPC_OldMan;
 import entity.object.OBJ_Chest;
+import entity.object.OBJ_Pot;
 import entity.object.OBJ_Switch;
 
 public record AssetSetter(GamePanel gp) {
@@ -40,5 +41,8 @@ public record AssetSetter(GamePanel gp) {
         i++;
 
         gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 21);
+        i++;
+
+        gp.obj[mapNum][i] = new OBJ_Pot(gp, 22, 20);
     }
 }
