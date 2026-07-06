@@ -17,8 +17,28 @@ public class OBJ_Switch extends Object {
     }
 
     @Override
+    public void update() {
+        manageValues();
+    }
+
+    @Override
     public void interact() {
-        opened = !opened;
+        if (!invincible) {
+            opened = !opened;
+            flipSwitches();
+            invincible = true;
+        }
+    }
+    
+    private void flipSwitches() {
+        for (int i = 0; i < gp.obj[0].length; i++) {
+
+            // Find other switches in object list
+            if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getName().equals(name)) {
+                gp.obj[gp.currentMap][i].setOpened(opened);
+                gp.obj[gp.currentMap][i].setInvincible(true);
+            }
+        }
     }
 
     @Override

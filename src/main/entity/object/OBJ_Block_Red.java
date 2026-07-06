@@ -1,0 +1,74 @@
+package entity.object;
+
+import application.GamePanel;
+import entity.Entity;
+
+import java.awt.*;
+
+public class OBJ_Block_Red extends Object {
+
+    public static final String objName = "Red Block";
+
+    public OBJ_Block_Red(GamePanel gp, int col, int row) {
+        super(gp, col, row, objName);
+    }
+
+    @Override
+    protected void getImages() {
+        up1 = setupImage("/objects/obj_block_red_on");
+        up2 = setupImage("/objects/obj_block_red_off");
+    }
+
+    @Override
+    public void update() {
+        detectSwitch();
+    }
+
+    /**
+     * DETECT SWITCHES
+     * Changes collision based on if a switch is activated on the same map
+     */
+    private void detectSwitch() {
+
+        for (int i = 0; i < gp.obj[0].length; i++) {
+
+            // Find switch in objects list
+            if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getName().equals(OBJ_Switch.objName)) {
+
+                // Turn switch on if off
+                if (!gp.obj[gp.currentMap][i].getOpened()) {
+                    opened = false;
+                    collisionOn = false;
+                }
+                // Turn off if no collision
+                else if (!gp.cChecker.onPlayer(this)) {
+                    opened = true;
+                    collisionOn = true;
+                }
+            }
+        }
+    }
+
+    /**
+     * CAN COLLIDE WITH
+     * Checks if entity hits block
+     * Called by checkCollision()
+     * Skips collision if entity is in air
+     * @param target Entity interacting with block
+     * @return True if entity collides with block
+     */
+    @Override
+    public boolean canCollideWith(Entity target) {
+        return collisionOn && !target.getElevated();
+    }
+
+    @Override
+    protected void getSpriteImage() {
+        if (opened) {
+            image = up1;
+        }
+        else {
+            image = up2;
+        }
+    }
+}

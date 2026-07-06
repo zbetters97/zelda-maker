@@ -3,9 +3,7 @@ package application;
 import entity.enemy.EMY_Goblin_Combat;
 import entity.enemy.EMY_Keese;
 import entity.npc.NPC_OldMan;
-import entity.object.OBJ_Chest;
-import entity.object.OBJ_Pot;
-import entity.object.OBJ_Switch;
+import entity.object.*;
 
 public record AssetSetter(GamePanel gp) {
 
@@ -42,7 +40,11 @@ public record AssetSetter(GamePanel gp) {
 
         gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 21);
         i++;
+        gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 22);
+        i++;
 
-        gp.obj[mapNum][i] = new OBJ_Pot(gp, 22, 20);
+        gp.obj[mapNum][i] = new OBJ_Block_Blue(gp, 22, 20);
+        i++;
+        gp.obj[mapNum][i] = new OBJ_Block_Red(gp, 22, 21);
     }
 }

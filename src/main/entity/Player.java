@@ -236,7 +236,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        item = new ITM_Bow(gp, this);
+        item = new ITM_Cape(gp, this);
     }
 
     /**
@@ -268,10 +268,8 @@ public class Player extends Entity {
     @Override
     public void update() {
 
-        // Always check for collision
-        checkCollision();
-
         if (knockback) {
+            checkCollision();
             handleKnockback();
             manageValues();
             return;
@@ -637,7 +635,6 @@ public class Player extends Entity {
         checkInteractiveCollision();
     }
     private void checkObstacleCollision() {
-
         gp.cChecker.checkTile(this);
         gp.cChecker.checkMovementCollision(this, gp.npc);
         gp.cChecker.checkMovementCollision(this, gp.obj);

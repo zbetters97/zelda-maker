@@ -263,6 +263,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void drawToTempScreen() {
         drawTiles();
+        drawObjects();
         drawEntities();
         ui.draw(g2);
     }
@@ -270,6 +271,20 @@ public class GamePanel extends JPanel implements Runnable {
     /** DRAW METHODS **/
     private void drawTiles() {
         tileM.draw(g2);
+    }
+    private void drawObjects() {
+
+        for (Entity obj : obj[currentMap]) {
+            if (obj != null) {
+                obj.draw(g2);
+            }
+        }
+
+        for (Entity col : col[currentMap]) {
+            if (col != null) {
+                col.draw(g2);
+            }
+        }
     }
     private void drawEntities() {
 
@@ -286,20 +301,6 @@ public class GamePanel extends JPanel implements Runnable {
         for (Entity n : enemy[currentMap]) {
             if (n != null) {
                 entityList.add(n);
-            }
-        }
-
-        // Objects
-        for (Entity obj : obj[currentMap]) {
-            if (obj != null) {
-                entityList.add(obj);
-            }
-        }
-
-        // Collectables
-        for (Entity col : col[currentMap]) {
-            if (col != null) {
-                entityList.add(col);
             }
         }
 

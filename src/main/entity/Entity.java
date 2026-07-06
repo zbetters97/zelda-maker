@@ -93,10 +93,13 @@ public class Entity {
     protected int animationSpeed;
 
     /** RPG VALUES */
-    protected String name;
+    protected String name = "";
     public boolean alive = true;
-    public int maxHealth = 1;
-    public int health = 1;
+    protected int maxHealth = 1;
+    protected int health = 1;
+    protected int value = 0;
+    protected int maxRupees = 99;
+    protected int rupees = 0;
     protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
@@ -104,6 +107,7 @@ public class Entity {
     protected int stunnedCounter = 0;
     public boolean dying = false;
     private int dyingCounter = 0;
+    protected Collectable loot;
     protected boolean opened = false;
     protected boolean isElevated = false;
 
@@ -1017,7 +1021,7 @@ public class Entity {
         getSpriteImage();
 
         // Flash sprite if hurt
-        if (invincible) {
+        if (invincible && entity_type == type_enemy) {
             playHurtAnimation(g2);
         }
 
@@ -1217,6 +1221,36 @@ public class Entity {
         this.action = action;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+    public void addHealth(int change) {
+        this.health += change;
+
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+    }
+
+    public int getMaxRupees() {
+        return maxRupees;
+    }
+
+    public int getRupees() {
+        return rupees;
+    }
+    public void addRupees(int amount) {
+        this.rupees += amount;
+    }
+
     public int getSpeed() {
         return speed;
     }
@@ -1228,8 +1262,19 @@ public class Entity {
         attack += change;
     }
 
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
+    }
+
+    public boolean getOpened() {
+        return opened;
+    }
+    public void setOpened(boolean opened) {
+        this.opened = opened;
     }
 
     public boolean getElevated() {

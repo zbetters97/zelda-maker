@@ -265,11 +265,10 @@ public record CollisionChecker(GamePanel gp) {
 
 
     /**
-     * CONTACT PLAYER
+     * CHECK PLAYER
      * Checks if the given entity will collide with the player entity
      * @param entity Entity to check collision for
      */
-
     public boolean checkPlayer(Entity entity) {
 
         if (gp.player.getAction() == FALLING || gp.player.getAction() == DROWNING) {
@@ -289,6 +288,29 @@ public record CollisionChecker(GamePanel gp) {
                 return false;
             }
         }
+
+        if (!entityRect.intersects(playerRect)) {
+            return false;
+        }
+
+        entity.setCollision(true);
+
+        return entity.isOnSameElevation(gp.player);
+    }
+
+    /**
+     * ON PLAYER
+     * Checks if the given entity is interacting with the player entity
+     * @param entity Entity to check collision for
+     */
+    public boolean onPlayer(Entity entity) {
+
+        if (gp.player.getAction() == FALLING || gp.player.getAction() == DROWNING) {
+            return false;
+        }
+
+        Rectangle entityRect = entity.getWorldHitbox();
+        Rectangle playerRect = gp.player.getWorldHitbox();
 
         if (!entityRect.intersects(playerRect)) {
             return false;

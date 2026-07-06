@@ -3,23 +3,23 @@ package entity.collectable;
 import application.GamePanel;
 import entity.Entity;
 
-public class COL_Rupee_Green extends Collectable {
+public class COL_Heart extends Collectable {
 
-    public static final String colName = "Green Rupee";
+    public static final String colName = "Heart";
 
-    public COL_Rupee_Green(GamePanel gp) {
+    public COL_Heart(GamePanel gp) {
         super(gp, colName);
         value = 1;
     }
 
     @Override
     protected void getImages() {
-        down1 = setupImage("/collectables/col_rupee_green");
+        down1 = setupImage("/collectables/col_heart");
     }
 
     @Override
     public void use(Entity user) {
-        gp.ui.setRupeeChange(value);
+        user.addHealth(value);
         alive = false;
     }
 }

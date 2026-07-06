@@ -14,22 +14,27 @@ import java.util.Objects;
 
 public class UI {
 
-    /* CONFIG */
+    /** CONFIG */
     private final GamePanel gp;
     private Graphics2D g2;
     private Font PK_DS;
 
-    /* UI COLORS */
+    /** UI COLORS */
     private final Color itm_brown_1 = new Color(168, 127, 89);
     private final Color itm_green = new Color(95, 190, 80);
 
-    /* Z-TARGETING */
+    /** HUD HANDLERS */
+    private int rupeeChange;
+    private int rupeeCounter = 0;
+
+    /** Z-TARGETING */
     private int zTargetCounter = 0;
     private int zTargetDirection = 0;
     private int zTargetRotation = 0;
 
-    /* SPRITES */
+    /** SPRITES */
     private BufferedImage
+            rupee,
             heart_0, heart_1, heart_2, heart_3, heart_4,
             ztarget_arrow, ztarget_circle;
 
@@ -60,19 +65,21 @@ public class UI {
     }
 
     private void getAllImages() {
-        getHeartImages();
+        getHUDImages();
         getZTargetImages();
     }
-    private void getHeartImages() {
+    private void getZTargetImages() {
+        ztarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
+        ztarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
+    }
+    private void getHUDImages() {
+        rupee = setupImage("/ui/ui_rupee");
+
         heart_0 = setupImage("/ui/ui_heart_0", 23, 23);
         heart_1 = setupImage("/ui/ui_heart_1", 23, 23);
         heart_2 = setupImage("/ui/ui_heart_2", 23, 23);
         heart_3 = setupImage("/ui/ui_heart_3", 23, 23);
         heart_4 = setupImage("/ui/ui_heart_4", 23, 23);
-    }
-    private void getZTargetImages() {
-        ztarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
-        ztarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
     }
 
     /**
@@ -101,6 +108,7 @@ public class UI {
         drawChargeBar();
         drawPlayerHealth();
         drawPlayerItem();
+        drawRupeeCount();
         drawDebug();
     }
 
@@ -117,8 +125,8 @@ public class UI {
         int spacing = (int) (gp.tileSize / 1.7);
 
         // Get count of whole hearts
-        int maxHearts = gp.player.maxHealth / 4;
-        int currentHealth = gp.player.health;
+        int maxHearts = gp.player.getMaxHealth() / 4;
+        int currentHealth = gp.player.getHealth();
 
         // Iterate through all whole hearts
         for (int i = 0; i < maxHearts; i++) {
@@ -187,6 +195,80 @@ public class UI {
         g2.drawString(text, x, y);
 
         g2.setStroke(new BasicStroke(1));
+    }
+
+    /**
+     * DRAW RUPEE COUNT
+     * Draws the current player's rupee count in the bottom-right corner of the screen
+     * Called by drawHUD()
+     */
+    private void drawRupeeCount() {
+
+        // Draw rupee image
+        int x = gp.tileSize * 14 - 20;
+        int y = gp.tileSize * 10 + 20;
+        g2.drawImage(rupee, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+
+        x += gp.tileSize - 8;
+        y += gp.tileSize - 12;
+
+        // Keep new rupees at maximum
+        if (rupeeChange >= gp.player.getMaxRupees()) {
+            rupeeChange = gp.player.getMaxRupees();
+        }
+
+        // Player adds rupees
+        if (gp.player.getRupees() < rupeeChange) {
+            modifyRupeeCount(1);
+        }
+        // Player loses rupees
+        else if (rupeeChange < gp.player.getRupees()) {
+            modifyRupeeCount(-1);
+        }
+
+        String formattedCount = formatRupeeCount();
+
+        // Draw rupee count
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+        g2.drawString(formattedCount, x, y);
+    }
+
+    /**
+     * MODIFY RUPEE COUNT
+     * Changes player rupee count every 2 frames based on given value
+     * @param count Amount to add to player rupee count
+     */
+    private void modifyRupeeCount(int count) {
+        if (rupeeCounter == 2) {
+            gp.player.addRupees(count);
+            rupeeCounter = 0;
+        }
+        else {
+            rupeeCounter++;
+        }
+    }
+
+    /**
+     * FORMAT RUPEE COUNT
+     * Formats the player rupee count based on wallet size
+     * @return Formatted player rupee count
+     */
+    private String formatRupeeCount() {
+
+        String rupeeCount = "0";
+
+        if (gp.player.getMaxRupees() == 99) {
+            rupeeCount = String.format("%02d", gp.player.getRupees());
+        }
+        else if (gp.player.getMaxRupees() == 999) {
+            rupeeCount = String.format("%03d", gp.player.getRupees());
+        }
+        else if (gp.player.getMaxRupees() == 9999) {
+            rupeeCount = String.format("%04d", gp.player.getRupees());
+        }
+
+        return rupeeCount;
     }
 
     /**
@@ -365,6 +447,10 @@ public class UI {
                 gp.player.getHitbox().height);
     }
 
+    public void setRupeeChange(int rupees) {
+        rupeeChange += rupees;
+    }
+
     /**
      * GET X FOR TEXT CENTERED
      * @param text Text being used
@@ -396,6 +482,28 @@ public class UI {
                     getClass().getResourceAsStream(imagePath + ".png")
             ));
             image = utility.scaleImage(image, width, height);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return image;
+    }
+    /**
+     * SETUP IMAGE
+     * @param imagePath Path to image file
+     * @return Scaled image
+     */
+    private BufferedImage setupImage(String imagePath) {
+
+        UtilityTool utility = new UtilityTool();
+        BufferedImage image = null;
+
+        try {
+            image = ImageIO.read(Objects.requireNonNull(
+                    getClass().getResourceAsStream(imagePath + ".png")
+            ));
+            image = utility.scaleImage(image, gp.tileSize, gp.tileSize);
         }
         catch (IOException e) {
             e.printStackTrace();

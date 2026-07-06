@@ -12,7 +12,7 @@ public class Object extends Entity {
 
         entity_type = type_object;
 
-        hitbox = new Rectangle(4, 16, 40, 32);
+        hitbox = new Rectangle(0, 0, gp.tileSize, gp.tileSize);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;

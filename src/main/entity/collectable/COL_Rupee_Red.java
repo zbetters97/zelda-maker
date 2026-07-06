@@ -3,18 +3,18 @@ package entity.collectable;
 import application.GamePanel;
 import entity.Entity;
 
-public class COL_Rupee_Green extends Collectable {
+public class COL_Rupee_Red extends Collectable {
 
-    public static final String colName = "Green Rupee";
+    public static final String colName = "Red Rupee";
 
-    public COL_Rupee_Green(GamePanel gp) {
+    public COL_Rupee_Red(GamePanel gp) {
         super(gp, colName);
-        value = 1;
+        value = 10;
     }
 
     @Override
     protected void getImages() {
-        down1 = setupImage("/collectables/col_rupee_green");
+        down1 = setupImage("/collectables/col_rupee_red");
     }
 
     @Override
