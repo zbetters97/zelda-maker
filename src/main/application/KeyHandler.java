@@ -18,9 +18,10 @@ public class KeyHandler implements KeyListener {
     public final int btn_X = KeyEvent.VK_D;
     public final int btn_R = KeyEvent.VK_E;
     public final int btn_L = KeyEvent.VK_W;
+    public final int btn_START = KeyEvent.VK_SPACE;
 
     /* CONFIG VALUES */
-    public boolean upPressed, downPressed, leftPressed, rightPressed,
+    public boolean startPressed, upPressed, downPressed, leftPressed, rightPressed,
             aPressed, bPressed, xPressed, rPressed, lPressed;
 
     /**
@@ -46,6 +47,9 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode(); // key pressed by user
 
+        if (code == btn_START) {
+            startPressed = true;
+        }
         if (code == btn_UP) {
             upPressed = true;
         }
@@ -88,6 +92,9 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
 
+        if (code == btn_START) {
+            startPressed = false;
+        }
         if (code == btn_UP) {
             upPressed = false;
         }

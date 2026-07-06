@@ -23,6 +23,11 @@ public class OBJ_Chest extends Object {
     }
 
     @Override
+    public boolean canCollideWith(Entity target) {
+        return !target.getElevated();
+    }
+
+    @Override
     public void interact(Entity user) {
         if (opened) {
             return;

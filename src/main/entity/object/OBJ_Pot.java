@@ -1,6 +1,7 @@
 package entity.object;
 
 import application.GamePanel;
+import entity.Entity;
 import entity.collectable.*;
 
 public class OBJ_Pot extends Object {
@@ -19,6 +20,11 @@ public class OBJ_Pot extends Object {
     @Override
     protected void getImages() {
         down1 = setupImage("/objects/obj_pot");
+    }
+
+    @Override
+    public boolean canCollideWith(Entity target) {
+        return !target.getElevated();
     }
 
     private void setLoot() {

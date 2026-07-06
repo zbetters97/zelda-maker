@@ -19,7 +19,7 @@ public class ITM_Bow extends Entity {
 
     @Override
     protected void use() {
-        if (user.arrows > 0) {
+        if (user.getArrows() > 0) {
             if (120 > user.charge) {
                 user.charge++;
             }
@@ -38,7 +38,7 @@ public class ITM_Bow extends Entity {
         projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
         addProjectile(projectile);
 
-        user.arrows--;
+        user.addArrows(-1);
         user.charge = 0;
         user.setAction(Action.IDLE);
     }

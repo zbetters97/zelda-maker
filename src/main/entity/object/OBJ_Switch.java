@@ -1,6 +1,7 @@
 package entity.object;
 
 import application.GamePanel;
+import entity.Entity;
 
 public class OBJ_Switch extends Object {
 
@@ -19,6 +20,11 @@ public class OBJ_Switch extends Object {
     @Override
     public void update() {
         manageValues();
+    }
+
+    @Override
+    public boolean canCollideWith(Entity target) {
+        return !target.getElevated();
     }
 
     @Override

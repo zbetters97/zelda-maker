@@ -124,7 +124,7 @@ public class Entity {
     protected int knockbackCounter = 0;
 
     /** INVENTORY VALUES */
-    public int arrows = 0;
+    protected int arrows = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -1289,6 +1289,16 @@ public class Entity {
 
     public Entity getItem() {
         return item;
+    }
+    public void setItem(Entity item) {
+        this.item = item;
+    }
+
+    public int getArrows() {
+        return arrows;
+    }
+    public void addArrows(int arrows) {
+        this.arrows += arrows;
     }
 
     public boolean isLatchable() {
