@@ -94,8 +94,8 @@ public class Entity {
     /** RPG VALUES */
     protected String name;
     public boolean alive = true;
-    public int health;
-    public int maxHealth;
+    public int maxHealth = 1;
+    public int health = 1;
     protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
@@ -599,8 +599,6 @@ public class Entity {
     }
     /** END PATH FINDING*/
 
-    protected void interact(Entity user) {}
-
     /**
      * USE
      * Initiates using the Entity
@@ -746,6 +744,11 @@ public class Entity {
         int projectile = gp.cChecker.checkOverlapCollision(this, gp.projectile);
         if (projectile != -1) {
             gp.projectile[gp.currentMap][projectile].deflect(this);
+        }
+
+        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        if (object != -1) {
+            gp.obj[gp.currentMap][object].interact();
         }
     }
     private void detectEnemySwordCollision() {

@@ -7,20 +7,13 @@ import java.awt.*;
 
 import static application.GamePanel.Direction.*;
 
-public class OBJ_Chest extends Entity {
+public class OBJ_Chest extends Object {
 
     public static final String objName = "Chest";
 
     public OBJ_Chest(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
-
-        entity_type = type_object;
         latchable = true;
-
-        hitbox = new Rectangle(4, 16, 40, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
     }
 
     @Override
@@ -30,7 +23,7 @@ public class OBJ_Chest extends Entity {
     }
 
     @Override
-    protected void interact(Entity user) {
+    public void interact(Entity user) {
         if (opened) {
             return;
         }

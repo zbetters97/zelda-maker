@@ -1,7 +1,6 @@
 package entity.projectile;
 
 import application.GamePanel;
-import entity.Entity;
 
 import java.awt.*;
 
@@ -37,14 +36,17 @@ public class PRJ_Boomerang extends Projectile {
     public void update() {
         super.update();
 
-        checkCollision();
-
         if (returning) {
             returnToUser();
         }
         else {
             moveInDirection(direction);
             health--;
+
+            checkCollision();
+            if (health <= 0 || collisionOn) {
+                returning = true;
+            }
         }
 
         cycleSprites();
@@ -53,26 +55,27 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     protected void checkCollision() {
+
         collisionOn = false;
 
-        Entity enemy = overlapEnemy(this);
-        if (enemy != null) {
-            damageEnemy(enemy);
-        }
-
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkOverlapCollision(this, gp.enemy);
-        int npcIndex = gp.cChecker.checkOverlapCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
+        checkObjectCollision();
 
-        if (health <= 0 || npcIndex != -1 || collisionOn) {
-            returning = true;
+        if (user == gp.player) {
+            checkEnemyCollision();
+        }
+        else {
+            checkPlayerCollision();
         }
     }
 
     private void returnToUser() {
+
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (worldPoint.y + gp.tileSize / 2 <= gp.player.getWorldPoint().y) {
+                if (getCenterY() < user.getCenterY()) {
                     worldPoint.y += 5;
                 }
                 else {
@@ -80,7 +83,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldPoint.y - gp.tileSize / 2 >= gp.player.getWorldPoint().y) {
+                if (getCenterY() > user.getCenterY()) {
                     worldPoint.y -= 5;
                 }
                 else {
@@ -88,7 +91,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case LEFT -> {
-                if (worldPoint.x + gp.tileSize / 2 <= gp.player.getWorldPoint().x) {
+                if (getCenterX() < user.getCenterX()) {
                     worldPoint.x += 5;
                 }
                 else {
@@ -96,7 +99,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (worldPoint.x - gp.tileSize / 2 >= gp.player.getWorldPoint().x) {
+                if (getCenterX() > user.getCenterX()) {
                     worldPoint.x -= 5;
                 }
                 else {

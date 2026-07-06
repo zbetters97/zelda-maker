@@ -11,7 +11,7 @@ public class PRJ_Claw extends Projectile {
     public static final String prjName = "Claw Projectile";
 
     private Entity grabbedEntity;
-    private boolean latched = false;
+    private boolean returning = false, latched = false;
     private BufferedImage grabUp1, grabDown1, grabLeft1, grabRight1, chainHor, chainVer;
 
     public PRJ_Claw(GamePanel gp, Entity user) {
@@ -54,8 +54,7 @@ public class PRJ_Claw extends Projectile {
     public void update() {
         super.update();
 
-        // Max length reached or Entity hit
-        if (health <= 0) {
+        if (returning) {
             if (latched) {
                 moveUser();
             }
@@ -63,16 +62,13 @@ public class PRJ_Claw extends Projectile {
                 returnToUser();
             }
         }
-        // No object hit
         else {
             moveInDirection(direction);
             health--;
 
-            collisionOn = false;
-
             checkCollision();
-            if (collisionOn) {
-                health = 0;
+            if (health <= 0 || collisionOn) {
+                returning = true;
             }
         }
 
@@ -81,31 +77,34 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     protected void checkCollision() {
+
+        collisionOn = false;
+
         checkGrabbableCollision();
-        checkObstacleCollision();
         checkLatchableCollision();
+        checkObstacleCollision();
     }
     private void checkGrabbableCollision() {
 
         Entity target = overlapEnemy(this);
-
         if (target != null) {
             grabbedEntity = target;
             collisionOn = true;
         }
     }
     private void checkLatchableCollision() {
-        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
 
+        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
         if (object != -1 && gp.obj[gp.currentMap][object].isLatchable()) {
-            latched = true;
             grabbedEntity = gp.obj[gp.currentMap][object];
-            health = 0;
+            returning = true;
+            latched = true;
         }
     }
     private void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkOverlapCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        checkObjectCollision();
     }
 
     private void moveUser() {
@@ -228,6 +227,7 @@ public class PRJ_Claw extends Projectile {
         alive = false;
         collisionOn = false;
         latched = false;
+        returning = false;
         health = maxHealth;
         user.setElevated(false);
         user.setAction(Action.IDLE);
@@ -241,7 +241,6 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void draw(Graphics2D g2) {
-
         drawChain(g2);
         super.draw(g2);
     }

@@ -1,7 +1,6 @@
 package entity.projectile;
 
 import application.GamePanel;
-import entity.Entity;
 
 import java.awt.*;
 
@@ -39,15 +38,7 @@ public class PRJ_Arrow extends Projectile {
     @Override
     public void update() {
 
-        collisionOn = false;
-
-        if (user == gp.player) {
-            checkEnemyCollision();
-            checkCollision();
-        }
-        else {
-            checkPlayerCollision();
-        }
+        checkCollision();
 
         if (!canPickup) {
             moveInDirection(direction);
@@ -65,43 +56,31 @@ public class PRJ_Arrow extends Projectile {
 
     @Override
     protected void checkCollision() {
+
+        collisionOn = false;
+
         gp.cChecker.checkTile(this);
         gp.cChecker.checkMovementCollision(this, gp.npc);
         gp.cChecker.checkMovementCollision(this, gp.obj);
-    }
-    private void checkEnemyCollision() {
+        checkObjectCollision();
 
-        Entity enemy = overlapEnemy(this);
-        if (enemy != null && enemy != user) {
-
-            damageEnemy(enemy);
-
-            if (speed >= defaultSpeed + 6) {
-                collisionOn = false;
-                alive = true;
-            }
-            else {
-                alive = false;
-            }
-        }
-    }
-    private void checkPlayerCollision() {
-        boolean contactPlayer = gp.cChecker.checkPlayer(this);
-
-        if (contactPlayer) {
-            alive = false;
-            damagePlayer(this);
+        if (user == gp.player) {
+            checkEnemyCollision();
         }
         else {
-            collisionOn = false;
+            checkPlayerCollision();
         }
     }
 
     @Override
-    protected void checkDeath() {
-        if (health <= 0 || !alive) {
-            resetValues();
+    protected boolean checkEnemyCollision() {
+        boolean enemyHit = super.checkEnemyCollision();
+        if (enemyHit) {
+            alive = speed >= defaultSpeed + 6;
+            collisionOn = !alive;
         }
+
+        return alive;
     }
 
     @Override

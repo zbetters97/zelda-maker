@@ -3,6 +3,8 @@ package application;
 import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
+import entity.object.Object;
+import entity.projectile.Projectile;
 import tile.TileManager;
 
 import javax.swing.*;
@@ -78,8 +80,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final Player player = new Player(this);
     public final Entity[][] npc = new Entity[maxMap][10];
     public final Entity[][] enemy = new Entity[maxMap][10];
-    public final Entity[][] obj = new Entity[maxMap][10];
-    public final Entity[][] projectile = new Entity[maxMap][10];
+    public final Object[][] obj = new Object[maxMap][10];
+    public final Projectile[][] projectile = new Projectile[maxMap][10];
 
     /**
      * CONSTRUCTOR

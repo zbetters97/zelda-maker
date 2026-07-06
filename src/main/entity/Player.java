@@ -144,15 +144,19 @@ public class Player extends Entity {
         attackUp1 = setupImage("/player/boy_attack_kokiri_up_1", gp.tileSize * 2, gp.tileSize);
         attackUp2 = setupImage("/player/boy_attack_kokiri_up_2", gp.tileSize * 2, gp.tileSize * 2);
         attackUp3 = setupImage("/player/boy_attack_kokiri_up_3", gp.tileSize, gp.tileSize * 2);
+        attackUp4 = setupImage("/player/boy_attack_kokiri_up_4", gp.tileSize, gp.tileSize * 2);
         attackDown1 = setupImage("/player/boy_attack_kokiri_down_1", gp.tileSize * 2, gp.tileSize);
         attackDown2 = setupImage("/player/boy_attack_kokiri_down_2", gp.tileSize * 2, gp.tileSize * 2);
         attackDown3 = setupImage("/player/boy_attack_kokiri_down_3", gp.tileSize, gp.tileSize * 2);
+        attackDown4 = setupImage("/player/boy_attack_kokiri_down_4", gp.tileSize, gp.tileSize * 2);
         attackLeft1 = setupImage("/player/boy_attack_kokiri_left_1", gp.tileSize, gp.tileSize * 2);
         attackLeft2 = setupImage("/player/boy_attack_kokiri_left_2", gp.tileSize * 2, gp.tileSize * 2);
         attackLeft3 = setupImage("/player/boy_attack_kokiri_left_3", gp.tileSize * 2, gp.tileSize);
+        attackLeft4 = setupImage("/player/boy_attack_kokiri_left_4", gp.tileSize * 2, gp.tileSize);
         attackRight1 = setupImage("/player/boy_attack_kokiri_right_1", gp.tileSize, gp.tileSize * 2);
         attackRight2 = setupImage("/player/boy_attack_kokiri_right_2", gp.tileSize * 2, gp.tileSize * 2);
         attackRight3 = setupImage("/player/boy_attack_kokiri_right_3", gp.tileSize * 2, gp.tileSize);
+        attackRight4 = setupImage("/player/boy_attack_kokiri_right_4", gp.tileSize * 2, gp.tileSize);
     }
     private void getSpinImages() {
         spinUp1 = setupImage("/player/boy_spin_kokiri_up_1", gp.tileSize * 2, gp.tileSize * 2);
@@ -499,10 +503,18 @@ public class Player extends Entity {
         // Item equipped
         if (item != null) {
             switch (item.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> item.use();
-                case ITM_Bow.itmName, ITM_Feather.itmName, ITM_Cape.itmName -> {
-                   lockonDirection = direction;
-                   item.use();
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> {
+                    gp.keyH.xPressed = false;
+                    item.use();
+                }
+                case ITM_Bow.itmName -> {
+                    lockonDirection = direction;
+                    item.use();
+                }
+                case ITM_Feather.itmName, ITM_Cape.itmName -> {
+                    gp.keyH.xPressed = false;
+                    lockonDirection = direction;
+                    item.use();
                 }
             }
         }

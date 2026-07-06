@@ -48,4 +48,53 @@ public class Projectile extends Entity {
 
         return true;
     }
+
+    protected boolean checkEnemyCollision() {
+
+        Entity enemy = overlapEnemy(this);
+        if (enemy != null) {
+            damageEnemy(enemy);
+            collisionOn = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    protected void checkPlayerCollision() {
+
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+        if (contactPlayer) {
+            alive = false;
+            damagePlayer(this);
+        }
+        else {
+            collisionOn = false;
+        }
+    }
+
+    protected void checkObjectCollision() {
+
+        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        if (object != -1 ) {
+            gp.obj[gp.currentMap][object].interact();
+            health = 0;
+            collisionOn = true;
+        }
+        else {
+            object = gp.cChecker.checkMovementCollision(this, gp.obj);
+            if (object != -1 ) {
+                gp.obj[gp.currentMap][object].interact();
+                health = 0;
+                collisionOn = true;
+            }
+        }
+    }
+
+    @Override
+    protected void checkDeath() {
+        if (health <= 0 || !alive) {
+            resetValues();
+        }
+    }
 }
