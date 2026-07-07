@@ -113,6 +113,7 @@ public class Entity {
     protected boolean isElevated = false;
     protected boolean canSwim = false;
     protected boolean needsWater = false;
+    protected boolean shielded = false;
 
     /** COMBAT VALUES */
     protected int attack;
@@ -250,7 +251,6 @@ public class Entity {
         if (knockback) {
             handleKnockback();
             manageValues();
-            // return;
         }
     }
 
@@ -873,6 +873,10 @@ public class Entity {
      */
     protected void damageEnemy(Entity target) {
 
+        if (target.getShielded()) {
+            return;
+        }
+
         // Damage same as player attack value
         int damage = attack;
 
@@ -907,6 +911,7 @@ public class Entity {
      * @param knockbackPower Power of the knockback
      */
     protected void setKnockback(Entity target, Entity attacker, int knockbackPower) {
+
         target.knockback = true;
 
         // Direction attacker was facing when hit
@@ -921,14 +926,13 @@ public class Entity {
      */
     protected void handleKnockback() {
 
+        canMove = false;
         collisionOn = false;
-        checkCollision();
 
         // Don't knockback if collision
+        checkCollision();
         if (collisionOn) {
-            knockback = false;
-            knockbackCounter = 0;
-            speed = defaultSpeed;
+            resetKnockback();
             return;
         }
 
@@ -937,10 +941,15 @@ public class Entity {
         // Run for 10 frames
         knockbackCounter++;
         if (knockbackCounter == 10) {
-            knockback = false;
-            knockbackCounter = 0;
-            speed = defaultSpeed;
+           resetKnockback();
         }
+    }
+
+    private void resetKnockback() {
+        knockback = false;
+        canMove = true;
+        knockbackCounter = 0;
+        speed = defaultSpeed;
     }
 
     /**
@@ -1373,5 +1382,9 @@ public class Entity {
 
     public boolean getBuzzing() {
         return buzzing;
+    }
+
+    public boolean getShielded() {
+        return shielded;
     }
 }
