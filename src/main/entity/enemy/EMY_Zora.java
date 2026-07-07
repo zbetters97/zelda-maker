@@ -74,7 +74,7 @@ public class EMY_Zora extends Entity {
     private void targetPlayer() {
 
         spriteNum = 2;
-        isElevated = false;
+        interactable = true;
 
         if (action == Action.IDLE) {
             prepareAttack();
@@ -114,7 +114,7 @@ public class EMY_Zora extends Entity {
         spriteNum = 1;
         spriteCounter = 0;
         action = Action.IDLE;
-        isElevated = true;
+        interactable = false;
         actionLockCounter = 0;
     }
 

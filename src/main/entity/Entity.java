@@ -71,6 +71,7 @@ public class Entity {
     protected Point hitboxDefaultPoint = new Point();
     protected int hitboxDefaultWidth = hitbox.width;
     protected int hitboxDefaultHeight = hitbox.height;
+    protected boolean interactable = true;
 
     /** MOVEMENT VALUES */
     protected Direction direction = DOWN;
@@ -292,6 +293,7 @@ public class Entity {
      * Checks if the entity collides with something
      */
     protected void checkCollision() {
+
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
@@ -507,7 +509,7 @@ public class Entity {
     public boolean playerWithinBounds() {
 
         // Don't search for player if not available
-        if (gp.player.isNotAvailable()) {
+        if (!gp.player.isAvailable()) {
             return false;
         }
 
@@ -536,6 +538,32 @@ public class Entity {
     }
     public int getGoalRow(Entity target) {
         return target.getCenterY() / gp.tileSize;
+    }
+
+    public void approachPlayer(int rate) {
+
+        actionLockCounter++;
+        if (actionLockCounter >= rate) {
+
+            if (getXDistance(gp.player) >= getYDistance(gp.player)) {
+                if (gp.player.getCenterX() < getCenterX()) {
+                    direction = LEFT;
+                }
+                else {
+                    direction = RIGHT;
+                }
+            }
+            else if (getXDistance(gp.player) < getYDistance(gp.player)) {
+                if (gp.player.getCenterY() < getCenterY()) {
+                    direction = UP;
+                }
+                else {
+                    direction = DOWN;
+                }
+            }
+
+            actionLockCounter = 0;
+        }
     }
 
     public int getTileDistance(Entity target) {
@@ -918,7 +946,7 @@ public class Entity {
     protected void damagePlayer(Entity enemy) {
 
         // Player can't be damaged
-        if (gp.player.invincible || gp.player.isNotAvailable()) {
+        if (gp.player.invincible || !gp.player.isAvailable()) {
             return;
         }
 
@@ -962,8 +990,8 @@ public class Entity {
     }
     /** END COMBAT*/
 
-    public boolean isNotAvailable() {
-        return !alive || dying || action == FALLING || action == DROWNING;
+    public boolean isAvailable() {
+        return alive && !dying && interactable && action != FALLING && action != DROWNING;
     }
 
     /**

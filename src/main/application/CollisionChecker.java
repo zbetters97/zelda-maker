@@ -222,7 +222,7 @@ public record CollisionChecker(GamePanel gp) {
 
             Entity target = targets[gp.currentMap][i];
 
-            if (target == null || target == entity) {
+            if (target == null || target == entity || !target.isAvailable()) {
                 continue;
             }
 
@@ -251,7 +251,7 @@ public record CollisionChecker(GamePanel gp) {
 
             Entity target = targets[gp.currentMap][i];
 
-            if (target == null || target == entity) {
+            if (target == null || target == entity || !target.isAvailable()) {
                 continue;
             }
 
@@ -274,7 +274,7 @@ public record CollisionChecker(GamePanel gp) {
      */
     public boolean checkPlayer(Entity entity) {
 
-        if (gp.player.getAction() == FALLING || gp.player.getAction() == DROWNING) {
+        if (!gp.player.isAvailable() || !entity.isAvailable()) {
             return false;
         }
 

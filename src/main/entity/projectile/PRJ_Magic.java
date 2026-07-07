@@ -4,20 +4,20 @@ import application.GamePanel;
 
 import java.awt.*;
 
-public class PRJ_Fireball extends Projectile {
+public class PRJ_Magic extends Projectile {
 
-    public static final String prjName = "Fireball Projectile";
+    public static final String prjName = "Magic Projectile";
 
-    public PRJ_Fireball(GamePanel gp) {
+    public PRJ_Magic(GamePanel gp) {
         super(gp, prjName);
 
-        defaultSpeed = 7;
+        defaultSpeed = 8;
         speed = defaultSpeed;
 
         defaultAttack = 2;
         attack = defaultAttack;
 
-        maxHealth = 60;
+        maxHealth = 120;
         health = maxHealth;
         alive = false;
 
@@ -29,8 +29,10 @@ public class PRJ_Fireball extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/fireball_down_1", 35, 35);
-        up2 = setupImage("/projectiles/fireball_down_2", 35, 35);
+        up1 = up2 = setupImage("/projectiles/magic_up_1");
+        down1 = down2 = setupImage("/projectiles/magic_down_1");
+        left1 = left2 = setupImage("/projectiles/magic_left_1");
+        right1 = right2 = setupImage("/projectiles/magic_right_1");
     }
 
     @Override
@@ -64,8 +66,8 @@ public class PRJ_Fireball extends Projectile {
     @Override
     protected boolean canBeDeflected(boolean usingShield) {
 
-        // Can only be deflected with a shield
-        return usingShield;
+        // Can only be deflected with a sword
+        return !usingShield;
     }
 
     @Override
@@ -81,15 +83,5 @@ public class PRJ_Fireball extends Projectile {
     public void resetValues() {
         alive = false;
         health = maxHealth;
-    }
-
-    @Override
-    protected void getSpriteImage() {
-        if (spriteNum == 1) {
-            image = up1;
-        }
-        else {
-            image = up2;
-        }
     }
 }

@@ -413,7 +413,7 @@ public class Player extends Entity {
 
         for (Entity e : gp.enemy[gp.currentMap]) {
 
-            if (e != null && e != lockedOnTarget && !e.dying) {
+            if (e != null && e != lockedOnTarget && e.isAvailable()) {
 
                 int enemyDistance = getTileDistance(e);
                 if (enemyDistance < currentDistance) {
@@ -431,7 +431,7 @@ public class Player extends Entity {
         if (lockedOnTarget != null && getTileDistance(lockedOnTarget) < maxZTargetDistance) {
 
             // Target alive
-            if (lockedOnTarget.alive) {
+            if (lockedOnTarget.isAvailable()) {
                 direction = getZTargetDirection(lockedOnTarget);
                 lockonDirection = direction;
             }

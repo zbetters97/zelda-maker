@@ -151,7 +151,7 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     protected void checkDeath() {
-        if (!alive) {
+        if (!alive || (user != null && !user.isAvailable())) {
             resetValues();
         }
     }

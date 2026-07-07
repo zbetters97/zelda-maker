@@ -14,13 +14,6 @@ public class Projectile extends Entity {
         entity_type = type_projectile;
     }
 
-    @Override
-    public void update() {
-        if (user != null && user.isNotAvailable()) {
-            alive = false;
-        }
-    }
-
     public void set(Point worldPoint, GamePanel.Direction direction, boolean alive, Entity user) {
         this.worldPoint.setLocation(worldPoint);
         this.direction = direction;
