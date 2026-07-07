@@ -266,6 +266,7 @@ public class GamePanel extends JPanel implements Runnable {
         drawTiles();
         drawObjects();
         drawEntities();
+        drawProjectiles();
         ui.draw(g2);
     }
 
@@ -305,13 +306,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        // Projectiles
-        for (Entity pr : proj[currentMap]) {
-            if (pr != null) {
-                entityList.add(pr);
-            }
-        }
-
         // Sort draw order by Y coordinate
         entityList.sort(Comparator.comparingInt(Entity::getWorldPointY));
 
@@ -322,6 +316,14 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Empty list
         entityList.clear();
+    }
+    private void drawProjectiles() {
+
+        for (Entity proj : proj[currentMap]) {
+            if (proj != null) {
+                proj.draw(g2);
+            }
+        }
     }
 
     /**
