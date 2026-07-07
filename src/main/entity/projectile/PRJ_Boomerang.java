@@ -1,6 +1,7 @@
 package entity.projectile;
 
 import application.GamePanel;
+import entity.Entity;
 
 import java.awt.*;
 
@@ -71,8 +72,18 @@ public class PRJ_Boomerang extends Projectile {
         }
     }
 
-    private void returnToUser() {
+    @Override
+    protected void checkPlayerCollision() {
 
+        // Return if player hit
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+        if (contactPlayer) {
+            damagePlayer(this);
+            collisionOn = true;
+        }
+    }
+
+    private void returnToUser() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 if (getCenterY() < user.getCenterY()) {
@@ -114,6 +125,11 @@ public class PRJ_Boomerang extends Projectile {
 
         // Can only be deflected with shield
         return usingShield;
+    }
+
+    @Override
+    protected void deflect(Entity target) {
+        alive = true;
     }
 
     @Override

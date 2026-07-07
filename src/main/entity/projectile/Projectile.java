@@ -65,8 +65,8 @@ public class Projectile extends Entity {
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
-            alive = false;
             damagePlayer(this);
+            alive = false;
         }
         else {
             collisionOn = false;

@@ -1,8 +1,6 @@
 package application;
 
-import entity.enemy.EMY_Goblin_Archer;
-import entity.enemy.EMY_Keese;
-import entity.enemy.EMY_Octorok;
+import entity.enemy.EMY_Goblin_Boomerang;
 import entity.npc.NPC_OldMan;
 import entity.object.*;
 
@@ -27,13 +25,7 @@ public record AssetSetter(GamePanel gp) {
         int mapNum = 0;
         int i = 0;
 
-        gp.enemy[mapNum][i] = new EMY_Keese(gp, 26, 20);
-        i++;
-
-        gp.enemy[mapNum][i] = new EMY_Goblin_Archer(gp, 26, 22);
-        i++;
-
-        gp.enemy[mapNum][i] = new EMY_Octorok(gp, 23, 9);
+        gp.enemy[mapNum][i] = new EMY_Goblin_Boomerang(gp, 26, 22);
     }
 
     private void setObjects() {
