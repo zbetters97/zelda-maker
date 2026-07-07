@@ -28,6 +28,7 @@ public class EMY_Octorok extends Entity {
         lockedOn = true;
         lockonDirection = DOWN;
         canSwim = true;
+        needsWater = true;
 
         hitbox = new Rectangle(8, 16, 32, 32);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);

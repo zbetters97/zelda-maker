@@ -1,7 +1,6 @@
 package application;
 
 import entity.Entity;
-import entity.enemy.EMY_Octorok;
 import tile.Tile;
 
 import java.awt.*;
@@ -124,7 +123,7 @@ public record CollisionChecker(GamePanel gp) {
             entity.setCollision(true);
         }
         // Fish enemies cannot move outside of water
-        else if (entity.getName().equals(EMY_Octorok.emyName)) {
+        else if (entity.getNeedsWater()) {
             entity.setCollision(true);
         }
     }

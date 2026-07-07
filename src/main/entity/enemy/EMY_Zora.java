@@ -24,6 +24,7 @@ public class EMY_Zora extends Entity {
         speed = defaultSpeed;
 
         canSwim = true;
+        needsWater = true;
 
         hitbox = new Rectangle(0, 0, gp.tileSize, gp.tileSize);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
@@ -71,7 +72,7 @@ public class EMY_Zora extends Entity {
     }
 
     private void targetPlayer() {
-        
+
         spriteNum = 2;
         isElevated = false;
 

@@ -1,6 +1,6 @@
 package application;
 
-import entity.enemy.EMY_Zora;
+import entity.enemy.EMY_Tektite;
 import entity.npc.NPC_OldMan;
 import entity.object.*;
 
@@ -25,7 +25,7 @@ public record AssetSetter(GamePanel gp) {
         int mapNum = 0;
         int i = 0;
 
-        gp.enemy[mapNum][i] = new EMY_Zora(gp, 23, 9);
+        gp.enemy[mapNum][i] = new EMY_Tektite(gp, 23, 9);
     }
 
     private void setObjects() {

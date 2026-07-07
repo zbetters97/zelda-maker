@@ -111,6 +111,7 @@ public class Entity {
     protected boolean opened = false;
     protected boolean isElevated = false;
     protected boolean canSwim = false;
+    protected boolean needsWater = false;
 
     /** COMBAT VALUES */
     protected int attack;
@@ -1331,5 +1332,9 @@ public class Entity {
 
     public boolean getCanSwim() {
         return canSwim;
+    }
+
+    public boolean getNeedsWater() {
+        return needsWater;
     }
 }
