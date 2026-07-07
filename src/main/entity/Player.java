@@ -236,7 +236,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        item = new ITM_Bow(gp, this);
+        item = new ITM_Hookshot(gp, this);
     }
 
     /**

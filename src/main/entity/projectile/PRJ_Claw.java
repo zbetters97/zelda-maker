@@ -88,8 +88,16 @@ public class PRJ_Claw extends Projectile {
 
         Entity target = overlapEnemy(this);
         if (target != null) {
-            grabbedEntity = target;
+
             collisionOn = true;
+
+            // Enemy shocks user, don't pull
+            if (target.getBuzzing()) {
+                damagePlayer(target);
+            }
+            else {
+                grabbedEntity = target;
+            }
         }
     }
     private void checkLatchableCollision() {

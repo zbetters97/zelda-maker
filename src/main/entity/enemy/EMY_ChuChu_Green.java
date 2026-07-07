@@ -22,7 +22,6 @@ public class EMY_ChuChu_Green extends Entity {
         speed = defaultSpeed;
         attack = 1;
 
-        // Collision attributes
         hitbox = new Rectangle(2, 18, 44, 30);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;

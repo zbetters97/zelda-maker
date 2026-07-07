@@ -1,0 +1,182 @@
+package entity.enemy;
+
+import application.GamePanel;
+import entity.Entity;
+
+import java.awt.*;
+
+public class EMY_Buzzblob extends Entity {
+
+    public static final String emyName = "Buzz Blob";
+
+    private int cycle = 0;
+
+    public EMY_Buzzblob(GamePanel gp, int worldX, int worldY) {
+        super(gp, worldX, worldY, emyName);
+
+        entity_type = type_enemy;
+        animationSpeed = 10;
+
+        maxHealth = 6;
+        health = maxHealth;
+
+        defaultSpeed = 1;
+        speed = defaultSpeed;
+        defaultAttack = 1;
+        attack = defaultAttack;
+
+        hitbox = new Rectangle(8, 16, 32, 32);
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
+
+        getAttackImages();
+    }
+
+    @Override
+    protected void getImages() {
+        up1 = down1 = left1 = right1 = setupImage("/enemy/buzzblob_down_1");
+        up2 = down2 = left2 = right2 = setupImage("/enemy/buzzblob_down_2");
+        up3 = down3 = left3 = right3 = setupImage("/enemy/buzzblob_down_3");
+
+    }
+
+    private void getAttackImages() {
+        attackUp1 = setupImage("/enemy/buzzblob_attack_down_1");
+        attackUp2 = setupImage("/enemy/buzzblob_attack_down_2");
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        if (!canMove) {
+            manageValues();
+            return;
+        }
+
+        setAction();
+        updateDirection();
+
+        manageValues();
+    }
+
+    @Override
+    protected void setAction() {
+
+        isOffPath(gp.player, 6);
+
+        if (onPath && playerWithinBounds()) {
+            chasePlayer();
+        }
+        else {
+            searchForPlayer();
+        }
+    }
+
+    private void chasePlayer() {
+        searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+
+        if (action != Action.ATTACKING) {
+            setAttacking(180, gp.tileSize * 3, gp.tileSize * 3);
+        }
+    }
+
+    private void searchForPlayer() {
+
+        setDirection(60);
+
+        if (playerWithinBounds()) {
+            isOnPath(gp.player, 3);
+        }
+        else {
+            onPath = false;
+        }
+    }
+
+    @Override
+    protected void cycleSprites() {
+
+        spriteCounter++;
+        if (animationSpeed < spriteCounter) {
+            if (action == Action.ATTACKING) {
+                cycleBuzzingSprites();
+            }
+            else {
+                cycleIdleSprites();
+            }
+
+            spriteCounter = 0;
+        }
+    }
+    private void cycleBuzzingSprites() {
+        if (attackNum == 1) {
+            attackNum = 2;
+        }
+        else if (attackNum == 2) {
+            attackNum = 1;
+        }
+    }
+    private void cycleIdleSprites() {
+
+        // 1 -> 2 -> 3 -> 2 -> 1
+        if (spriteNum == 1) {
+            spriteNum = 2;
+        }
+        else if (spriteNum == 2 && cycle == 0) {
+            spriteNum = 3;
+            cycle++;
+        }
+        else if (spriteNum == 2 && cycle == 1) {
+            spriteNum = 1;
+            cycle = 0;
+        }
+        else if (spriteNum == 3) {
+            spriteNum = 2;
+        }
+    }
+
+    @Override
+    protected void manageValues() {
+        if (action == Action.ATTACKING) {
+            attack = 2;
+            buzzing = true;
+
+            attackCounter++;
+            if (120 < attackCounter) {
+                action = Action.IDLE;
+                attackCounter = 0;
+            }
+        }
+        else {
+            attack = defaultAttack;
+            buzzing = false;
+        }
+
+        super.manageValues();
+    }
+
+    @Override
+    protected void getSpriteImage() {
+
+        if (action == Action.ATTACKING) {
+            if (attackNum == 1) {
+                image = attackUp1;
+            }
+            else {
+                image = attackUp2;
+            }
+        }
+        else {
+            if (spriteNum == 1) {
+                image = up1;
+            }
+            else if (spriteNum == 2) {
+                image = up2;
+            }
+            else {
+                image = up3;
+            }
+        }
+    }
+}

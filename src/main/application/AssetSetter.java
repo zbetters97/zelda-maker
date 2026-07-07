@@ -1,7 +1,6 @@
 package application;
 
 import entity.enemy.EMY_Wizrobe;
-import entity.enemy.EMY_Zora;
 import entity.npc.NPC_OldMan;
 import entity.object.*;
 
@@ -27,12 +26,10 @@ public record AssetSetter(GamePanel gp) {
         int i = 0;
 
         gp.enemy[mapNum][i] = new EMY_Wizrobe(gp, 23, 18);
-        i++;
-
-        gp.enemy[mapNum][i] = new EMY_Zora(gp, 23, 9);
     }
 
     private void setObjects() {
+
         int mapNum = 0;
         int i = 0;
 
@@ -41,9 +38,6 @@ public record AssetSetter(GamePanel gp) {
 
         gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 21);
         i++;
-        gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 22);
-        i++;
-
         gp.obj[mapNum][i] = new OBJ_Block_Blue(gp, 22, 20);
         i++;
         gp.obj[mapNum][i] = new OBJ_Block_Red(gp, 22, 21);

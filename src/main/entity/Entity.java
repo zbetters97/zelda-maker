@@ -125,6 +125,7 @@ public class Entity {
     protected boolean knockback;
     protected GamePanel.Direction knockbackDirection;
     protected int knockbackCounter = 0;
+    protected boolean buzzing = false;
 
     /** INVENTORY VALUES */
     protected int arrows = 0;
@@ -792,10 +793,14 @@ public class Entity {
     protected void detectPlayerSwordCollision() {
         // Find enemy that intersects collision box
         Entity enemy = overlapEnemy(this);
+        if (enemy != null) {
 
-        // Sword collides with enemy, apply damage
-        if (enemy != null && !enemy.invincible) {
-            damageEnemy(enemy);
+            if (enemy.getBuzzing()) {
+                damagePlayer(enemy);
+            }
+            else if (!enemy.invincible) {
+                damageEnemy(enemy);
+            }
         }
 
         int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
@@ -1364,5 +1369,9 @@ public class Entity {
 
     public boolean getNeedsWater() {
         return needsWater;
+    }
+
+    public boolean getBuzzing() {
+        return buzzing;
     }
 }

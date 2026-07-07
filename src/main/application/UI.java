@@ -356,17 +356,17 @@ public class UI {
         Entity newTarget = null;
         int currentDistance = Entity.maxZTargetDistance;
 
-        for (Entity e : gp.enemy[gp.currentMap]) {
+        for (Entity enemy : gp.enemy[gp.currentMap]) {
 
-            if (e != null) {
+            if (enemy != null && enemy.isAvailable()) {
 
                 // Enemy distance from player
-                int enemyDistance = e.getTileDistance(gp.player);
+                int enemyDistance = enemy.getTileDistance(gp.player);
 
                 // Find closest enemy distance within 8 tiles
                 if (enemyDistance < currentDistance) {
                     currentDistance = enemyDistance;
-                    newTarget = e;
+                    newTarget = enemy;
                 }
             }
         }
