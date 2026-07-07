@@ -1,6 +1,7 @@
 package application;
 
 import entity.Entity;
+import entity.enemy.EMY_Octorok;
 import tile.Tile;
 
 import java.awt.*;
@@ -106,10 +107,10 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
         // Water
-        if (tile1.isWater || tile2.isWater) {
+        else if (tile1.isWater || tile2.isWater) {
 
-            // Entity in air
-            if (entity.getElevated()) {
+            // Entity in air or can swim
+            if (entity.getElevated() || entity.getCanSwim()) {
                 return;
             }
 
@@ -120,6 +121,10 @@ public record CollisionChecker(GamePanel gp) {
         }
         // Collision titles
         else if (tile1.hasCollision || tile2.hasCollision) {
+            entity.setCollision(true);
+        }
+        // Fish enemies cannot move outside of water
+        else if (entity.getName().equals(EMY_Octorok.emyName)) {
             entity.setCollision(true);
         }
     }
@@ -161,7 +166,7 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
     private void handleWater(Entity entity) {
-        if (entity.getElevated()) {
+        if (entity.getElevated() || entity.getCanSwim()) {
             return;
         }
 
@@ -262,7 +267,6 @@ public record CollisionChecker(GamePanel gp) {
 
         return entityIndex;
     }
-
 
     /**
      * CHECK PLAYER

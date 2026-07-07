@@ -5,7 +5,6 @@ import entity.Entity;
 import entity.projectile.PRJ_Arrow;
 
 import java.awt.*;
-import java.util.Random;
 
 public class EMY_Goblin_Archer extends Entity {
 
@@ -76,7 +75,7 @@ public class EMY_Goblin_Archer extends Entity {
     }
 
     @Override
-    public void setAction() {
+    protected void setAction() {
 
         // Player found
         if (onPath) {
@@ -104,15 +103,7 @@ public class EMY_Goblin_Archer extends Entity {
         projectile.modifySpeed(4);
         projectile.modifyAttack(2);
 
-        // Shoot one arrow every ~2 seconds
-        int i = new Random().nextInt(120);
-        if (i == 0 && !projectile.alive && actionLockCounter == 0) {
-            projectile.set(worldPoint, direction, true, this);
-            addProjectile(projectile);
-
-            // Force 30 frame delay in between shots
-            actionLockCounter = 30;
-        }
+        useProjectile(projectile, 2);
     }
 
     @Override

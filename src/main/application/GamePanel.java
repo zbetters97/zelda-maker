@@ -65,7 +65,6 @@ public class GamePanel extends JPanel implements Runnable {
     /** GAME STATES */
     public int gameState;
     public final int playState = 1;
-    public final int pauseState = 2;
 
     /** AREA STATES */
     public int currentArea;
@@ -197,25 +196,12 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
 
-        if (gameState == playState) {
-            player.update();
-            updateNPCs();
-            updateEnemies();
-            updateObjects();
-            updateCollectables();
-            updateProjectiles();
-
-            if (keyH.startPressed) {
-                gameState = pauseState;
-                keyH.startPressed = false;
-            }
-        }
-        else if (gameState == pauseState) {
-            if (keyH.startPressed) {
-                gameState = playState;
-                keyH.startPressed = false;
-            }
-        }
+        player.update();
+        updateNPCs();
+        updateEnemies();
+        updateObjects();
+        updateCollectables();
+        updateProjectiles();
     }
 
     /** UPDATERS **/

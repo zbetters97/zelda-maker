@@ -8,8 +8,6 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -18,9 +16,6 @@ public class Player extends Entity {
 
     /** X/Y VALUES */
     public Point safePoint;
-
-    /** INVENTORY VALUES */
-    private final ArrayList<Entity> inventoryItems = new ArrayList<>();
 
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
@@ -241,14 +236,6 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        inventoryItems.addAll(Arrays.asList(
-                new ITM_Shovel(gp, this),
-                new ITM_Boomerang(gp, this),
-                new ITM_Bow(gp, this),
-                new ITM_Hookshot(gp, this),
-                new ITM_Feather(gp, this),
-                new ITM_Cape(gp, this)
-        ));
     }
 
     /**
@@ -1536,9 +1523,5 @@ public class Player extends Entity {
     /** GETTERS */
     public Entity getLockedOnTarget() {
         return lockedOnTarget;
-    }
-
-    public ArrayList<Entity> getInventoryItems() {
-        return inventoryItems;
     }
 }

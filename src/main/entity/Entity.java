@@ -110,6 +110,7 @@ public class Entity {
     protected Collectable loot;
     protected boolean opened = false;
     protected boolean isElevated = false;
+    protected boolean canSwim = false;
 
     /** COMBAT VALUES */
     protected int attack;
@@ -620,6 +621,18 @@ public class Entity {
      */
     protected void use() { }
 
+    protected void useProjectile(Projectile projectile, int seconds) {
+
+        int i = new Random().nextInt(60 * seconds);
+        if (i == 0 && !projectile.alive && actionLockCounter == 0) {
+            projectile.set(worldPoint, direction, true, this);
+            addProjectile(projectile);
+
+            // Force 30 frame delay in between shots
+            actionLockCounter = 30;
+        }
+    }
+
     /**
      * ADD PROJECTILE
      * Adds new projectile entity to gp projectile list
@@ -756,14 +769,18 @@ public class Entity {
             damageEnemy(enemy);
         }
 
-        int projectile = gp.cChecker.checkOverlapCollision(this, gp.proj);
-        if (projectile != -1) {
-            gp.proj[gp.currentMap][projectile].deflect(this);
+        int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
+        if (proj != -1) {
+            Projectile projectile = gp.proj[gp.currentMap][proj];
+
+            if (projectile.canBeDeflected(false)) {
+                projectile.deflect(this);
+            }
         }
 
-        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
-        if (object != -1) {
-            gp.obj[gp.currentMap][object].interact();
+        int obj = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        if (obj != -1) {
+            gp.obj[gp.currentMap][obj].interact();
         }
     }
     private void detectEnemySwordCollision() {
@@ -915,8 +932,13 @@ public class Entity {
         setKnockback(gp.player, enemy, 1);
 
         // Player blocked with shield
-        if (gp.player.getAction() == GUARDING &&
-                gp.player.getDirection() == getOppositeDirection(enemy.getDirection())) {
+        boolean facingEnemy = gp.player.getDirection() == getOppositeDirection(enemy.getDirection());
+        if (gp.player.getAction() == GUARDING && facingEnemy) {
+
+            if (enemy.canBeDeflected(true)) {
+                enemy.deflect(gp.player);
+            }
+
             return;
         }
 
@@ -925,12 +947,17 @@ public class Entity {
         gp.player.invincible = true;
     }
 
-    public void deflect(Entity target) {
+    protected boolean canBeDeflected(boolean usingShield) {
+        return false;
+    }
+
+    protected void deflect(Entity target) {
         collisionOn = false;
         alive = true;
+        health = maxHealth;
         user = target;
         direction = target.getDirection();
-        speed = 6;
+        speed = defaultSpeed;
     }
     /** END COMBAT*/
 
@@ -1290,9 +1317,6 @@ public class Entity {
     public Entity getItem() {
         return item;
     }
-    public void setItem(Entity item) {
-        this.item = item;
-    }
 
     public int getArrows() {
         return arrows;
@@ -1303,5 +1327,9 @@ public class Entity {
 
     public boolean isLatchable() {
         return latchable;
+    }
+
+    public boolean getCanSwim() {
+        return canSwim;
     }
 }

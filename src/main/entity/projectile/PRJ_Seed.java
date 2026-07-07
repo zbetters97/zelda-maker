@@ -1,28 +1,27 @@
 package entity.projectile;
 
 import application.GamePanel;
-import entity.Entity;
 
 import java.awt.*;
 
-public class PRJ_Arrow extends Projectile {
+public class PRJ_Seed extends Projectile {
 
-    public static final String prjName = "Arrow Projectile";
+    public static final String prjName = "Seed Projectile";
 
-    public PRJ_Arrow(GamePanel gp) {
+    public PRJ_Seed(GamePanel gp) {
         super(gp, prjName);
 
-        defaultSpeed = 5;
+        defaultSpeed = 7;
         speed = defaultSpeed;
 
-        defaultAttack = 1;
+        defaultAttack = 2;
         attack = defaultAttack;
 
-        maxHealth = 120;
+        maxHealth = 45;
         health = maxHealth;
         alive = false;
 
-        hitbox = new Rectangle(4, 8, 24, 24);
+        hitbox = new Rectangle(12, 12, 24, 24);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
@@ -30,10 +29,7 @@ public class PRJ_Arrow extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = up2 = setupImage("/projectiles/arrow_up_1", 35, 35);
-        down1 = down2 = setupImage("/projectiles/arrow_down_1", 35, 35);
-        left1 = left2 = setupImage("/projectiles/arrow_left_1", 35, 35);
-        right1 = right2 = setupImage("/projectiles/arrow_right_1", 35, 35);
+        up1 = setupImage("/projectiles/seed_down_1", 35, 35);
     }
 
     @Override
@@ -43,12 +39,6 @@ public class PRJ_Arrow extends Projectile {
 
         if (!canPickup) {
             moveInDirection(direction);
-        }
-
-        if (collisionOn && alive) {
-            canPickup = true;
-            speed = 0;
-            attack = 0;
         }
 
         health--;
@@ -74,35 +64,29 @@ public class PRJ_Arrow extends Projectile {
     }
 
     @Override
-    protected boolean checkEnemyCollision() {
-        boolean enemyHit = super.checkEnemyCollision();
-        if (enemyHit) {
-            alive = speed >= defaultSpeed + 6;
-            collisionOn = !alive;
-        }
-
-        return alive;
-    }
-
-    @Override
     protected boolean canBeDeflected(boolean usingShield) {
 
-        // Can only be deflected using sword
-        return !usingShield;
+        // Can be deflected with sword or shield
+        return true;
     }
 
     @Override
-    protected void deflect(Entity target) {
-        super.deflect(target);
+    protected void checkDeath() {
+        super.checkDeath();
 
-        speed = 6;
-        attack = 2;
+        if (collisionOn) {
+            resetValues();
+        }
     }
 
     @Override
     public void resetValues() {
         alive = false;
-        attack = defaultAttack;
-        speed = defaultSpeed;
+        health = maxHealth;
+    }
+
+    @Override
+    protected void getSpriteImage() {
+        image = up1;
     }
 }

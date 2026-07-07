@@ -110,6 +110,13 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     @Override
+    protected boolean canBeDeflected(boolean usingShield) {
+
+        // Can only be deflected with shield
+        return usingShield;
+    }
+
+    @Override
     protected void cycleSprites() {
 
         spriteCounter++;
