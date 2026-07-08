@@ -20,6 +20,8 @@ public class EMY_Wizrobe extends Enemy {
         defaultSpeed = 2;
         speed = defaultSpeed;
 
+        knockbackPower = 0;
+
         projectile = new PRJ_Magic(gp);
     }
 

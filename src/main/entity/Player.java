@@ -11,6 +11,8 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -19,6 +21,9 @@ public class Player extends Entity {
 
     /** X/Y VALUES */
     public Point safePoint;
+
+    private final ArrayList<Item> items = new ArrayList<>();
+    private int currentItemSlot = 0;
 
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
@@ -63,18 +68,12 @@ public class Player extends Entity {
      * @param gp GamePanel
      */
     public Player(GamePanel gp) {
-        super(gp);
-
-        name = "Link";
-
-        maxHealth = 16;
-        health = maxHealth;
-        defaultAttack = 2;
-        attack = defaultAttack;
+        super(gp, "Link");
 
         // Player position locked to center of screen
         screenPoint = new Point(gp.screenWidth / 2 - (gp.tileSize / 2), gp.screenHeight / 2 - (gp.tileSize / 2));
 
+        // AI pathfinder
         ai = new EntityAI(gp, this);
 
         // Hitbox
@@ -240,19 +239,18 @@ public class Player extends Entity {
      */
     public void setDefaultValues() {
         setDefaultAnimationValues();
+        setDefaultRPGValues();
         setDefaultPosition();
-
-        arrows = 50;
-        item = new ITM_Bow(gp, this);
     }
 
     /**
      * SET DEFAULT ANIMATION VALUES
      */
     private void setDefaultAnimationValues() {
-        speed = 3;
-        defaultSpeed = speed;
+
         animationSpeed = 10;
+        defaultSpeed = 3;
+        speed = defaultSpeed;
         action = IDLE;
     }
 
@@ -260,11 +258,35 @@ public class Player extends Entity {
      * SET DEFAULT POSITON
      */
     private void setDefaultPosition() {
+
         worldPoint = new Point(gp.tileSize * 23, gp.tileSize * 21);
         safePoint = new Point(worldPoint.x, worldPoint.y);
 
         gp.currentMap = 0;
         gp.currentArea = gp.outside;
+    }
+
+    private void setDefaultRPGValues() {
+
+        maxHealth = 16;
+        health = maxHealth;
+
+        defaultAttack = 2;
+        attack = defaultAttack;
+        knockbackPower = 1;
+
+        arrows = 50;
+
+        items.addAll(Arrays.asList(
+                new ITM_Shovel(gp, this),
+                new ITM_Boomerang(gp, this),
+                new ITM_Feather(gp, this),
+                new ITM_Bow(gp, this),
+                new ITM_Hookshot(gp, this),
+                new ITM_Cape(gp, this)
+        ));
+
+        item = items.getFirst();
     }
 
     /**
@@ -335,6 +357,10 @@ public class Player extends Entity {
         // Use item
         else if (gp.keyH.xPressed) {
             useItem();
+        }
+        // Switch item
+        else if (gp.keyH.startPressed) {
+           switchItem();
         }
     }
 
@@ -529,6 +555,17 @@ public class Player extends Entity {
         }
     }
 
+    private void switchItem() {
+        gp.keyH.startPressed = false;
+
+        currentItemSlot++;
+        if (items.size() <= currentItemSlot) {
+            currentItemSlot = 0;
+        }
+
+        item = items.get(currentItemSlot);
+    }
+
     /**
      * UPDATE ACTION
      * Calls the action method based on current player action
@@ -652,7 +689,7 @@ public class Player extends Entity {
 
         Enemy enemy = moveIntoEnemy(this);
         if (enemy != null && !enemy.invincible) {
-            enemy.damagePlayer();
+            takeDamage(enemy);
         }
     }
     private void checkInteractiveCollision() {
@@ -1126,19 +1163,8 @@ public class Player extends Entity {
     protected void manageValues() {
 
         // Decrease cooldown if filled
-        if (actionLockCounter > 0) {
+        if (0 < actionLockCounter) {
             actionLockCounter--;
-        }
-
-        // Shield after taking damage
-        if (invincible) {
-            invincibleCounter++;
-
-            // 1 SECOND REFRESH TIME
-            if (invincibleCounter > 60) {
-                invincible = false;
-                invincibleCounter = 0;
-            }
         }
     }
 

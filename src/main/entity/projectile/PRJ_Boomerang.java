@@ -16,14 +16,15 @@ public class PRJ_Boomerang extends Projectile {
 
         animationSpeed = 3;
 
+        maxHealth = 30;
+        health = maxHealth;
+
         defaultSpeed = 8;
         speed = defaultSpeed;
 
         defaultAttack = 1;
         attack = defaultAttack;
-
-        maxHealth = 30;
-        health = maxHealth;
+        knockbackPower = 2;
     }
 
     @Override
@@ -34,8 +35,6 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     public void update() {
-        super.update();
-
         if (returning) {
             returnToUser();
         }
@@ -59,7 +58,7 @@ public class PRJ_Boomerang extends Projectile {
         // Return if player hit
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
-            damagePlayer();
+            gp.player.takeDamage(this);
             collisionOn = true;
         }
     }

@@ -4,6 +4,9 @@ import application.GamePanel;
 import entity.Entity;
 import entity.enemy.Enemy;
 
+import static application.GamePanel.Direction.DOWN;
+import static application.GamePanel.Direction.UP;
+
 import java.awt.*;
 
 public class Projectile extends Entity {
@@ -14,6 +17,7 @@ public class Projectile extends Entity {
         super(gp, name);
         entity_type = type_projectile;
 
+        knockbackPower = 1;
         alive = false;
 
         hitbox = new Rectangle(12, 16, 24, 24);
@@ -28,8 +32,19 @@ public class Projectile extends Entity {
         this.alive = alive;
         this.user = user;
 
+        this.direction = getCorrectedDirection();
+
         shiftPosition();
     }
+
+    private GamePanel.Direction getCorrectedDirection() {
+        return switch (direction) {
+            case UPLEFT, UPRIGHT -> UP;
+            case DOWNLEFT, DOWNRIGHT -> DOWN;
+            default -> direction;
+        };
+    }
+
     private void shiftPosition() {
 
         // Avoids potential collision issue
@@ -70,7 +85,7 @@ public class Projectile extends Entity {
 
         Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
-            enemy.damageEnemy(this);
+            enemy.takeDamage(this);
             collisionOn = true;
             return true;
         }
@@ -81,7 +96,7 @@ public class Projectile extends Entity {
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
-            damagePlayer();
+            gp.player.takeDamage(this);
             alive = false;
         }
         else {

@@ -18,11 +18,11 @@ public class PRJ_Claw extends Projectile {
     public PRJ_Claw(GamePanel gp, Entity user) {
         super(gp, prjName);
 
-        defaultSpeed = 10;
-        speed = defaultSpeed;
-
         maxHealth = 30;
         health = maxHealth;
+
+        defaultSpeed = 10;
+        speed = defaultSpeed;
 
         this.user = user;
 
@@ -31,10 +31,10 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = up2 = setupImage("/projectiles/hookshot_up_1");
-        down1 = down2 = setupImage("/projectiles/hookshot_down_1");
-        left1 = left2 = setupImage("/projectiles/hookshot_left_1");
-        right1 = right2 = setupImage("/projectiles/hookshot_right_1");
+        up1 = setupImage("/projectiles/hookshot_up_1");
+        down1 = setupImage("/projectiles/hookshot_down_1");
+        left1 = setupImage("/projectiles/hookshot_left_1");
+        right1 = setupImage("/projectiles/hookshot_right_1");
     }
 
     private void getClawImages() {
@@ -49,7 +49,6 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void update() {
-        super.update();
 
         if (returning) {
             if (latched) {
@@ -90,7 +89,7 @@ public class PRJ_Claw extends Projectile {
 
             // Enemy shocks user, don't pull
             if (target.getBuzzing()) {
-                target.damagePlayer();
+                user.takeDamage(target);
             }
             else {
                 grabbedEntity = target;

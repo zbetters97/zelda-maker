@@ -4,17 +4,17 @@ import application.GamePanel;
 import entity.Entity;
 import entity.projectile.PRJ_Arrow;
 
-public class ITM_Bow extends Entity {
+public class ITM_Bow extends Item {
 
     public static final String itmName = "Hylian Bow";
 
     public ITM_Bow(GamePanel gp, Entity user) {
-        super(gp, user, itmName);
+        super(gp, itmName, user, Action.AIMING);
     }
 
     @Override
     protected void getImages() {
-        image = down1 = setupImage("/items/itm_bow");
+        image = setupImage("/items/itm_bow");
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ITM_Bow extends Entity {
                 user.charge++;
             }
 
-            user.setAction(Action.AIMING);
+            super.use();
         }
     }
 

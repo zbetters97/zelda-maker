@@ -16,6 +16,8 @@ public class EMY_Keese extends Enemy {
 
         defaultSpeed = 2;
         speed = defaultSpeed;
+
+        knockbackPower = 0;
     }
 
     @Override

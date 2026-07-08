@@ -3,22 +3,22 @@ package entity.item;
 import application.GamePanel;
 import entity.Entity;
 
-public class ITM_Feather extends Entity {
+public class ITM_Feather extends Item {
 
     public static final String itmName = "Feather";
 
     public ITM_Feather(GamePanel gp, Entity user) {
-        super(gp, user, itmName);
+        super(gp, itmName, user, Action.JUMPING);
     }
 
     @Override
     protected void getImages() {
-        image = down1 = setupImage("/items/itm_feather");
+        image = setupImage("/items/itm_feather");
     }
 
     @Override
     protected void use() {
-        user.setAction(Action.JUMPING);
+        super.use();
         user.setElevated(true);
     }
 }

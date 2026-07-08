@@ -12,14 +12,14 @@ public class PRJ_Arrow extends Projectile {
     public PRJ_Arrow(GamePanel gp) {
         super(gp, prjName);
 
+        maxHealth = 120;
+        health = maxHealth;
+
         defaultSpeed = 5;
         speed = defaultSpeed;
 
         defaultAttack = 1;
         attack = defaultAttack;
-
-        maxHealth = 120;
-        health = maxHealth;
 
         hitbox = new Rectangle(4, 8, 24, 24);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
@@ -38,9 +38,8 @@ public class PRJ_Arrow extends Projectile {
     @Override
     public void update() {
 
-        checkCollision();
-
         if (!canPickup) {
+            checkCollision();
             moveInDirection(direction);
         }
 

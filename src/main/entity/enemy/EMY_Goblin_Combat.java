@@ -16,8 +16,10 @@ public class EMY_Goblin_Combat extends Enemy {
 
         defaultSpeed = 1;
         speed = defaultSpeed;
+
         defaultAttack = 4;
         attack = defaultAttack;
+        knockbackPower = 2;
 
         minTileDistanceToPlayer = 5;
         maxTileDistanceToPlayer = 8;

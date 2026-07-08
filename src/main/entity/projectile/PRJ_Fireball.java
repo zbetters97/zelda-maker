@@ -9,14 +9,16 @@ public class PRJ_Fireball extends Projectile {
     public PRJ_Fireball(GamePanel gp) {
         super(gp, prjName);
 
+        maxHealth = 60;
+        health = maxHealth;
+
         defaultSpeed = 7;
         speed = defaultSpeed;
 
         defaultAttack = 2;
         attack = defaultAttack;
 
-        maxHealth = 60;
-        health = maxHealth;
+        knockbackPower = 0;
     }
 
     @Override

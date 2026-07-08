@@ -25,6 +25,7 @@ public class Enemy extends Entity {
 
         defaultAttack = 1;
         attack = defaultAttack;
+        knockbackPower = 1;
 
         ai = new EntityAI(gp, this);
 
@@ -96,38 +97,6 @@ public class Enemy extends Entity {
         else {
             onPath = false;
         }
-    }
-
-    public void damageEnemy(Entity attacker) {
-
-        if (shielded) {
-            return;
-        }
-
-        // Damage same as player attack value
-        int damage = attacker.getAttack();
-
-        // Keep damage at or above 0
-        if (damage < 0) {
-            damage = 0;
-        }
-
-        // Take damage
-        health -= damage;
-        invincible = true;
-        reactToDamage();
-
-        // Lost all health, start dying animation
-        if (health <= 0) {
-            dying = true;
-        }
-
-        // Push target back
-        setKnockback(attacker, 1);
-    }
-
-    protected void reactToDamage() {
-
     }
 
     @Override

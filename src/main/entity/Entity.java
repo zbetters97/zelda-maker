@@ -115,6 +115,7 @@ public class Entity {
     /** COMBAT VALUES */
     protected int attack;
     protected int defaultAttack;
+    protected int knockbackPower;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
     protected int attackNum = 1, attackCounter = 0;
     protected int swingSpeed1;
@@ -167,7 +168,7 @@ public class Entity {
     public Entity(GamePanel gp, int worldX, int worldY, String name) {
         this(gp, worldX, worldY, name, null);
     }
-    public Entity(GamePanel gp, Entity user, String name) {
+    public Entity(GamePanel gp, String name, Entity user) {
         this(gp, 0, 0, name, user);
         entity_type = type_item;
     }
@@ -229,12 +230,10 @@ public class Entity {
      * Handles logic involving moving the entity
      */
     protected void updateDirection() {
+
         checkCollision();
         move(direction);
-
-        if (moving) {
-            cycleSprites();
-        }
+        cycleSprites();
     }
 
     /**
@@ -270,7 +269,7 @@ public class Entity {
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         boolean canHurtPlayer = entity_type == type_enemy;
         if (contactPlayer && canHurtPlayer) {
-            damagePlayer();
+            gp.player.takeDamage(this);
         }
 
         gp.cChecker.checkHazard(this);
@@ -475,16 +474,11 @@ public class Entity {
     }
 
     protected void detectPlayerSwordCollision() {
+
         // Find enemy that intersects collision box
         Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
-
-            if (enemy.getBuzzing()) {
-                enemy.damagePlayer();
-            }
-            else if (!enemy.invincible) {
-                enemy.damageEnemy(this);
-            }
+            enemy.takeDamage(this);
         }
 
         int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
@@ -503,7 +497,7 @@ public class Entity {
     }
     private void detectEnemySwordCollision() {
         if (gp.cChecker.checkPlayer(this)) {
-            damagePlayer();
+            gp.player.takeDamage(this);
         }
     }
 
@@ -543,16 +537,15 @@ public class Entity {
      * SET KNOCKBACK
      * Starts the knockback animation on the target
      * @param attacker Entity that provided the knockback
-     * @param knockbackPower Power of the knockback
      */
-    protected void setKnockback(Entity attacker, int knockbackPower) {
+    protected void setKnockback(Entity attacker) {
 
         knockback = true;
 
         // Direction attacker was facing when hit
-        knockbackDirection = attacker.getMoveDirection();
+        knockbackDirection = attacker.getDirection();
 
-        speed += knockbackPower;
+        speed += attacker.getKnockbackPower();
     }
 
     /**
@@ -585,41 +578,47 @@ public class Entity {
         speed = defaultSpeed;
     }
 
-    /**
-     * DAMAGE PLAYER
-     * Handles logic for damaging the player
-     */
-    public void damagePlayer() {
+    public void takeDamage(Entity attacker) {
 
-        // Player can't be damaged
-        if (gp.player.invincible || !gp.player.isAvailable()) {
+        if (invincible || !isAvailable()) {
             return;
         }
 
-        int damage = attack;
-
-        // Keep damage at or above 0
-        if (damage < 0) {
-            damage = 0;
+        if (buzzing && attacker.getType() != type_projectile) {
+            attacker.takeDamage(this);
+            return;
         }
 
-        // Knockback player
-        gp.player.setKnockback(this, 1);
-
-        // Player blocked with shield
-        boolean facingEnemy = gp.player.getDirection() == getOppositeDirection(getDirection());
-        if (gp.player.getAction() == GUARDING && facingEnemy) {
+        // Target blocked with shield
+        boolean facingEnemy = getDirection() == getOppositeDirection(attacker.getDirection());
+        if (action == GUARDING && facingEnemy) {
 
             if (canBeDeflected(true)) {
-                deflect(gp.player);
+                deflect(this);
+            }
+            else {
+                setKnockback(attacker);
             }
 
             return;
         }
 
-        // Damage player
-        gp.player.health -= damage;
-        gp.player.invincible = true;
+        int damage = attacker.getAttack();
+
+        health -= damage;
+        if (health <= 0) {
+            dying = true;
+        }
+        else {
+            invincible = true;
+            reactToDamage();
+        }
+
+        setKnockback(attacker);
+    }
+
+    protected void reactToDamage() {
+
     }
 
     protected boolean canBeDeflected(boolean usingShield) {
@@ -831,7 +830,7 @@ public class Entity {
     }
 
     public int getCenterX() {
-        return worldPoint.x + left1.getWidth() / 2;
+        return worldPoint.x + up1.getWidth() / 2;
     }
     public int getCenterY() {
         return worldPoint.y + up1.getHeight() / 2;
@@ -934,6 +933,10 @@ public class Entity {
     }
     public void modifyAttack(int change) {
         attack += change;
+    }
+
+    public int getKnockbackPower() {
+        return knockbackPower;
     }
 
     public void setInvincible(boolean invincible) {

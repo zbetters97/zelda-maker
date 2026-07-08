@@ -3,21 +3,16 @@ package entity.item;
 import application.GamePanel;
 import entity.Entity;
 
-public class ITM_Shovel extends Entity {
+public class ITM_Shovel extends Item {
 
     public static final String itmName = "Wooden Shovel";
 
     public ITM_Shovel(GamePanel gp, Entity user) {
-        super(gp, user, itmName);
+        super(gp, itmName, user, Action.DIGGING);
     }
 
     @Override
     protected void getImages() {
-        image = down1 = setupImage("/items/itm_shovel");
-    }
-
-    @Override
-    protected void use() {
-        user.setAction(Action.DIGGING);
+        image = setupImage("/items/itm_shovel");
     }
 }

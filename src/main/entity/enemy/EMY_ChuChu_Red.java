@@ -14,8 +14,10 @@ public class EMY_ChuChu_Red extends Enemy {
 
         defaultSpeed = 0;
         speed = defaultSpeed;
+
         defaultAttack = 4;
         attack = defaultAttack;
+        knockbackPower = 0;
 
         minTileDistanceToPlayer = 4;
         maxTileDistanceToPlayer = 6;
