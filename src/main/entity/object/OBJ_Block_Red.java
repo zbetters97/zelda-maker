@@ -41,12 +41,20 @@ public class OBJ_Block_Red extends Object {
                     collisionOn = false;
                 }
                 // Turn off if no collision
-                else if (!gp.cChecker.onPlayer(this)) {
+                else if (noOverlap()) {
                     opened = true;
                     collisionOn = true;
                 }
             }
         }
+    }
+
+    private boolean noOverlap() {
+        int npc = gp.cChecker.checkOverlapCollision(this, gp.npc);
+        int enemy = gp.cChecker.checkOverlapCollision(this, gp.enemy);
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+
+        return npc == -1 && enemy == -1 && !contactPlayer;
     }
 
     /**

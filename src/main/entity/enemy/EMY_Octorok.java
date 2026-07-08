@@ -1,22 +1,19 @@
 package entity.enemy;
 
 import application.GamePanel;
-import application.GamePanel.Direction;
-import entity.Entity;
 import entity.projectile.PRJ_Seed;
 
 import java.awt.*;
 
 import static application.GamePanel.Direction.*;
 
-public class EMY_Octorok extends Entity {
+public class EMY_Octorok extends Enemy {
 
     public static final String emyName = "Octorok";
 
     public EMY_Octorok(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 15;
 
         maxHealth = 8;
@@ -30,10 +27,13 @@ public class EMY_Octorok extends Entity {
         canSwim = true;
         needsWater = true;
 
-        hitbox = new Rectangle(8, 16, 32, 32);
+        hitbox = new Rectangle(0, 0, gp.tileSize, gp.tileSize);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
+
+        minTileDistanceToPlayer = 6;
+        maxTileDistanceToPlayer = 10;
     }
 
     @Override
@@ -49,17 +49,15 @@ public class EMY_Octorok extends Entity {
     }
 
     public void update() {
-        super.update();
 
-        if (!canMove) {
-            manageValues();
+        if (isStuck()) {
             return;
         }
 
         setAction();
 
         if (onPath) {
-            move(direction);
+            move();
         }
 
         cycleSprites();
@@ -67,56 +65,40 @@ public class EMY_Octorok extends Entity {
     }
 
     @Override
-    protected void setAction() {
-
-        // Player found
-        if (onPath) {
-            isOffPath(gp.player, 10);
-            attack();
-        }
-        // Look for player
-        else if (playerWithinBounds()) {
-            isOnPath(gp.player, 6);
-        }
+    protected void chasePlayer() {
+        attack();
     }
 
     @Override
-    protected void move(Direction direction) {
+    protected void move() {
+
+        setDirection();
+
+        checkCollision();
+        if (!collisionOn) {
+            moveInDirection(lockonDirection);
+        }
+    }
+
+    private void setDirection() {
         switch (direction) {
             case UP, DOWN -> {
-                if (gp.player.getCenterX() > getCenterX()) {
+                if (gp.player.getCenterX() >= getCenterX()) {
                     lockonDirection = RIGHT;
-                    checkCollision();
-                    if (!collisionOn) {
-                        worldPoint.x += speed;
-                    }
                 }
                 else if (gp.player.getCenterX() < getCenterX()) {
                     lockonDirection = LEFT;
-                    checkCollision();
-                    if (!collisionOn) {
-                        worldPoint.x -= speed;
-                    }
                 }
             }
             case LEFT, RIGHT -> {
-                if (gp.player.getCenterY() > getCenterY()) {
+                if (gp.player.getCenterY() >= getCenterY()) {
                     lockonDirection = DOWN;
-                    checkCollision();
-                    if (!collisionOn) {
-                        worldPoint.y += speed;
-                    }
                 }
                 else if (gp.player.getCenterY() < getCenterY()) {
                     lockonDirection = UP;
-                    checkCollision();
-                    if (!collisionOn) {
-                        worldPoint.y -= speed;
-                    }
                 }
             }
         }
-
     }
 
     @Override

@@ -1,19 +1,15 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 import entity.projectile.PRJ_Boomerang;
 
-import java.awt.*;
-
-public class EMY_Goblin_Boomerang extends Entity {
+public class EMY_Goblin_Boomerang extends Enemy {
 
     public static final String emyName = "Boomerang Goblin";
 
     public EMY_Goblin_Boomerang(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 15;
 
         maxHealth = 8;
@@ -21,18 +17,11 @@ public class EMY_Goblin_Boomerang extends Entity {
 
         defaultSpeed = 1;
         speed = defaultSpeed;
-        attack = 1;
-
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
-
-        attackBox.width = 48;
-        attackBox.height = 48;
 
         projectile = new PRJ_Boomerang(gp);
-        projectile.modifyAttack(1);
+
+        minTileDistanceToPlayer = 5;
+        maxTileDistanceToPlayer = 8;
     }
 
     @Override
@@ -48,21 +37,9 @@ public class EMY_Goblin_Boomerang extends Entity {
     }
 
     @Override
-    public void update() {
-        super.update();
-
-        if (!canMove) {
-            manageValues();
-            return;
-        }
-
+    protected void chasePlayer() {
         handleLookingAtPlayer();
-        setAction();
-
-        updateDirection();
-
-        cycleSprites();
-        manageValues();
+        super.chasePlayer();
     }
 
     private void handleLookingAtPlayer() {
@@ -78,38 +55,21 @@ public class EMY_Goblin_Boomerang extends Entity {
     }
 
     @Override
-    protected void setAction() {
-
-        // Player found
-        if (onPath) {
-            isOffPath(gp.player, 10);
-
-            // Player still found, follow path
-            if (onPath && playerWithinBounds()) {
-                searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-            }
-        }
-        else {
-            // Move in random directions
-            setDirection(60);
-
-            // Look for player
-            if (playerWithinBounds()) {
-                isOnPath(gp.player, 8);
-            }
-        }
+    protected void attack() {
+        useProjectile(projectile, 2);
     }
 
     @Override
-    protected void attack() {
-        useProjectile(projectile, 2);
+    protected void searchForPlayer() {
+        setDirection(60);
+        super.searchForPlayer();
     }
 
     @Override
     protected void manageValues() {
 
         // Force 30 frame delay between throws
-        if (actionLockCounter > 0 && !projectile.alive) {
+        if (actionLockCounter > 0 && !projectile.getAlive()) {
             actionLockCounter--;
         }
 

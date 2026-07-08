@@ -3,6 +3,7 @@ package entity;
 import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.collectable.Collectable;
+import entity.enemy.Enemy;
 import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
@@ -95,7 +96,7 @@ public class Entity {
 
     /** RPG VALUES */
     protected String name = "";
-    public boolean alive = true;
+    protected boolean alive = true;
     protected int maxHealth = 1;
     protected int health = 1;
     protected int value = 0;
@@ -104,9 +105,7 @@ public class Entity {
     protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
-    protected boolean stunned = false;
-    protected int stunnedCounter = 0;
-    public boolean dying = false;
+    protected boolean dying = false;
     private int dyingCounter = 0;
     protected Collectable loot;
     protected boolean opened = false;
@@ -248,10 +247,7 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
-        if (knockback) {
-            handleKnockback();
-            manageValues();
-        }
+        manageValues();
     }
 
     /**
@@ -320,6 +316,9 @@ public class Entity {
      * Repositions the entity's X, Y based on direction and speed
      * Called by updateDirection() if o collision
      */
+    protected void move() {
+
+    }
     protected void move(Direction direction) {
 
         if (!canMove || collisionOn) {
@@ -328,7 +327,6 @@ public class Entity {
         }
 
         moving = true;
-
         moveInDirection(direction);
     }
     protected void moveInDirection(Direction movingDirection) {
@@ -507,7 +505,7 @@ public class Entity {
         }
     }
 
-    public boolean playerWithinBounds() {
+    public boolean playerWithinRange() {
 
         // Don't search for player if not available
         if (!gp.player.isAvailable()) {
@@ -516,7 +514,7 @@ public class Entity {
 
         boolean playerWithinBounds = true;
 
-        int tileDistance = (Math.abs(startPoint.x - gp.player.worldPoint.x) + Math.abs(startPoint.y - gp.player.worldPoint.y)) / gp.tileSize;
+        int tileDistance = (Math.abs(worldPoint.x - gp.player.worldPoint.x) + Math.abs(worldPoint.y - gp.player.worldPoint.y)) / gp.tileSize;
 
         if (tileDistance > bounds) {
             playerWithinBounds = false;
@@ -792,14 +790,14 @@ public class Entity {
     }
     protected void detectPlayerSwordCollision() {
         // Find enemy that intersects collision box
-        Entity enemy = overlapEnemy(this);
+        Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
 
             if (enemy.getBuzzing()) {
                 damagePlayer(enemy);
             }
             else if (!enemy.invincible) {
-                damageEnemy(enemy);
+                enemy.damageEnemy(this);
             }
         }
 
@@ -834,9 +832,9 @@ public class Entity {
 
         return enemy;
     }
-    protected Entity overlapEnemy(Entity entity) {
+    protected Enemy overlapEnemy(Entity entity) {
 
-        Entity enemy = null;
+        Enemy enemy = null;
 
         int enemyIndex = gp.cChecker.checkOverlapCollision(entity, gp.enemy);
         if (enemyIndex != -1) {
@@ -867,43 +865,6 @@ public class Entity {
     }
 
     /**
-     * DAMAGE ENEMY
-     * Handles logic when an enemy is hit by an attack
-     * @param target Enemy being damaged
-     */
-    protected void damageEnemy(Entity target) {
-
-        if (target.getShielded()) {
-            return;
-        }
-
-        // Damage same as player attack value
-        int damage = attack;
-
-        // Keep damage at or above 0
-        if (damage < 0) {
-            damage = 0;
-        }
-
-        // Damage target
-        target.health -= damage;
-        target.invincible = true;
-        target.reactToDamage();
-
-        // Target loses all health, start dying animation
-        if (target.health <= 0) {
-            target.dying = true;
-        }
-
-        // Push target back
-        setKnockback(target, this, 1);
-    }
-
-    protected void reactToDamage() {
-
-    }
-
-    /**
      * SET KNOCKBACK
      * Starts the knockback animation on the target
      * @param target Entity hit by knockback
@@ -926,7 +887,6 @@ public class Entity {
      */
     protected void handleKnockback() {
 
-        canMove = false;
         collisionOn = false;
 
         // Don't knockback if collision
@@ -947,7 +907,6 @@ public class Entity {
 
     private void resetKnockback() {
         knockback = false;
-        canMove = true;
         knockbackCounter = 0;
         speed = defaultSpeed;
     }
@@ -1029,26 +988,7 @@ public class Entity {
      * Resets or reassigns entity attributes
      * Called at the end of update
      */
-    protected void manageValues() {
-        // Shield after taking damage
-        if (invincible) {
-            invincibleCounter++;
-
-            // Refresh time
-            if (invincibleCounter > 45) {
-                invincibleCounter = 0;
-                invincible = false;
-            }
-        }
-        else if (stunned) {
-            stunnedCounter++;
-
-            if (stunnedCounter > 45) {
-                stunnedCounter = 0;
-                stunned = false;
-            }
-        }
-    }
+    protected void manageValues() { }
 
     /**
      * RESET VALUES
@@ -1062,7 +1002,6 @@ public class Entity {
         attackNum = 1; attackCounter = 0;
         knockback = false; knockbackCounter = 0;
         invincible = false; invincibleCounter = 0;
-        stunned = false; stunnedCounter = 0;
         dying = false; dyingCounter = 0;
 
         speed = defaultSpeed;
@@ -1087,18 +1026,11 @@ public class Entity {
      */
     public void draw(Graphics2D g2) {
 
+        // Adjust if camera is off center
         adjustOffCenter();
+
+        // Get sprite
         getSpriteImage();
-
-        // Flash sprite if hurt
-        if (invincible && entity_type == type_enemy) {
-            playHurtAnimation(g2);
-        }
-
-        // Dying animation
-        if (dying) {
-            playDyingAnimation(g2);
-        }
 
         // Draw sprite
         g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
@@ -1142,16 +1074,7 @@ public class Entity {
         }
     }
 
-    /** GET CURRENT SPRITE TO DRAW **/
     protected void getSpriteImage() {
-        if (action == ATTACKING) {
-            getAttackImage();
-        }
-        else {
-            getIdleImage();
-        }
-    }
-    private void getIdleImage() {
         if (spriteNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up1;
@@ -1168,55 +1091,6 @@ public class Entity {
             };
         }
     }
-    private void getAttackImage() {
-        if (attackNum == 1) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenPoint.y -= up1.getHeight();
-                    yield attackUp1;
-                }
-                case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown1;
-                case LEFT -> {
-                    tempScreenPoint.x -= left1.getWidth();
-                    yield attackLeft1;
-                }
-                case RIGHT -> attackRight1;
-            };
-        } else if (attackNum == 2) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenPoint.y -= up1.getHeight();
-                    yield attackUp2;
-                }
-                case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown2;
-                case LEFT -> {
-                    tempScreenPoint.x -= left1.getWidth();
-                    yield attackLeft2;
-                }
-                case RIGHT -> attackRight2;
-            };
-        }
-    }
-
-    /** SPRITE ANIMATIONS **/
-    protected void playHurtAnimation(Graphics2D g2) {
-        if (invincibleCounter % 5 == 0) {
-            changeAlpha(g2, 0.2f);
-        }
-    }
-    private void playDyingAnimation(Graphics2D g2) {
-
-        invincible = false;
-
-        dyingCounter++;
-        if (dyingCounter % 5 == 0) {
-            changeAlpha(g2, 0.2f);
-        }
-
-        if (dyingCounter >= 40) {
-            alive = false;
-        }
-    }
 
     /**
      * CHANGE ALPHA
@@ -1226,6 +1100,34 @@ public class Entity {
      */
     protected void changeAlpha(Graphics2D g2, float alphaValue) {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
+    }
+
+    protected void playHurtAnimation(Graphics2D g2) {
+
+        invincibleCounter++;
+
+        if (invincibleCounter % 5 == 0) {
+            changeAlpha(g2, 0.2f);
+        }
+
+        if (45 < invincibleCounter) {
+            invincibleCounter = 0;
+            invincible = false;
+        }
+    }
+    protected void playDyingAnimation(Graphics2D g2) {
+
+        invincible = false;
+        dyingCounter++;
+
+        if (dyingCounter % 5 == 0) {
+            changeAlpha(g2, 0.2f);
+        }
+
+        if (40 < dyingCounter) {
+            dyingCounter = 0;
+            alive = false;
+        }
     }
 
     /** GETTERS and SETTERS */
@@ -1268,6 +1170,17 @@ public class Entity {
 
     public int getType() {
         return entity_type;
+    }
+
+    public boolean getAlive() {
+        return alive;
+    }
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public boolean getDying() {
+        return dying;
     }
 
     public Direction getDirection() {
@@ -1328,6 +1241,9 @@ public class Entity {
         speed += change;
     }
 
+    public int getAttack() {
+        return attack;
+    }
     public void modifyAttack(int change) {
         attack += change;
     }
@@ -1382,9 +1298,5 @@ public class Entity {
 
     public boolean getBuzzing() {
         return buzzing;
-    }
-
-    public boolean getShielded() {
-        return shielded;
     }
 }

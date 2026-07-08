@@ -12,7 +12,6 @@ public class EMY_Tektite extends Entity {
     public EMY_Tektite(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 8;
 
         maxHealth = 6;
@@ -20,7 +19,6 @@ public class EMY_Tektite extends Entity {
 
         defaultSpeed = 2;
         speed = defaultSpeed;
-        attack = 1;
 
         canSwim = true;
         needsWater = true;
@@ -38,21 +36,6 @@ public class EMY_Tektite extends Entity {
     }
 
     @Override
-    public void update() {
-        super.update();
-
-        if (!canMove) {
-            manageValues();
-            return;
-        }
-
-        setAction();
-        updateDirection();
-
-        manageValues();
-    }
-
-    @Override
     protected void setAction() {
 
         if (speed == 0) {
@@ -62,6 +45,7 @@ public class EMY_Tektite extends Entity {
             moveATile();
         }
     }
+
     private void pauseMovement() {
 
         // Wait 2 seconds before changing direction
@@ -72,6 +56,7 @@ public class EMY_Tektite extends Entity {
             setDirection(0);
         }
     }
+
     private void moveATile() {
 
         // Move 1 tile at a time

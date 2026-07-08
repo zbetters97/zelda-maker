@@ -3,16 +3,13 @@ package entity.enemy;
 import application.GamePanel;
 import entity.Entity;
 
-import java.awt.*;
-
-public class EMY_Beetle extends Entity {
+public class EMY_Beetle extends Enemy {
 
     public static final String emyName = "Beetle";
 
     public EMY_Beetle(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 15;
 
         maxHealth = 16;
@@ -20,16 +17,13 @@ public class EMY_Beetle extends Entity {
 
         defaultSpeed = 1;
         speed = defaultSpeed;
-        attack = 2;
+        defaultAttack = 2;
+        attack = defaultAttack;
 
         shielded = true;
 
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
-
-        getAttackImages();
+        minTileDistanceToPlayer = 3;
+        maxTileDistanceToPlayer = 6;
     }
 
     @Override
@@ -38,17 +32,16 @@ public class EMY_Beetle extends Entity {
         up2 = down2 = left2 = right2 = setupImage("/enemy/beetle_down_2");
     }
 
-    private void getAttackImages() {
+    @Override
+    protected void getAttackImages() {
         attackUp1 = setupImage("/enemy/beetle_attack_down_1");
         attackUp2 = setupImage("/enemy/beetle_attack_down_2");
     }
 
     @Override
     public void update() {
-        super.update();
 
-        if (!canMove) {
-            manageValues();
+        if (isStuck()) {
             return;
         }
 
@@ -64,23 +57,9 @@ public class EMY_Beetle extends Entity {
     }
 
     @Override
-    protected void setAction() {
-
-        isOffPath(gp.player, 7);
-
-        if (onPath && playerWithinBounds()) {
-            searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-        }
-        else {
-            setDirection(60);
-
-            if (playerWithinBounds()) {
-                isOnPath(gp.player, 5);
-            }
-            else {
-                onPath = false;
-            }
-        }
+    protected void searchForPlayer() {
+        setDirection(60);
+        super.searchForPlayer();
     }
 
     private void runShieldTimer() {

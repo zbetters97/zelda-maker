@@ -1,31 +1,22 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 
-import java.awt.*;
-
-public class EMY_ChuChu_Green extends Entity {
+public class EMY_ChuChu_Green extends Enemy {
 
     public static final String emyName = "Green Chu Chu";
 
     public EMY_ChuChu_Green(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
-        animationSpeed = 12;
-
         maxHealth = 6;
         health = maxHealth;
 
         defaultSpeed = 0;
         speed = defaultSpeed;
-        attack = 1;
 
-        hitbox = new Rectangle(2, 18, 44, 30);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
+        minTileDistanceToPlayer = 3;
+        maxTileDistanceToPlayer = 5;
     }
 
     @Override
@@ -36,37 +27,15 @@ public class EMY_ChuChu_Green extends Entity {
     }
 
     @Override
-    public void update() {
-        super.update();
+    protected void searchForPlayer() {
 
-        if (!canMove) {
-            manageValues();
-            return;
-        }
-
-        setAction();
-        updateDirection();
-
-        manageValues();
-    }
-
-    @Override
-    protected void setAction() {
-
-        isOffPath(gp.player, 5);
-
-        if (onPath && playerWithinBounds()) {
-            searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+        if (playerWithinRange()) {
+            isOnPath(gp.player, minTileDistanceToPlayer);
         }
         else {
-            if (playerWithinBounds()) {
-                isOnPath(gp.player, 4);
-            }
-            else {
-                onPath = false;
-                spriteNum = 1;
-                spriteCounter = 0;
-            }
+            onPath = false;
+            spriteNum = 1;
+            spriteCounter = 0;
         }
     }
 

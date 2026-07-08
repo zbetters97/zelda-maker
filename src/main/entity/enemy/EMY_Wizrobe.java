@@ -1,12 +1,9 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 import entity.projectile.PRJ_Magic;
 
-import java.awt.*;
-
-public class EMY_Wizrobe extends Entity {
+public class EMY_Wizrobe extends Enemy {
 
     public static final String emyName = "Wizrobe";
 
@@ -15,7 +12,6 @@ public class EMY_Wizrobe extends Entity {
     public EMY_Wizrobe(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 10;
 
         maxHealth = 16;
@@ -25,12 +21,6 @@ public class EMY_Wizrobe extends Entity {
         speed = defaultSpeed;
 
         projectile = new PRJ_Magic(gp);
-
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
-
     }
 
     @Override
@@ -45,10 +35,8 @@ public class EMY_Wizrobe extends Entity {
 
     @Override
     public void update() {
-        super.update();
 
-        if (!canMove) {
-            manageValues();
+        if (isStuck()) {
             return;
         }
 
@@ -68,7 +56,7 @@ public class EMY_Wizrobe extends Entity {
 
     private void updateTeleport() {
         if (advanceAnimation(4)) {
-            move(direction);
+            move();
 
             if (checkTeleportTimer()) {
                 teleporting = false;
@@ -91,7 +79,7 @@ public class EMY_Wizrobe extends Entity {
     }
 
     @Override
-    protected void move(GamePanel.Direction direction) {
+    protected void move() {
 
         setDirection(30);
 
@@ -101,19 +89,12 @@ public class EMY_Wizrobe extends Entity {
         }
     }
 
-    @Override
-    protected void moveInDirection(GamePanel.Direction direction) {
-        switch (direction) {
-            case UP -> worldPoint.y -= speed;
-            case DOWN -> worldPoint.y += speed;
-            case LEFT -> worldPoint.x -= speed;
-            case RIGHT -> worldPoint.x += speed;
-        }
-    }
-
     private void updateAttackState() {
+
         if (advanceAnimation(1)) {
+
             searchForPlayer();
+
             if (checkTeleportTimer()) {
                 teleporting = true;
                 interactable = false;
@@ -122,7 +103,8 @@ public class EMY_Wizrobe extends Entity {
         }
     }
 
-    private void searchForPlayer() {
+    @Override
+    protected void searchForPlayer() {
         if (onPath) {
             if (attackCounter == 45) {
                 attack();
@@ -131,7 +113,7 @@ public class EMY_Wizrobe extends Entity {
             approachPlayer(10);
             isOffPath(gp.player, 8);
         }
-        else if (playerWithinBounds()) {
+        else if (playerWithinRange()) {
             isOnPath(gp.player, 6);
         }
     }

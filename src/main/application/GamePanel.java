@@ -4,6 +4,7 @@ import ai.PathFinder;
 import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
+import entity.enemy.Enemy;
 import entity.object.Object;
 import entity.projectile.Projectile;
 import tile.TileManager;
@@ -80,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
     public final Entity[][] npc = new Entity[maxMap][10];
-    public final Entity[][] enemy = new Entity[maxMap][10];
+    public final Enemy[][] enemy = new Enemy[maxMap][10];
     public final Object[][] obj = new Object[maxMap][10];
     public final Collectable[][] col = new Collectable[maxMap][10];
     public final Projectile[][] proj = new Projectile[maxMap][10];
@@ -216,11 +217,11 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < enemy[0].length; i++) {
             if (enemy[currentMap][i] != null) {
                 // Only update if enemy is alive and not dying
-                if (enemy[currentMap][i].alive && !enemy[currentMap][i].dying) {
+                if (enemy[currentMap][i].getAlive() && !enemy[currentMap][i].getDying()) {
                     enemy[currentMap][i].update();
                 }
                 // Delete enemy if dead
-                else if (!enemy[currentMap][i].alive) {
+                else if (!enemy[currentMap][i].getAlive()) {
                     enemy[currentMap][i] = null;
                 }
             }
@@ -230,7 +231,7 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < obj[0].length; i++) {
             if (obj[currentMap][i] != null) {
                 obj[currentMap][i].update();
-                if (!obj[currentMap][i].alive) {
+                if (!obj[currentMap][i].getAlive()) {
                     obj[currentMap][i] = null;
                 }
             }
@@ -240,7 +241,7 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < col[0].length; i++) {
             if (col[currentMap][i] != null) {
                 col[currentMap][i].update();
-                if (!col[currentMap][i].alive) {
+                if (!col[currentMap][i].getAlive()) {
                     col[currentMap][i] = null;
                 }
             }
@@ -250,7 +251,7 @@ public class GamePanel extends JPanel implements Runnable {
         for (int i = 0; i < proj[0].length; i++) {
             if (proj[currentMap][i] != null) {
                 proj[currentMap][i].update();
-                if (!proj[currentMap][i].alive) {
+                if (!proj[currentMap][i].getAlive()) {
                     proj[currentMap][i] = null;
                 }
             }
@@ -276,13 +277,13 @@ public class GamePanel extends JPanel implements Runnable {
     }
     private void drawObjects() {
 
-        for (Entity obj : obj[currentMap]) {
+        for (Object obj : obj[currentMap]) {
             if (obj != null) {
                 obj.draw(g2);
             }
         }
 
-        for (Entity col : col[currentMap]) {
+        for (Collectable col : col[currentMap]) {
             if (col != null) {
                 col.draw(g2);
             }
@@ -300,7 +301,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // Enemies
-        for (Entity n : enemy[currentMap]) {
+        for (Enemy n : enemy[currentMap]) {
             if (n != null) {
                 entityList.add(n);
             }
@@ -319,7 +320,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
     private void drawProjectiles() {
 
-        for (Entity proj : proj[currentMap]) {
+        for (Projectile proj : proj[currentMap]) {
             if (proj != null) {
                 proj.draw(g2);
             }

@@ -1,20 +1,18 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 import entity.projectile.PRJ_Fireball;
 
 import java.awt.*;
 import java.util.Random;
 
-public class EMY_Zora extends Entity {
+public class EMY_Zora extends Enemy {
 
     public static final String emyName = "Zora";
 
     public EMY_Zora(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 12;
 
         maxHealth = 10;
@@ -33,7 +31,8 @@ public class EMY_Zora extends Entity {
 
         projectile = new PRJ_Fireball(gp);
 
-        getAttackImages();
+        minTileDistanceToPlayer = 5;
+        maxTileDistanceToPlayer = 9;
     }
 
     @Override
@@ -48,10 +47,8 @@ public class EMY_Zora extends Entity {
     }
 
     public void update() {
-        super.update();
 
-        if (!canMove) {
-            manageValues();
+        if (isStuck()) {
             return;
         }
 
@@ -60,18 +57,7 @@ public class EMY_Zora extends Entity {
     }
 
     @Override
-    protected void setAction() {
-
-        if (onPath) {
-            targetPlayer();
-            isOffPath(gp.player, 6);
-        }
-        else {
-            searchForPlayer();
-        }
-    }
-
-    private void targetPlayer() {
+    protected void chasePlayer() {
 
         spriteNum = 2;
         interactable = true;
@@ -86,7 +72,7 @@ public class EMY_Zora extends Entity {
 
     private void prepareAttack() {
         int i = new Random().nextInt(100);
-        if (i == 0 && !projectile.alive && actionLockCounter == 0) {
+        if (i == 0 && !projectile.getAlive() && actionLockCounter == 0) {
             action = Action.ATTACKING;
         }
     }
@@ -108,8 +94,9 @@ public class EMY_Zora extends Entity {
         }
     }
 
-    private void searchForPlayer() {
-        isOnPath(gp.player, 5);
+    @Override
+    protected void searchForPlayer() {
+        super.searchForPlayer();
 
         spriteNum = 1;
         spriteCounter = 0;

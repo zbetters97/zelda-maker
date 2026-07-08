@@ -425,6 +425,12 @@ public class UI {
      * Called by drawHUD()
      */
     private void drawDebug() {
+        drawCoordinates();
+        drawPlayerHitbox();
+        drawPathFinding();
+    }
+
+    private void drawCoordinates() {
 
         int x = 10;
         int y = gp.tileSize * 6;
@@ -433,7 +439,6 @@ public class UI {
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.PLAIN, 20));
 
-        // Draw coordinates
         g2.drawString("World X: " + gp.player.getWorldPoint().x, x, y);
         y += lineHeight;
         g2.drawString("World Y: " + gp.player.getWorldPoint().y, x, y);
@@ -441,14 +446,32 @@ public class UI {
         g2.drawString("Column: " + gp.player.getCenterX() / gp.tileSize, x, y);
         y += lineHeight;
         g2.drawString("Row: " + gp.player.getCenterY() / gp.tileSize, x, y);
+    }
 
-        // Draw player hitbox
+    private void drawPlayerHitbox() {
+
         g2.setColor(Color.RED);
+
         g2.drawRect(
                 gp.player.getScreenPoint().x + gp.player.getHitbox().x,
                 gp.player.getScreenPoint().y + gp.player.getHitbox().y,
                 gp.player.getHitbox().width,
                 gp.player.getHitbox().height);
+    }
+
+    private void drawPathFinding() {
+
+        g2.setColor(new Color(255, 0, 0, 100));
+
+        for (int i = 0; i < gp.pFinder.pathList.size(); i++) {
+
+            int worldX = gp.pFinder.pathList.get(i).col * gp.tileSize;
+            int worldY = gp.pFinder.pathList.get(i).row * gp.tileSize;
+            int screenX = worldX - gp.player.getWorldPoint().x + gp.player.getScreenPoint().x;
+            int screenY = worldY - gp.player.getWorldPoint().y + gp.player.getScreenPoint().y;
+
+            g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+        }
     }
 
     /**

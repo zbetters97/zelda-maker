@@ -56,44 +56,24 @@ public record CollisionChecker(GamePanel gp) {
         int topRow = box.y / gp.tileSize;
         int bottomRow = (box.y + box.height - 1) / gp.tileSize;
 
-        Tile tile1 = null;
-        Tile tile2 = null;
+        for (int row = topRow; row <= bottomRow; row++) {
+            for (int col = leftCol; col <= rightCol; col++) {
 
-        switch (entity.getMoveDirection()) {
-            case UP, DOWN -> {
-                tile1 = getTileAtColRow(leftCol, topRow == bottomRow ? topRow : (delta.y < 0 ? topRow : bottomRow));
-                tile2 = getTileAtColRow(rightCol, topRow == bottomRow ? topRow : (delta.y < 0 ? topRow : bottomRow));
-            }
-            case UPLEFT -> {
-                tile1 = getTileAtColRow(leftCol, topRow);
-                tile2 = getTileAtColRow(leftCol + 1, topRow);
-            }
-            case UPRIGHT -> {
-                tile1 = getTileAtColRow(rightCol - 1, topRow);
-                tile2 = getTileAtColRow(rightCol, topRow);
-            }
-            case DOWNLEFT -> {
-                tile1 = getTileAtColRow(leftCol, bottomRow);
-                tile2 = getTileAtColRow(leftCol + 1, bottomRow);
-            }
-            case DOWNRIGHT -> {
-                tile1 = getTileAtColRow(rightCol - 1, bottomRow);
-                tile2 = getTileAtColRow(rightCol, bottomRow);
-            }
-            case LEFT, RIGHT -> {
-                tile1 = getTileAtColRow(delta.x < 0 ? leftCol : rightCol, topRow);
-                tile2 = getTileAtColRow(delta.x < 0 ? leftCol : rightCol, bottomRow);
+                Tile tile = getTileAtColRow(col, row);
+                if (tile == null) {
+                    continue;
+                }
+
+                checkTileCollision(entity, tile);
             }
         }
-
-        checkTileCollision(entity, tile1, tile2);
     }
     private Tile getTileAtColRow(int col, int row) {
         return gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
     }
-    private void checkTileCollision(Entity entity, Tile tile1, Tile tile2) {
+    private void checkTileCollision(Entity entity, Tile tile) {
         // Bottomless pits
-        if (tile1.isPit || tile2.isPit) {
+        if (tile.isPit) {
 
             // Entity in air
             if (entity.getElevated()) {
@@ -106,7 +86,7 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
         // Water
-        else if (tile1.isWater || tile2.isWater) {
+        else if (tile.isWater) {
 
             // Entity in air or can swim
             if (entity.getElevated() || entity.getCanSwim()) {
@@ -119,7 +99,7 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
         // Collision titles
-        else if (tile1.hasCollision || tile2.hasCollision) {
+        else if (tile.hasCollision) {
             entity.setCollision(true);
         }
         // Fish enemies cannot move outside of water
@@ -161,7 +141,7 @@ public record CollisionChecker(GamePanel gp) {
             gp.player.shiftToCenter();
         }
         else {
-            entity.alive = false;
+            entity.setAlive(false);
         }
     }
     private void handleWater(Entity entity) {
@@ -174,7 +154,7 @@ public record CollisionChecker(GamePanel gp) {
             gp.player.shiftToCenter();
         }
         else {
-            entity.alive = false;
+            entity.setAlive(false);
         }
     }
     private void setSafePoint() {
@@ -291,29 +271,6 @@ public record CollisionChecker(GamePanel gp) {
                 return false;
             }
         }
-
-        if (!entityRect.intersects(playerRect)) {
-            return false;
-        }
-
-        entity.setCollision(true);
-
-        return entity.isOnSameElevation(gp.player);
-    }
-
-    /**
-     * ON PLAYER
-     * Checks if the given entity is interacting with the player entity
-     * @param entity Entity to check collision for
-     */
-    public boolean onPlayer(Entity entity) {
-
-        if (gp.player.getAction() == FALLING || gp.player.getAction() == DROWNING) {
-            return false;
-        }
-
-        Rectangle entityRect = entity.getWorldHitbox();
-        Rectangle playerRect = gp.player.getWorldHitbox();
 
         if (!entityRect.intersects(playerRect)) {
             return false;

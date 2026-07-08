@@ -1,11 +1,8 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 
-import java.awt.*;
-
-public class EMY_Buzzblob extends Entity {
+public class EMY_Buzzblob extends Enemy {
 
     public static final String emyName = "Buzz Blob";
 
@@ -14,7 +11,6 @@ public class EMY_Buzzblob extends Entity {
     public EMY_Buzzblob(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 10;
 
         maxHealth = 6;
@@ -22,15 +18,9 @@ public class EMY_Buzzblob extends Entity {
 
         defaultSpeed = 1;
         speed = defaultSpeed;
-        defaultAttack = 1;
-        attack = defaultAttack;
 
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
-
-        getAttackImages();
+        minTileDistanceToPlayer = 3;
+        maxTileDistanceToPlayer = 6;
     }
 
     @Override
@@ -38,60 +28,27 @@ public class EMY_Buzzblob extends Entity {
         up1 = down1 = left1 = right1 = setupImage("/enemy/buzzblob_down_1");
         up2 = down2 = left2 = right2 = setupImage("/enemy/buzzblob_down_2");
         up3 = down3 = left3 = right3 = setupImage("/enemy/buzzblob_down_3");
-
     }
 
-    private void getAttackImages() {
+    @Override
+    protected void getAttackImages() {
         attackUp1 = setupImage("/enemy/buzzblob_attack_down_1");
         attackUp2 = setupImage("/enemy/buzzblob_attack_down_2");
     }
 
     @Override
-    public void update() {
-        super.update();
-
-        if (!canMove) {
-            manageValues();
-            return;
-        }
-
-        setAction();
-        updateDirection();
-
-        manageValues();
-    }
-
-    @Override
-    protected void setAction() {
-
-        isOffPath(gp.player, 6);
-
-        if (onPath && playerWithinBounds()) {
-            chasePlayer();
-        }
-        else {
-            searchForPlayer();
-        }
-    }
-
-    private void chasePlayer() {
-        searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+    protected void chasePlayer() {
+        super.chasePlayer();
 
         if (action != Action.ATTACKING) {
             setAttacking(180, gp.tileSize * 3, gp.tileSize * 3);
         }
     }
 
-    private void searchForPlayer() {
-
+    @Override
+    protected void searchForPlayer() {
         setDirection(60);
-
-        if (playerWithinBounds()) {
-            isOnPath(gp.player, 3);
-        }
-        else {
-            onPath = false;
-        }
+        super.searchForPlayer();
     }
 
     @Override

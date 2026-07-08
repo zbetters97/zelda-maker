@@ -1,18 +1,14 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 
-import java.awt.*;
-
-public class EMY_Goblin_Combat extends Entity {
+public class EMY_Goblin_Combat extends Enemy {
 
     public static final String emyName = "Combat Goblin";
 
     public EMY_Goblin_Combat(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
         animationSpeed = 15;
 
         maxHealth = 12;
@@ -20,20 +16,11 @@ public class EMY_Goblin_Combat extends Entity {
 
         defaultSpeed = 1;
         speed = defaultSpeed;
-        attack = 4;
+        defaultAttack = 4;
+        attack = defaultAttack;
 
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
-
-        swingSpeed1 = 15;
-        swingSpeed2 = 45;
-
-        attackBox.width = 48;
-        attackBox.height = 48;
-
-        getAttackImages();
+        minTileDistanceToPlayer = 5;
+        maxTileDistanceToPlayer = 8;
     }
 
     @Override
@@ -47,7 +34,9 @@ public class EMY_Goblin_Combat extends Entity {
         right1 = setupImage("/enemy/goblin_right_1");
         right2 = setupImage("/enemy/goblin_right_2");
     }
-    private void getAttackImages() {
+
+    @Override
+    protected void getAttackImages() {
         attackUp1 = setupImage("/enemy/goblin_attack_up_1", gp.tileSize, gp.tileSize * 2);
         attackUp2 = setupImage("/enemy/goblin_attack_up_2", gp.tileSize, gp.tileSize * 2);
         attackDown1 = setupImage("/enemy/goblin_attack_down_1", gp.tileSize, gp.tileSize * 2);
@@ -59,59 +48,26 @@ public class EMY_Goblin_Combat extends Entity {
     }
 
     @Override
-    public void update() {
-        super.update();
+    protected void chasePlayer() {
 
-        if (!canMove) {
-            manageValues();
-            return;
-        }
+        super.chasePlayer();
 
+        // Decide to attack
+        setAttacking(60, gp.tileSize * 3, gp.tileSize);
+
+        // Stop to attack
         if (action == Action.ATTACKING) {
             attacking();
+            speed = 0;
         }
-
-        setAction();
-
-        updateDirection();
-
-        cycleSprites();
-        manageValues();
+        else {
+            speed = defaultSpeed;
+        }
     }
 
     @Override
-    public void setAction() {
-
-        // Player found
-        if (onPath) {
-            isOffPath(gp.player, 8);
-
-            // Player still found
-            if (onPath && playerWithinBounds()) {
-
-                // Follow path
-                searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
-
-                // Decide to attack
-                setAttacking(60, gp.tileSize * 3, gp.tileSize);
-
-                // Stop to attack
-                if (action == Action.ATTACKING) {
-                    speed = 0;
-                }
-                else {
-                    speed = defaultSpeed;
-                }
-            }
-        }
-        else {
-            // Move in random directions
-            setDirection(60);
-
-            // Look for player
-            if (playerWithinBounds()) {
-                isOnPath(gp.player, 5);
-            }
-        }
+    protected void searchForPlayer() {
+        setDirection(60);
+        super.searchForPlayer();
     }
 }

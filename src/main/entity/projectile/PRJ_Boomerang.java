@@ -19,6 +19,9 @@ public class PRJ_Boomerang extends Projectile {
 
         maxHealth = 30;
         health = maxHealth;
+        defaultAttack = 1;
+        attack = defaultAttack;
+
         alive = false;
 
         hitbox = new Rectangle(12, 12, 24, 24);

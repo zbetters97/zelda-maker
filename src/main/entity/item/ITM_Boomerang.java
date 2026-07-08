@@ -21,7 +21,7 @@ public class ITM_Boomerang extends Entity {
     @Override
     protected void use() {
 
-        if (!projectile.alive) {
+        if (!projectile.getAlive()) {
             projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
             addProjectile(projectile);
 

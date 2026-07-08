@@ -2,6 +2,7 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.enemy.Enemy;
 
 import java.awt.*;
 
@@ -44,9 +45,9 @@ public class Projectile extends Entity {
 
     protected boolean checkEnemyCollision() {
 
-        Entity enemy = overlapEnemy(this);
+        Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
-            damageEnemy(enemy);
+            enemy.damageEnemy(this);
             collisionOn = true;
             return true;
         }

@@ -18,11 +18,6 @@ public class OBJ_Switch extends Object {
     }
 
     @Override
-    public void update() {
-        manageValues();
-    }
-
-    @Override
     public boolean canCollideWith(Entity target) {
         return !target.getElevated();
     }
@@ -44,6 +39,15 @@ public class OBJ_Switch extends Object {
                 gp.obj[gp.currentMap][i].setOpened(opened);
                 gp.obj[gp.currentMap][i].setInvincible(true);
             }
+        }
+    }
+
+    @Override
+    protected void manageValues() {
+        invincibleCounter++;
+        if (30 < invincibleCounter) {
+            invincibleCounter = 0;
+            invincible = false;
         }
     }
 

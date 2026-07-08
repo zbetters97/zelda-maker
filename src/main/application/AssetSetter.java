@@ -1,6 +1,6 @@
 package application;
 
-import entity.enemy.EMY_ChuChu_Green;
+import entity.enemy.*;
 import entity.npc.NPC_OldMan;
 import entity.object.*;
 
@@ -22,10 +22,8 @@ public record AssetSetter(GamePanel gp) {
 
     private void setEnemies() {
 
-        int mapNum = 0;
-        int i = 0;
-
-        gp.enemy[mapNum][i] = new EMY_ChuChu_Green(gp, 23, 18);
+       // int mapNum = 0;
+       // int i = 0;
     }
 
     private void setObjects() {
