@@ -21,9 +21,10 @@ public record AssetSetter(GamePanel gp) {
     }
 
     private void setEnemies() {
+        int mapNum = 0;
+        int i = 0;
 
-       // int mapNum = 0;
-       // int i = 0;
+        gp.enemy[mapNum][i] = new EMY_ChuChu_Green(gp, 24, 20);
     }
 
     private void setObjects() {

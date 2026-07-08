@@ -2,8 +2,6 @@ package entity.projectile;
 
 import application.GamePanel;
 
-import java.awt.*;
-
 public class PRJ_Fireball extends Projectile {
 
     public static final String prjName = "Fireball Projectile";
@@ -19,12 +17,6 @@ public class PRJ_Fireball extends Projectile {
 
         maxHealth = 60;
         health = maxHealth;
-        alive = false;
-
-        hitbox = new Rectangle(12, 12, 24, 24);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
     }
 
     @Override
@@ -34,53 +26,10 @@ public class PRJ_Fireball extends Projectile {
     }
 
     @Override
-    public void update() {
-
-        checkCollision();
-        moveInDirection(direction);
-
-        health--;
-        checkDeath();
-    }
-
-    @Override
-    protected void checkCollision() {
-
-        collisionOn = false;
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
-        checkObjectCollision();
-
-        if (user == gp.player) {
-            checkEnemyCollision();
-        }
-        else {
-            checkPlayerCollision();
-        }
-    }
-
-    @Override
     protected boolean canBeDeflected(boolean usingShield) {
 
         // Can only be deflected with a shield
         return usingShield;
-    }
-
-    @Override
-    protected void checkDeath() {
-        super.checkDeath();
-
-        if (collisionOn) {
-            resetValues();
-        }
-    }
-
-    @Override
-    public void resetValues() {
-        alive = false;
-        health = maxHealth;
     }
 
     @Override

@@ -13,6 +13,13 @@ public class Projectile extends Entity {
     public Projectile(GamePanel gp, String name) {
         super(gp, name);
         entity_type = type_projectile;
+
+        alive = false;
+
+        hitbox = new Rectangle(12, 16, 24, 24);
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
     }
 
     public void set(Point worldPoint, GamePanel.Direction direction, boolean alive, Entity user) {
@@ -33,16 +40,32 @@ public class Projectile extends Entity {
     }
 
     @Override
-    public boolean canCollideWith(Entity target) {
+    public void update() {
 
-        // Ignore enemies on a different elevation
-        if (target.getType() == type_enemy || target == gp.player) {
-            return isOnSameElevation(target);
-        }
+        checkCollision();
+        moveInDirection(direction);
 
-        return true;
+        health--;
+        checkDeath();
     }
 
+    @Override
+    public void checkCollision() {
+
+        collisionOn = false;
+
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
+        checkObjectCollision();
+
+        if (user == gp.player) {
+            checkEnemyCollision();
+        }
+        else {
+            checkPlayerCollision();
+        }
+    }
     protected boolean checkEnemyCollision() {
 
         Enemy enemy = overlapEnemy(this);
@@ -54,19 +77,17 @@ public class Projectile extends Entity {
 
         return false;
     }
-
     protected void checkPlayerCollision() {
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
-            damagePlayer(this);
+            damagePlayer();
             alive = false;
         }
         else {
             collisionOn = false;
         }
     }
-
     protected void checkObjectCollision() {
 
         int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
@@ -86,9 +107,37 @@ public class Projectile extends Entity {
     }
 
     @Override
+    public boolean canCollideWith(Entity target) {
+
+        // Ignore enemies on a different elevation
+        if (target.getType() == type_enemy || target == gp.player) {
+            return isOnSameElevation(target);
+        }
+
+        return true;
+    }
+
+    @Override
     protected void checkDeath() {
-        if (health <= 0 || !alive) {
+        if (health <= 0 || !alive || collisionOn) {
             resetValues();
         }
+    }
+
+    @Override
+    public void resetValues() {
+        alive = false;
+        collisionOn = false;
+        health = maxHealth;
+        attack = defaultAttack;
+        speed = defaultSpeed;
+    }
+
+    public boolean getCanPickup() {
+        return canPickup;
+    }
+
+    public void pickup(Entity user) {
+
     }
 }

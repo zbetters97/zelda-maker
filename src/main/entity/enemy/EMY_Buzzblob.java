@@ -41,7 +41,7 @@ public class EMY_Buzzblob extends Enemy {
         super.chasePlayer();
 
         if (action != Action.ATTACKING) {
-            setAttacking(180, gp.tileSize * 3, gp.tileSize * 3);
+            ai.setAttacking(180, gp.tileSize * 3, gp.tileSize * 3);
         }
     }
 

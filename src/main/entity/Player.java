@@ -1,8 +1,11 @@
 package entity;
 
+import ai.EntityAI;
 import application.GamePanel;
 import application.GamePanel.Direction;
+import entity.enemy.Enemy;
 import entity.item.*;
+import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
 
@@ -63,12 +66,16 @@ public class Player extends Entity {
         super(gp);
 
         name = "Link";
-        health = 16;
+
         maxHealth = 16;
-        attack = 2;
+        health = maxHealth;
+        defaultAttack = 2;
+        attack = defaultAttack;
 
         // Player position locked to center of screen
         screenPoint = new Point(gp.screenWidth / 2 - (gp.tileSize / 2), gp.screenHeight / 2 - (gp.tileSize / 2));
+
+        ai = new EntityAI(gp, this);
 
         // Hitbox
         hitbox = new Rectangle(8, 12, 32, 34);
@@ -236,7 +243,7 @@ public class Player extends Entity {
         setDefaultPosition();
 
         arrows = 50;
-        item = new ITM_Hookshot(gp, this);
+        item = new ITM_Bow(gp, this);
     }
 
     /**
@@ -415,7 +422,7 @@ public class Player extends Entity {
 
             if (e != null && e != lockedOnTarget && e.isAvailable()) {
 
-                int enemyDistance = getTileDistance(e);
+                int enemyDistance = ai.getTileDistance(e);
                 if (enemyDistance < currentDistance) {
                     currentDistance = enemyDistance;
                     target = e;
@@ -428,7 +435,7 @@ public class Player extends Entity {
     private void zTargeting() {
 
         // Locked target within 8 tiles
-        if (lockedOnTarget != null && getTileDistance(lockedOnTarget) < maxZTargetDistance) {
+        if (lockedOnTarget != null && ai.getTileDistance(lockedOnTarget) < maxZTargetDistance) {
 
             // Target alive
             if (lockedOnTarget.isAvailable()) {
@@ -626,7 +633,7 @@ public class Player extends Entity {
      * Called by move()
      */
     @Override
-    protected void checkCollision() {
+    public void checkCollision() {
 
         collisionOn = false;
 
@@ -643,9 +650,9 @@ public class Player extends Entity {
 
         gp.cChecker.checkHazard(this);
 
-        Entity enemy = moveIntoEnemy(this);
+        Enemy enemy = moveIntoEnemy(this);
         if (enemy != null && !enemy.invincible) {
-            damagePlayer(enemy);
+            enemy.damagePlayer();
         }
     }
     private void checkInteractiveCollision() {
@@ -654,6 +661,26 @@ public class Player extends Entity {
         if (col != -1) {
             gp.col[gp.currentMap][col].use(this);
         }
+
+        int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
+        if (proj != -1) {
+            Projectile projectile = gp.proj[gp.currentMap][proj];
+            if (projectile.getCanPickup()) {
+                projectile.pickup(this);
+            }
+        }
+    }
+
+    private Enemy moveIntoEnemy(Entity entity) {
+
+        Enemy enemy = null;
+
+        int enemyIndex = gp.cChecker.checkMovementCollision(entity, gp.enemy);
+        if (enemyIndex != -1) {
+            enemy = gp.enemy[gp.currentMap][enemyIndex];
+        }
+
+        return enemy;
     }
 
     /**

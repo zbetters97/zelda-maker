@@ -1,27 +1,16 @@
 package entity.npc;
 
 import application.GamePanel;
-import entity.Entity;
 
-import java.awt.*;
-
-public class NPC_OldMan extends Entity {
+public class NPC_OldMan extends NPC {
 
     public static final String npcName = "Old Man";
 
     public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
 
-        entity_type = type_npc;
-
         speed = 1;
         defaultSpeed = speed;
-        animationSpeed = 15;
-
-        hitbox = new Rectangle(8, 16, 32, 32);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
     }
 
     @Override

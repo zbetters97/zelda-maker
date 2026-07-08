@@ -14,26 +14,22 @@ public class PRJ_Boomerang extends Projectile {
     public PRJ_Boomerang(GamePanel gp) {
         super(gp, prjName);
 
-        speed = 8;
         animationSpeed = 3;
 
-        maxHealth = 30;
-        health = maxHealth;
+        defaultSpeed = 8;
+        speed = defaultSpeed;
+
         defaultAttack = 1;
         attack = defaultAttack;
 
-        alive = false;
-
-        hitbox = new Rectangle(12, 12, 24, 24);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
+        maxHealth = 30;
+        health = maxHealth;
     }
 
     @Override
     public void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/projectiles/boomerang_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/projectiles/boomerang_down_2");
+        up1 = setupImage("/projectiles/boomerang_down_1");
+        up2 = setupImage("/projectiles/boomerang_down_2");
     }
 
     @Override
@@ -58,30 +54,12 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     @Override
-    protected void checkCollision() {
-
-        collisionOn = false;
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
-        checkObjectCollision();
-
-        if (user == gp.player) {
-            checkEnemyCollision();
-        }
-        else {
-            checkPlayerCollision();
-        }
-    }
-
-    @Override
     protected void checkPlayerCollision() {
 
         // Return if player hit
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
-            damagePlayer(this);
+            damagePlayer();
             collisionOn = true;
         }
     }
@@ -161,10 +139,18 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     public void resetValues() {
+        super.resetValues();
         returning = false;
-        alive = false;
-        collisionOn = false;
-        health = maxHealth;
         user.setAction(Action.IDLE);
+    }
+
+    @Override
+    protected void getSpriteImage() {
+        if (spriteNum == 1) {
+            image = up1;
+        }
+        else {
+            image = up2;
+        }
     }
 }

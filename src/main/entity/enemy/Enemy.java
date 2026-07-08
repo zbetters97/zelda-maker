@@ -1,5 +1,6 @@
 package entity.enemy;
 
+import ai.EntityAI;
 import application.GamePanel;
 import entity.Entity;
 
@@ -24,6 +25,8 @@ public class Enemy extends Entity {
 
         defaultAttack = 1;
         attack = defaultAttack;
+
+        ai = new EntityAI(gp, this);
 
         hitbox = new Rectangle(8, 16, 32, 32);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
@@ -72,9 +75,9 @@ public class Enemy extends Entity {
     }
 
     protected void setAction() {
-        isOffPath(gp.player, maxTileDistanceToPlayer);
+        ai.isOffPath(gp.player, maxTileDistanceToPlayer);
 
-        if (onPath && playerWithinRange()) {
+        if (onPath && ai.playerWithinRange()) {
             chasePlayer();
         }
         else {
@@ -83,12 +86,12 @@ public class Enemy extends Entity {
     }
 
     protected void chasePlayer() {
-        searchPath(getGoalCol(gp.player), getGoalRow(gp.player));
+        ai.searchPath(gp.player);
     }
 
     protected void searchForPlayer() {
-        if (playerWithinRange()) {
-            isOnPath(gp.player, minTileDistanceToPlayer);
+        if (ai.playerWithinRange()) {
+            ai.isOnPath(gp.player, minTileDistanceToPlayer);
         }
         else {
             onPath = false;
@@ -120,7 +123,7 @@ public class Enemy extends Entity {
         }
 
         // Push target back
-        setKnockback(this, attacker, 1);
+        setKnockback(attacker, 1);
     }
 
     protected void reactToDamage() {

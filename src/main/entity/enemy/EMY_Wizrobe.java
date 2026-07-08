@@ -110,11 +110,11 @@ public class EMY_Wizrobe extends Enemy {
                 attack();
             }
 
-            approachPlayer(10);
-            isOffPath(gp.player, 8);
+            ai.approachPlayer(10);
+            ai.isOffPath(gp.player, 8);
         }
-        else if (playerWithinRange()) {
-            isOnPath(gp.player, 6);
+        else if (ai.playerWithinRange()) {
+            ai.isOnPath(gp.player, 6);
         }
     }
 

@@ -53,7 +53,7 @@ public class EMY_Goblin_Combat extends Enemy {
         super.chasePlayer();
 
         // Decide to attack
-        setAttacking(60, gp.tileSize * 3, gp.tileSize);
+        ai.setAttacking(60, gp.tileSize * 3, gp.tileSize);
 
         // Stop to attack
         if (action == Action.ATTACKING) {

@@ -2,6 +2,7 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.enemy.Enemy;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,18 +18,13 @@ public class PRJ_Claw extends Projectile {
     public PRJ_Claw(GamePanel gp, Entity user) {
         super(gp, prjName);
 
-        speed = 10;
+        defaultSpeed = 10;
+        speed = defaultSpeed;
 
         maxHealth = 30;
         health = maxHealth;
-        alive = false;
 
         this.user = user;
-
-        hitbox = new Rectangle(12, 16, 24, 24);
-        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
-        hitboxDefaultWidth = hitbox.width;
-        hitboxDefaultHeight = hitbox.height;
 
         getClawImages();
     }
@@ -40,6 +36,7 @@ public class PRJ_Claw extends Projectile {
         left1 = left2 = setupImage("/projectiles/hookshot_left_1");
         right1 = right2 = setupImage("/projectiles/hookshot_right_1");
     }
+
     private void getClawImages() {
         grabUp1 = setupImage("/projectiles/hookshot_grab_up_1");
         grabDown1 = setupImage("/projectiles/hookshot_grab_down_1");
@@ -76,7 +73,7 @@ public class PRJ_Claw extends Projectile {
     }
 
     @Override
-    protected void checkCollision() {
+    public void checkCollision() {
 
         collisionOn = false;
 
@@ -86,14 +83,14 @@ public class PRJ_Claw extends Projectile {
     }
     private void checkGrabbableCollision() {
 
-        Entity target = overlapEnemy(this);
+        Enemy target = overlapEnemy(this);
         if (target != null) {
 
             collisionOn = true;
 
             // Enemy shocks user, don't pull
             if (target.getBuzzing()) {
-                damagePlayer(target);
+                target.damagePlayer();
             }
             else {
                 grabbedEntity = target;
@@ -232,8 +229,8 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void resetValues() {
-        alive = false;
-        collisionOn = false;
+        super.resetValues();
+
         latched = false;
         returning = false;
         health = maxHealth;

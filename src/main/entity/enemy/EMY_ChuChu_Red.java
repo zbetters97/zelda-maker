@@ -31,8 +31,8 @@ public class EMY_ChuChu_Red extends Enemy {
     @Override
     protected void searchForPlayer() {
 
-        if (playerWithinRange()) {
-            isOnPath(gp.player, minTileDistanceToPlayer);
+        if (ai.playerWithinRange()) {
+            ai.isOnPath(gp.player, minTileDistanceToPlayer);
         }
         else {
             onPath = false;

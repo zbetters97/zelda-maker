@@ -361,7 +361,7 @@ public class UI {
             if (enemy != null && enemy.isAvailable()) {
 
                 // Enemy distance from player
-                int enemyDistance = enemy.getTileDistance(gp.player);
+                int enemyDistance = enemy.getAI().getTileDistance(gp.player);
 
                 // Find closest enemy distance within 8 tiles
                 if (enemyDistance < currentDistance) {

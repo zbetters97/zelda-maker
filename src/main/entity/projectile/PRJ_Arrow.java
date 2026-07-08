@@ -20,7 +20,6 @@ public class PRJ_Arrow extends Projectile {
 
         maxHealth = 120;
         health = maxHealth;
-        alive = false;
 
         hitbox = new Rectangle(4, 8, 24, 24);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
@@ -30,10 +29,10 @@ public class PRJ_Arrow extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = up2 = setupImage("/projectiles/arrow_up_1", 35, 35);
-        down1 = down2 = setupImage("/projectiles/arrow_down_1", 35, 35);
-        left1 = left2 = setupImage("/projectiles/arrow_left_1", 35, 35);
-        right1 = right2 = setupImage("/projectiles/arrow_right_1", 35, 35);
+        up1 = setupImage("/projectiles/arrow_up_1", 35, 35);
+        down1 = setupImage("/projectiles/arrow_down_1", 35, 35);
+        left1 = setupImage("/projectiles/arrow_left_1", 35, 35);
+        right1 = setupImage("/projectiles/arrow_right_1", 35, 35);
     }
 
     @Override
@@ -56,25 +55,8 @@ public class PRJ_Arrow extends Projectile {
     }
 
     @Override
-    protected void checkCollision() {
-
-        collisionOn = false;
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
-        checkObjectCollision();
-
-        if (user == gp.player) {
-            checkEnemyCollision();
-        }
-        else {
-            checkPlayerCollision();
-        }
-    }
-
-    @Override
     protected boolean checkEnemyCollision() {
+
         boolean enemyHit = super.checkEnemyCollision();
         if (enemyHit) {
             alive = speed >= defaultSpeed + 6;
@@ -100,9 +82,15 @@ public class PRJ_Arrow extends Projectile {
     }
 
     @Override
-    public void resetValues() {
-        alive = false;
-        attack = defaultAttack;
-        speed = defaultSpeed;
+    protected void checkDeath() {
+        if (health <= 0 || !alive) {
+            resetValues();
+        }
+    }
+
+    @Override
+    public void pickup(Entity user) {
+        user.addArrows(1);
+        resetValues();
     }
 }

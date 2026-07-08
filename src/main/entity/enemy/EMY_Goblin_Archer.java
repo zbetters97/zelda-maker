@@ -43,7 +43,7 @@ public class EMY_Goblin_Archer extends Enemy {
     private void handleLookingAtPlayer() {
 
         // Stop moving if in range to shoot at player
-        if (lookingAtPlayer(gp.tileSize / 2)) {
+        if (ai.lookingAtPlayer(gp.tileSize / 2)) {
             speed = 0;
             attack();
         }
