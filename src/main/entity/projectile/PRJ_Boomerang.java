@@ -2,6 +2,7 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.enemy.Enemy;
 
 import java.awt.*;
 
@@ -50,6 +51,19 @@ public class PRJ_Boomerang extends Projectile {
 
         cycleSprites();
         checkDeath();
+    }
+
+    @Override
+    protected boolean checkEnemyCollision() {
+
+        Enemy enemy = overlapEnemy(this);
+        if (enemy != null) {
+            enemy.setStunned(true);
+            enemy.takeDamage(this);
+            collisionOn = true;
+        }
+
+        return true;
     }
 
     @Override

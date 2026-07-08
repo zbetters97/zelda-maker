@@ -103,6 +103,8 @@ public class Entity {
     protected Entity item;
     protected boolean invincible = false;
     protected int invincibleCounter = 0;
+    protected boolean stunned = false;
+    protected int stunnedCounter = 0;
     protected boolean dying = false;
     private int dyingCounter = 0;
     protected Collectable loot;
@@ -289,7 +291,7 @@ public class Entity {
     }
     protected void move(Direction direction) {
 
-        if (!canMove || collisionOn) {
+        if (unableToMove() || collisionOn) {
             moving = false;
             return;
         }
@@ -584,9 +586,15 @@ public class Entity {
             return;
         }
 
+        // Target is buzzing, hurt attacker
         if (buzzing && attacker.getType() != type_projectile) {
+            attacker.setStunned(true);
             attacker.takeDamage(this);
             return;
+        }
+        // Attacker is buzzing, stun target
+        else if (attacker.getBuzzing()) {
+            setStunned(true);
         }
 
         // Target blocked with shield
@@ -639,6 +647,10 @@ public class Entity {
         return alive && !dying && interactable && action != FALLING && action != DROWNING;
     }
 
+    public boolean unableToMove() {
+        return !canMove || stunned;
+    }
+
     /**
      * CHECK DEATH
      * Checks if the entity has died
@@ -660,7 +672,16 @@ public class Entity {
      * Resets or reassigns entity attributes
      * Called at the end of update
      */
-    protected void manageValues() { }
+    protected void manageValues() {
+
+        if (stunned) {
+            stunnedCounter++;
+            if (90 < stunnedCounter) {
+                stunned = false;
+                stunnedCounter = 0;
+            }
+        }
+    }
 
     /**
      * RESET VALUES
@@ -668,12 +689,14 @@ public class Entity {
      */
     public void resetValues() {
 
-        action = IDLE;
         alive = true;
+        action = IDLE;
 
-        attackNum = 1; attackCounter = 0;
+        resetCounters();
+
         knockback = false; knockbackCounter = 0;
         invincible = false; invincibleCounter = 0;
+        stunned = false; stunnedCounter = 0;
         dying = false; dyingCounter = 0;
 
         speed = defaultSpeed;
@@ -683,12 +706,14 @@ public class Entity {
 
         lockedOn = false; lockedOnTarget = null;
 
-        charge = 0;
-        actionLockCounter = 0;
-        spriteNum = 1; spriteCounter = 0;
-
         opened = false;
         isElevated = false;
+    }
+
+    public void resetCounters() {
+        spriteNum = 1; spriteCounter = 0;
+        attackNum = 1; attackCounter = 0;
+        charge = 0; actionLockCounter = 0;
     }
 
     /**
@@ -942,7 +967,11 @@ public class Entity {
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
     }
-
+    public void setStunned(boolean stunned) {
+        this.stunned = stunned;
+        action = IDLE;
+        resetCounters();
+    }
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
     }

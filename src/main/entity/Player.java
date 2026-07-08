@@ -661,6 +661,8 @@ public class Player extends Entity {
         collisionOn = false;
         checkCollision();
 
+        System.out.println(stunned);
+
         super.move(newDirection);
     }
 
@@ -1134,24 +1136,14 @@ public class Player extends Entity {
 
     private void resetHandlers() {
 
+        resetCounters();
+
         speed = defaultSpeed;
         collisionOn = false; canMove = true;
         isElevated = false;
 
-        charge = 0;
-        actionLockCounter = 0;
-        spriteNum = 1; spriteCounter = 0;
-        attackNum = 1; attackCounter = 0;
-
         knockback = false; knockbackCounter = 0;
         lockedOn = false; lockedOnTarget = null;
-
-        spinCharge = 0;
-        digNum = 1; digCounter = 0;
-        aimNum = 1; aimCounter = 0;
-        throwNum = 1; throwCounter = 0;
-        jumpNum = 1; jumpCounter = 0;
-        damageNum = 1; damageCounter = 0;
     }
 
     /**
@@ -1161,6 +1153,14 @@ public class Player extends Entity {
      */
     @Override
     protected void manageValues() {
+
+        if (stunned) {
+            stunnedCounter++;
+            if (60 < stunnedCounter) {
+                stunned = false;
+                stunnedCounter = 0;
+            }
+        }
 
         // Decrease cooldown if filled
         if (0 < actionLockCounter) {
@@ -1172,6 +1172,18 @@ public class Player extends Entity {
     public void resetValues() {
         super.resetValues();
         resetHandlers();
+    }
+
+    @Override
+    public void resetCounters() {
+        super.resetCounters();
+
+        spinCharge = 0;
+        digNum = 1; digCounter = 0;
+        aimNum = 1; aimCounter = 0;
+        throwNum = 1; throwCounter = 0;
+        jumpNum = 1; jumpCounter = 0;
+        damageNum = 1; damageCounter = 0;
     }
 
     /**

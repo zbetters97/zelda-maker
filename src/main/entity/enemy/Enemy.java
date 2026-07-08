@@ -10,9 +10,6 @@ import static entity.Entity.Action.ATTACKING;
 
 public class Enemy extends Entity {
 
-    private boolean stunned = false;
-    private int stunnedCounter = 0;
-
     protected int minTileDistanceToPlayer = 1;
     protected int maxTileDistanceToPlayer = 1;
 
@@ -62,7 +59,7 @@ public class Enemy extends Entity {
 
     protected boolean isStuck() {
 
-        if (knockback || !canMove) {
+        if (knockback || unableToMove()) {
 
             if (knockback) {
                 handleKnockback();
@@ -96,18 +93,6 @@ public class Enemy extends Entity {
         }
         else {
             onPath = false;
-        }
-    }
-
-    @Override
-    protected void manageValues() {
-        if (stunned) {
-            stunnedCounter++;
-
-            if (40 < stunnedCounter) {
-                stunnedCounter = 0;
-                stunned = false;
-            }
         }
     }
 
