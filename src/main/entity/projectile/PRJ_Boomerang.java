@@ -129,9 +129,7 @@ public class PRJ_Boomerang extends Projectile {
     @Override
     protected void cycleSprites() {
 
-        spriteCounter++;
-
-        if (spriteCounter > animationSpeed) {
+        if (animationSpeed < ++spriteCounter) {
             if (spriteNum == 1) {
                 spriteNum = 2;
             }

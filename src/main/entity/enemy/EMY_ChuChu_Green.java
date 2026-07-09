@@ -44,8 +44,7 @@ public class EMY_ChuChu_Green extends Enemy {
     @Override
     protected void cycleSprites() {
 
-        spriteCounter++;
-        if (animationSpeed < spriteCounter) {
+        if (animationSpeed < ++spriteCounter) {
 
             if (onPath) {
                 speed = 1;

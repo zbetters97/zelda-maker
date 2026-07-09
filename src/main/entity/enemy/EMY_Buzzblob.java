@@ -54,8 +54,7 @@ public class EMY_Buzzblob extends Enemy {
     @Override
     protected void cycleSprites() {
 
-        spriteCounter++;
-        if (animationSpeed < spriteCounter) {
+        if (animationSpeed < ++spriteCounter) {
             if (action == Action.ATTACKING) {
                 cycleBuzzingSprites();
             }
@@ -99,8 +98,7 @@ public class EMY_Buzzblob extends Enemy {
             attack = 2;
             buzzing = true;
 
-            attackCounter++;
-            if (120 < attackCounter) {
+            if (120 < ++attackCounter) {
                 action = Action.IDLE;
                 attackCounter = 0;
             }

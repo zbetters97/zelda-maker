@@ -238,6 +238,15 @@ public class Entity {
         cycleSprites();
     }
 
+    protected void updateSpinDirection() {
+        direction = switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> LEFT;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
+            case LEFT -> DOWN;
+            case RIGHT -> UP;
+        };
+    }
+
     /**
      * GET MOVE DIRECTION
      * Called by CollisionDetector
@@ -329,8 +338,8 @@ public class Entity {
      * Changes the animation counter for draw to render the correct sprite
      */
     protected void cycleSprites() {
-        spriteCounter++;
-        if (spriteCounter > animationSpeed && animationSpeed != 0) {
+
+        if (animationSpeed < ++spriteCounter && animationSpeed != 0) {
 
             if (spriteNum == 1) {
                 spriteNum = 2;
@@ -350,8 +359,7 @@ public class Entity {
      */
     protected void setDirection(int rate) {
 
-        actionLockCounter++;
-        if (actionLockCounter >= rate) {
+        if (rate <= ++actionLockCounter) {
 
             int dir = 1 + (int) (Math.random() * 4);
             if (dir == 1) {
@@ -412,15 +420,13 @@ public class Entity {
 
     protected void attacking() {
 
-        attackCounter++;
-
         // Prevent glitch
         if (swingSpeed1 == 0 && swingSpeed2 == 0) {
             swingSpeed1 = 3;
             swingSpeed2 = 15;
         }
 
-        if (attackCounter <= swingSpeed1) {
+        if (++attackCounter <= swingSpeed1) {
             attackNum = 1;
         }
         if (attackCounter <= swingSpeed2 && swingSpeed1 < attackCounter) {
@@ -568,8 +574,7 @@ public class Entity {
         moveInDirection(knockbackDirection);
 
         // Run for 10 frames
-        knockbackCounter++;
-        if (knockbackCounter == 10) {
+        if (10 <= ++knockbackCounter) {
            resetKnockback();
         }
     }
@@ -675,8 +680,7 @@ public class Entity {
     protected void manageValues() {
 
         if (stunned) {
-            stunnedCounter++;
-            if (90 < stunnedCounter) {
+            if (90 < ++stunnedCounter) {
                 stunned = false;
                 stunnedCounter = 0;
             }
@@ -801,9 +805,7 @@ public class Entity {
 
     protected void playHurtAnimation(Graphics2D g2) {
 
-        invincibleCounter++;
-
-        if (invincibleCounter % 5 == 0) {
+        if (++invincibleCounter % 5 == 0) {
             changeAlpha(g2, 0.2f);
         }
 
@@ -815,9 +817,8 @@ public class Entity {
     protected void playDyingAnimation(Graphics2D g2) {
 
         invincible = false;
-        dyingCounter++;
 
-        if (dyingCounter % 5 == 0) {
+        if (++dyingCounter % 5 == 0) {
             changeAlpha(g2, 0.2f);
         }
 

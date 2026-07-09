@@ -64,8 +64,7 @@ public class EMY_Beetle extends Enemy {
 
     private void runShieldTimer() {
 
-        attackCounter++;
-        if (60 <= attackCounter && attackCounter < 120) {
+        if (60 <= ++attackCounter && attackCounter < 120) {
             attackNum = 2;
         }
         else if (120 <= attackCounter) {

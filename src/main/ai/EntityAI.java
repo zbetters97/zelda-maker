@@ -152,8 +152,7 @@ public class EntityAI {
 
     public void approachPlayer(int rate) {
 
-        counter++;
-        if (counter >= rate) {
+        if (rate <= ++counter) {
 
             if (getXDistance(gp.player) >= getYDistance(gp.player)) {
                 if (gp.player.getCenterX() < entity.getCenterX()) {
@@ -230,6 +229,23 @@ public class EntityAI {
 
     public int getTileDistance(Entity target) {
         return (getXDistance(target) + getYDistance(target)) / gp.tileSize;
+    }
+
+    public boolean withinRange(Entity target, int buffer) {
+
+        int dx = target.getCenterX() - entity.getCenterX();
+        int dy = target.getCenterY() - entity.getCenterY();
+
+        return switch (entity.getDirection()) {
+            case UP -> dy < 0 && Math.abs(dx) <= buffer;
+            case UPLEFT -> dy < 0 && dx < 0;
+            case UPRIGHT -> dy < 0 && dx > 0;
+            case DOWN -> dy > 0 && Math.abs(dx) <= buffer;
+            case DOWNLEFT -> dy > 0 && dx < 0;
+            case DOWNRIGHT -> dy > 0 && dx > 0;
+            case LEFT -> dx < 0 && Math.abs(dy) <= buffer;
+            case RIGHT -> dx > 0 && Math.abs(dy) <= buffer;
+        };
     }
 
     private int getGoalCol(Entity target) {

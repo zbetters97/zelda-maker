@@ -162,8 +162,7 @@ public class TileManager {
     public void draw(Graphics2D g2) {
 
         // Animate water
-        waterCounter++;
-        if (waterCounter >= waterCounterMax) {
+        if (waterCounterMax <= ++waterCounter) {
             waterCounter = 0;
             if (waterNum == 1) {
                 waterNum = 2;

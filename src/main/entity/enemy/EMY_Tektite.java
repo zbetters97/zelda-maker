@@ -49,8 +49,7 @@ public class EMY_Tektite extends Entity {
     private void pauseMovement() {
 
         // Wait 2 seconds before changing direction
-        actionLockCounter++;
-        if (actionLockCounter >= 120) {
+        if (120 < ++actionLockCounter) {
             actionLockCounter = 0;
             speed = defaultSpeed;
             setDirection(0);
@@ -60,8 +59,7 @@ public class EMY_Tektite extends Entity {
     private void moveATile() {
 
         // Move 1 tile at a time
-        actionLockCounter++;
-        if (actionLockCounter >= 24) {
+        if (24 <= ++actionLockCounter) {
             actionLockCounter = 0;
             speed = 0;
         }

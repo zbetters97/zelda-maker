@@ -44,8 +44,7 @@ public class OBJ_Switch extends Object {
 
     @Override
     protected void manageValues() {
-        invincibleCounter++;
-        if (30 < invincibleCounter) {
+        if (30 < ++invincibleCounter) {
             invincibleCounter = 0;
             invincible = false;
         }

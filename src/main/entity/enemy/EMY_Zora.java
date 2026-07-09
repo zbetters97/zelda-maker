@@ -80,9 +80,7 @@ public class EMY_Zora extends Enemy {
     @Override
     protected void attack() {
 
-        spriteCounter++;
-
-        if (spriteCounter == 30) {
+        if (++spriteCounter == 30) {
             projectile.set(worldPoint, direction, true, this);
             addProjectile(projectile);
 

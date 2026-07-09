@@ -661,8 +661,6 @@ public class Player extends Entity {
         collisionOn = false;
         checkCollision();
 
-        System.out.println(stunned);
-
         super.move(newDirection);
     }
 
@@ -731,8 +729,7 @@ public class Player extends Entity {
 
         speed = 5;
 
-        spriteCounter++;
-        if (spriteCounter < 6) {
+        if (++spriteCounter < 6) {
             spriteNum = 1;
         }
         else if (spriteCounter < 10) {
@@ -796,9 +793,7 @@ public class Player extends Entity {
             spinCharge = 0;
         }
 
-        attackCounter++;
-
-        if (attackCounter <= swingSpeed1) {
+        if (++attackCounter <= swingSpeed1) {
             attackNum = 1;
         }
         else if (attackCounter <= swingSpeed2) {
@@ -858,28 +853,13 @@ public class Player extends Entity {
     }
 
     /**
-     * UPDATE SPIN DIRECTION
-     * Assigns new direction using counter-clockwise rotation
-     * Called by charging() and spinning()
-     */
-    private void updateSpinDirection() {
-        direction = switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> LEFT;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
-            case LEFT -> DOWN;
-            case RIGHT -> UP;
-        };
-    }
-
-    /**
      * SPIN ATTACKING
      * Handles sword spin attack logic
      * Called by getAction() when action == SPINNING
      */
     private void spinning() {
 
-        attackCounter++;
-        if (attackCounter < 3) {
+        if (++attackCounter < 3) {
             attackNum = 1;
         }
         else if (attackCounter < 6) {
@@ -957,9 +937,7 @@ public class Player extends Entity {
      */
     private void throwing() {
 
-        throwCounter++;
-
-        if (throwCounter <= 6) {
+        if (++throwCounter <= 6) {
             throwNum = 1;
         }
         else {
@@ -978,9 +956,8 @@ public class Player extends Entity {
      * Called by startAction() when player action is DIGGING
      */
     private void digging() {
-        digCounter++;
 
-        if (digCounter <= 12) {
+        if (++digCounter <= 12) {
             digNum = 1;
         }
         else if (digCounter < 24 ) {
@@ -1003,9 +980,8 @@ public class Player extends Entity {
         speed = 2;
 
         if (moving) {
-            aimCounter++;
 
-            if (10 < aimCounter) {
+            if (10 < ++aimCounter) {
                 aimNum++;
 
                 if (2 < aimNum) {
@@ -1039,9 +1015,7 @@ public class Player extends Entity {
      */
     private void jumping() {
 
-        jumpCounter++;
-
-        if (jumpCounter <= 6) {
+        if (++jumpCounter <= 6) {
             jumpNum = 1;
         }
         else if (12 <= jumpCounter && jumpCounter < 18) {
@@ -1107,9 +1081,8 @@ public class Player extends Entity {
 
         speed = 0;
         knockback = false;
-        damageCounter++;
 
-        if (damageCounter <= 6) {
+        if (++damageCounter <= 6) {
             damageNum = 1;
         }
         else if (damageCounter < 18) {

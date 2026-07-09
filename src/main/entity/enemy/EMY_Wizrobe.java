@@ -32,7 +32,7 @@ public class EMY_Wizrobe extends Enemy {
         left1 = setupImage("/enemy/wizzrobe_left_1");
         right1 = setupImage("/enemy/wizzrobe_right_1");
 
-        up2 = down2 = left2 = right2 = setupImage("/enemy/wizzrobe_down_2");
+        up2 = setupImage("/enemy/wizzrobe_down_2");
     }
 
     @Override
@@ -69,9 +69,8 @@ public class EMY_Wizrobe extends Enemy {
     }
 
     private boolean advanceAnimation(int activeSprite) {
-        spriteCounter++;
 
-        if (spriteCounter <= animationSpeed) {
+        if (++spriteCounter <= animationSpeed) {
             spriteNum = 2;
             return false;
         }
@@ -128,8 +127,7 @@ public class EMY_Wizrobe extends Enemy {
 
     private boolean checkTeleportTimer() {
 
-        attackCounter++;
-        if (120 < attackCounter) {
+        if (120 < ++attackCounter) {
             spriteCounter = 0;
             attackCounter = 0;
             return true;
@@ -145,5 +143,20 @@ public class EMY_Wizrobe extends Enemy {
         attackCounter = 0;
         teleporting = true;
         interactable = false;
+    }
+
+    @Override
+    protected void getSpriteImage() {
+        if (spriteNum == 1) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
+                case LEFT -> left1;
+                case RIGHT -> right1;
+            };
+        }
+        else {
+            image = up2;
+        }
     }
 }
