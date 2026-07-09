@@ -24,12 +24,12 @@ public class EMY_Zora extends Enemy {
         canSwim = true;
         needsWater = true;
 
+        projectile = new PRJ_Fireball(gp);
+
         hitbox = new Rectangle(0, 0, gp.tileSize, gp.tileSize);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
-
-        projectile = new PRJ_Fireball(gp);
 
         minTileDistanceToPlayer = 5;
         maxTileDistanceToPlayer = 9;

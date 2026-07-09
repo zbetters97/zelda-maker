@@ -18,6 +18,8 @@ public class EMY_Goblin_Archer extends Enemy {
         defaultSpeed = 1;
         speed = defaultSpeed;
 
+        projectile = new PRJ_Arrow(gp);
+
         minTileDistanceToPlayer = 7;
         maxTileDistanceToPlayer = 10;
     }
@@ -54,10 +56,8 @@ public class EMY_Goblin_Archer extends Enemy {
 
     @Override
     protected void attack() {
-        projectile = new PRJ_Arrow(gp);
-        projectile.modifySpeed(4);
-        projectile.modifyAttack(2);
-
+        projectile.setSpeed(6);
+        projectile.setAttack(2);
         useProjectile(projectile, 2);
     }
 

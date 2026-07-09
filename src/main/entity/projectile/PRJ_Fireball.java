@@ -9,9 +9,6 @@ public class PRJ_Fireball extends Projectile {
     public PRJ_Fireball(GamePanel gp) {
         super(gp, prjName);
 
-        maxHealth = 60;
-        health = maxHealth;
-
         defaultSpeed = 7;
         speed = defaultSpeed;
 
@@ -25,6 +22,13 @@ public class PRJ_Fireball extends Projectile {
     public void getImages() {
         up1 = setupImage("/projectiles/fireball_down_1", 35, 35);
         up2 = setupImage("/projectiles/fireball_down_2", 35, 35);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        cycleSprites();
     }
 
     @Override

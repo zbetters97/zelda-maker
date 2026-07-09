@@ -9,12 +9,6 @@ public class PRJ_Seed extends Projectile {
     public PRJ_Seed(GamePanel gp) {
         super(gp, prjName);
 
-        maxHealth = 45;
-        health = maxHealth;
-
-        defaultSpeed = 6;
-        speed = defaultSpeed;
-
         defaultAttack = 2;
         attack = defaultAttack;
     }

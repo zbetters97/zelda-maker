@@ -11,9 +11,6 @@ public class PRJ_Bone extends Projectile {
 
         animationSpeed = 6;
 
-        maxHealth = 45;
-        health = maxHealth;
-
         defaultSpeed = 6;
         speed = defaultSpeed;
 
@@ -26,14 +23,23 @@ public class PRJ_Bone extends Projectile {
     @Override
     public void getImages() {
         up1 = setupImage("/projectiles/bone_down_1");
-        left1 = setupImage("/projectiles/bone_down_2");
+        up2 = setupImage("/projectiles/bone_down_2");
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        cycleSprites();
     }
 
     @Override
     protected void getSpriteImage() {
-        image = switch (direction) {
-            case UP, UPLEFT, UPRIGHT, DOWN, DOWNLEFT, DOWNRIGHT -> up1;
-            case LEFT, RIGHT -> left1;
-        };
+        if (spriteNum == 1) {
+            image = up1;
+        }
+        else {
+            image = up2;
+        }
     }
 }

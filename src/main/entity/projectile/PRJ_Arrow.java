@@ -18,9 +18,6 @@ public class PRJ_Arrow extends Projectile {
         defaultSpeed = 5;
         speed = defaultSpeed;
 
-        defaultAttack = 1;
-        attack = defaultAttack;
-
         hitbox = new Rectangle(4, 8, 24, 24);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;

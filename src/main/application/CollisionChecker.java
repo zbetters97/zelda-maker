@@ -72,6 +72,7 @@ public record CollisionChecker(GamePanel gp) {
         return gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
     }
     private void checkTileCollision(Entity entity, Tile tile) {
+
         // Bottomless pits
         if (tile.isPit) {
 
@@ -202,7 +203,7 @@ public record CollisionChecker(GamePanel gp) {
 
             Entity target = targets[gp.currentMap][i];
 
-            if (target == null || target == entity || !target.isAvailable()) {
+            if (target == null || target == entity || target.isNotInteractable()) {
                 continue;
             }
 
@@ -231,7 +232,7 @@ public record CollisionChecker(GamePanel gp) {
 
             Entity target = targets[gp.currentMap][i];
 
-            if (target == null || target == entity || !target.isAvailable()) {
+            if (target == null || target == entity || target.isNotInteractable()) {
                 continue;
             }
 
@@ -254,7 +255,7 @@ public record CollisionChecker(GamePanel gp) {
      */
     public boolean checkPlayer(Entity entity) {
 
-        if (!gp.player.isAvailable() || !entity.isAvailable()) {
+        if (gp.player.isNotInteractable() || entity.isNotInteractable()) {
             return false;
         }
 

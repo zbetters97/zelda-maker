@@ -22,6 +22,8 @@ public class EMY_Stalfos extends Enemy {
         defaultSpeed = 1;
         speed = defaultSpeed;
 
+        projectile = new PRJ_Bone(gp);
+
         minTileDistanceToPlayer = 5;
         maxTileDistanceToPlayer = 7;
     }
@@ -78,13 +80,14 @@ public class EMY_Stalfos extends Enemy {
 
     @Override
     protected void attack() {
-        projectile = new PRJ_Bone(gp);
         useProjectile(projectile, 2);
     }
 
     @Override
     protected void manageValues() {
-        super.manageValues();
+        if (actionLockCounter > 0) {
+            actionLockCounter--;
+        }
 
         if (action == Action.JUMPING) {
             if (15 < ++jumpCounter) {
@@ -94,6 +97,8 @@ public class EMY_Stalfos extends Enemy {
                 speed = defaultSpeed;
             }
         }
+
+        super.manageValues();
     }
 
     @Override

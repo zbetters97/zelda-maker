@@ -27,6 +27,8 @@ public class EMY_Octorok extends Enemy {
         canSwim = true;
         needsWater = true;
 
+        projectile = new PRJ_Seed(gp);
+
         hitbox = new Rectangle(0, 0, gp.tileSize, gp.tileSize);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
@@ -103,7 +105,6 @@ public class EMY_Octorok extends Enemy {
 
     @Override
     protected void attack() {
-        projectile = new PRJ_Seed(gp);
         useProjectile(projectile, 2);
     }
 

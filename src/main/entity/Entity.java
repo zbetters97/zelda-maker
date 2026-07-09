@@ -587,7 +587,7 @@ public class Entity {
 
     public void takeDamage(Entity attacker) {
 
-        if (invincible || !isAvailable() || !isOnSameElevation(attacker)) {
+        if (invincible || !isAvailable() || isNotInteractable() || !isOnSameElevation(attacker)) {
             return;
         }
 
@@ -649,7 +649,11 @@ public class Entity {
     /** END COMBAT*/
 
     public boolean isAvailable() {
-        return alive && !dying && interactable && action != FALLING && action != DROWNING;
+        return alive && !dying && action != FALLING && action != DROWNING;
+    }
+
+    public boolean isNotInteractable() {
+        return !interactable;
     }
 
     public boolean unableToMove() {
@@ -950,12 +954,18 @@ public class Entity {
     public int getSpeed() {
         return speed;
     }
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
     public void modifySpeed(int change) {
         speed += change;
     }
 
     public int getAttack() {
         return attack;
+    }
+    public void setAttack(int attack) {
+        this.attack = attack;
     }
     public void modifyAttack(int change) {
         attack += change;

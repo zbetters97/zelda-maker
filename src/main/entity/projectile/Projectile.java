@@ -17,6 +17,12 @@ public class Projectile extends Entity {
         super(gp, name);
         entity_type = type_projectile;
 
+        maxHealth = 60;
+        health = maxHealth;
+
+        defaultAttack = 1;
+        attack = defaultAttack;
+
         knockbackPower = 1;
         alive = false;
 
@@ -99,9 +105,6 @@ public class Projectile extends Entity {
             gp.player.takeDamage(this);
             alive = false;
         }
-        else {
-            collisionOn = false;
-        }
     }
     protected void checkObjectCollision() {
 
@@ -130,6 +133,11 @@ public class Projectile extends Entity {
         }
 
         return true;
+    }
+
+    @Override
+    protected void cycleSprites() {
+
     }
 
     @Override

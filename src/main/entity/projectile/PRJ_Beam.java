@@ -17,8 +17,6 @@ public class PRJ_Beam extends Projectile {
 
         defaultAttack = 2;
         attack = defaultAttack;
-
-        knockbackPower = 1;
     }
 
     @Override

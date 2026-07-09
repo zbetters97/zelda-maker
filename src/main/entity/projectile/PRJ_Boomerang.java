@@ -23,8 +23,6 @@ public class PRJ_Boomerang extends Projectile {
         defaultSpeed = 8;
         speed = defaultSpeed;
 
-        defaultAttack = 1;
-        attack = defaultAttack;
         knockbackPower = 2;
     }
 

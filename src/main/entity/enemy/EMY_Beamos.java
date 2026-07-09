@@ -27,6 +27,8 @@ public class EMY_Beamos extends Enemy {
 
         interactable = false;
 
+        projectile = new PRJ_Beam(gp);
+
         minTileDistanceToPlayer = 3;
         maxTileDistanceToPlayer = 5;
     }
@@ -102,7 +104,6 @@ public class EMY_Beamos extends Enemy {
 
     @Override
     protected void attack() {
-        projectile = new PRJ_Beam(gp);
         useProjectile(projectile, 1);
     }
 
