@@ -1032,7 +1032,7 @@ public class Player extends Entity {
             else {
                 jumpNum = 1;
                 jumpCounter = 0;
-                isElevated = false;
+                elevated = false;
                 action = IDLE;
             }
         }
@@ -1051,7 +1051,7 @@ public class Player extends Entity {
         else if (70 <= jumpCounter) {
             jumpNum = 1;
             jumpCounter = 0;
-            isElevated = false;
+            elevated = false;
             action = IDLE;
 
             gp.cChecker.checkHazard(this);
@@ -1113,7 +1113,7 @@ public class Player extends Entity {
 
         speed = defaultSpeed;
         collisionOn = false; canMove = true;
-        isElevated = false;
+        elevated = false;
 
         knockback = false; knockbackCounter = 0;
         lockedOn = false; lockedOnTarget = null;

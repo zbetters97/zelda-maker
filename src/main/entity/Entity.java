@@ -109,7 +109,7 @@ public class Entity {
     private int dyingCounter = 0;
     protected Collectable loot;
     protected boolean opened = false;
-    protected boolean isElevated = false;
+    protected boolean elevated = false;
     protected boolean canSwim = false;
     protected boolean needsWater = false;
     protected boolean shielded = false;
@@ -587,7 +587,7 @@ public class Entity {
 
     public void takeDamage(Entity attacker) {
 
-        if (invincible || !isAvailable()) {
+        if (invincible || !isAvailable() || !isOnSameElevation(attacker)) {
             return;
         }
 
@@ -711,7 +711,7 @@ public class Entity {
         lockedOn = false; lockedOnTarget = null;
 
         opened = false;
-        isElevated = false;
+        elevated = false;
     }
 
     public void resetCounters() {
@@ -985,13 +985,13 @@ public class Entity {
     }
 
     public boolean getElevated() {
-        return isElevated;
+        return elevated;
     }
-    public void setElevated(boolean isElevated) {
-        this.isElevated = isElevated;
+    public void setElevated(boolean elevated) {
+        this.elevated = elevated;
     }
     public boolean isOnSameElevation(Entity target) {
-        return target.getElevated() == isElevated;
+        return target.getElevated() == elevated;
     }
 
     public Entity getItem() {
