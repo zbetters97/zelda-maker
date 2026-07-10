@@ -980,17 +980,15 @@ public class Player extends Entity {
         speed = 2;
 
         if (moving) {
-
             if (10 < ++aimCounter) {
-                aimNum++;
-
-                if (2 < aimNum) {
+                if (2 < ++aimNum) {
                     aimNum = 1;
                 }
 
                 aimCounter = 0;
             }
-        } else {
+        }
+        else {
             if (charge <= 6) {
                 aimNum = 1;
             }

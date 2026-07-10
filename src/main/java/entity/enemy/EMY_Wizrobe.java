@@ -146,6 +146,12 @@ public class EMY_Wizrobe extends Enemy {
     }
 
     @Override
+    public void resetValues() {
+        super.resetValues();
+        teleporting = false;
+    }
+
+    @Override
     protected void getSpriteImage() {
         if (spriteNum == 1) {
             image = switch (direction) {

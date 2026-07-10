@@ -233,6 +233,7 @@ public class PRJ_Claw extends Projectile {
         latched = false;
         returning = false;
         health = maxHealth;
+        user.resetCounters();
         user.setElevated(false);
         user.setAction(Action.IDLE);
 

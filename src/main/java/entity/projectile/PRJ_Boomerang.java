@@ -150,6 +150,7 @@ public class PRJ_Boomerang extends Projectile {
     public void resetValues() {
         super.resetValues();
         returning = false;
+        user.resetCounters();
         user.setAction(Action.IDLE);
     }
 

@@ -99,8 +99,8 @@ public class Enemy extends Entity {
     @Override
     public void resetValues() {
         super.resetValues();
-
-        stunned = false; stunnedCounter = 0;
+        stunned = false;
+        stunnedCounter = 0;
     }
 
     @Override
