@@ -2,6 +2,7 @@ package data;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.Player;
 import entity.collectable.*;
 import entity.enemy.*;
 import entity.npc.*;
@@ -13,12 +14,16 @@ import java.util.function.Supplier;
 
 public class EntityGenerator {
 
+    public final Map<String, Supplier<Entity>> playerFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> npcFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> enemyFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> objectFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> collectableFactory = new LinkedHashMap<>();
 
     public EntityGenerator(GamePanel gp) {
+
+        // Player
+        playerFactory.put(Player.playerName, () -> new Player(gp));
 
         // NPCs
         npcFactory.put(NPC_OldMan.npcName, () -> new NPC_OldMan(gp, 0, 0));
@@ -32,15 +37,23 @@ public class EntityGenerator {
         objectFactory.put(OBJ_Block_Blue.objName, () -> new OBJ_Block_Blue(gp, 0, 0));
         objectFactory.put(OBJ_Block_Red.objName, () -> new OBJ_Block_Red(gp, 0, 0));
         objectFactory.put(OBJ_Chest.objName, () -> new OBJ_Chest(gp, 0, 0));
+        objectFactory.put(OBJ_Pot.objName, () -> new OBJ_Pot(gp, 0, 0));
+        objectFactory.put(OBJ_Switch.objName, () -> new OBJ_Switch(gp, 0, 0));
 
         // Collectables
+        collectableFactory.put(COL_Arrow.colName, () -> new COL_Arrow(gp));
         collectableFactory.put(COL_Heart.colName, () -> new COL_Heart(gp));
         collectableFactory.put(COL_Rupee_Blue.colName, () -> new COL_Rupee_Blue(gp));
+        collectableFactory.put(COL_Rupee_Green.colName, () -> new COL_Rupee_Green(gp));
+        collectableFactory.put(COL_Rupee_Red.colName, () -> new COL_Rupee_Red(gp));
     }
 
     public Entity getEntity(String eName) {
 
         Entity entity;
+
+        entity = getFromFactory(playerFactory, eName);
+        if (entity != null) return entity;
 
         entity = getFromFactory(npcFactory, eName);
         if (entity != null) return entity;

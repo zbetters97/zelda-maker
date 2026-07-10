@@ -147,17 +147,6 @@ public class Entity {
             attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
 
-    /** ENTITY TYPES */
-    protected int entity_type = 0;
-    public final int type_npc = 1;
-    public final int type_enemy = 2;
-    public final int type_item = 3;
-
-    /** OBJECT TYPES */
-    public final int type_collectable = 4;
-    public final int type_object = 5;
-    public final int type_projectile = 6;
-
     /** CONSTRUCTORS */
     public Entity(GamePanel gp) {
         this(gp, 0, 0, "", null);
@@ -173,7 +162,6 @@ public class Entity {
     }
     public Entity(GamePanel gp, String name, Entity user) {
         this(gp, 0, 0, name, user);
-        entity_type = type_item;
     }
     private Entity(GamePanel gp, int worldX, int worldY, String name, Entity user) {
 
@@ -279,7 +267,7 @@ public class Entity {
         gp.cChecker.checkMovementCollision(this, gp.obj);
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
-        boolean canHurtPlayer = entity_type == type_enemy;
+        boolean canHurtPlayer = this instanceof Enemy;
         if (contactPlayer && canHurtPlayer) {
             gp.player.takeDamage(this);
         }
@@ -593,7 +581,7 @@ public class Entity {
         }
 
         // Target is buzzing, hurt attacker
-        if (buzzing && attacker.getType() != type_projectile) {
+        if (buzzing && !(attacker instanceof Projectile)) {
             attacker.setStunned(true);
             attacker.takeDamage(this);
             return;
@@ -877,10 +865,6 @@ public class Entity {
 
     public EntityAI getAI() {
         return ai;
-    }
-
-    public int getType() {
-        return entity_type;
     }
 
     public boolean getAlive() {

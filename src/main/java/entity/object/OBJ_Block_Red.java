@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class OBJ_Block_Red extends Object {
 
-    public static final String objName = "Red Block";
+    public static final String objName = "Block_Red";
 
     public OBJ_Block_Red(GamePanel gp, int col, int row) {
         super(gp, col, row, objName);
@@ -15,8 +15,8 @@ public class OBJ_Block_Red extends Object {
 
     @Override
     protected void getImages() {
-        sprite = up1 = setupImage("/objects/obj_block_red_on");
-        up2 = setupImage("/objects/obj_block_red_off");
+        up1 = setupImage("/objects/obj_block_red_on");
+        sprite = up2 = setupImage("/objects/obj_block_red_off");
     }
 
     @Override

@@ -4,7 +4,7 @@ import application.GamePanel;
 
 public class NPC_OldMan extends NPC {
 
-    public static final String npcName = "Old Man";
+    public static final String npcName = "Old_Man";
 
     public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);

@@ -4,7 +4,7 @@ import application.GamePanel;
 
 public class EMY_Buzzblob extends Enemy {
 
-    public static final String emyName = "Buzz Blob";
+    public static final String emyName = "BuzzBlob";
 
     private int cycle = 0;
 

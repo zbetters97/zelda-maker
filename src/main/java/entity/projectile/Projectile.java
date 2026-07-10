@@ -15,7 +15,6 @@ public class Projectile extends Entity {
 
     public Projectile(GamePanel gp, String name) {
         super(gp, name);
-        entity_type = type_projectile;
 
         maxHealth = 60;
         health = maxHealth;
@@ -128,7 +127,7 @@ public class Projectile extends Entity {
     public boolean canCollideWith(Entity target) {
 
         // Ignore enemies on a different elevation
-        if (target.getType() == type_enemy || target == gp.player) {
+        if (target instanceof Enemy || target == gp.player) {
             return isOnSameElevation(target);
         }
 

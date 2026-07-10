@@ -19,6 +19,8 @@ import static application.GamePanel.Direction.*;
 
 public class Player extends Entity {
 
+    public static final String playerName = "Link";
+
     /** X/Y VALUES */
     public Point safePoint;
 
@@ -68,7 +70,7 @@ public class Player extends Entity {
      * @param gp GamePanel
      */
     public Player(GamePanel gp) {
-        super(gp, "Link");
+        super(gp, playerName);
 
         // Player position locked to center of screen
         screenPoint = new Point(gp.screenWidth / 2 - (gp.tileSize / 2), gp.screenHeight / 2 - (gp.tileSize / 2));

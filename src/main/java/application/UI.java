@@ -1,6 +1,8 @@
 package application;
 
 import entity.Entity;
+import entity.Player;
+import entity.UIEntity;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -10,7 +12,11 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class UI {
 
@@ -32,6 +38,19 @@ public class UI {
     private int zTargetDirection = 0;
     private int zTargetRotation = 0;
 
+    /** EDITING HANDLERS */
+    private BufferedImage cursor, cursor_select;
+    private boolean wasYPressed = false;
+    private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
+    private int entityListIndex = 0;
+    private int entityIndex = 0;
+    private Entity currentEntity;
+    private Entity selectedEntity;
+
+    /** INDEX VALUES */
+    private int slotCol = 0;
+    private int slotRow = 0;
+
     /** SPRITES */
     private BufferedImage
             rupee,
@@ -48,6 +67,7 @@ public class UI {
 
         importFont();
         getAllImages();
+        fillEntityLibrary();
     }
 
     /**
@@ -67,6 +87,7 @@ public class UI {
     private void getAllImages() {
         getHUDImages();
         getZTargetImages();
+        getEditingImages();
     }
     private void getZTargetImages() {
         ztarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
@@ -80,6 +101,29 @@ public class UI {
         heart_2 = setupImage("/ui/ui_heart_2", 23, 23);
         heart_3 = setupImage("/ui/ui_heart_3", 23, 23);
         heart_4 = setupImage("/ui/ui_heart_4", 23, 23);
+    }
+    private void getEditingImages() {
+        cursor = setupImage("/ui/ui_cursor");
+        cursor_select = setupImage("/ui/ui_cursor_select");
+    }
+
+    private void fillEntityLibrary() {
+        entityLibrary.addAll(Arrays.asList(
+                buildFromFactory("player", gp.eGenerator.playerFactory),
+                buildFromFactory("npc", gp.eGenerator.npcFactory),
+                buildFromFactory("enemy", gp.eGenerator.enemyFactory),
+                buildFromFactory("object", gp.eGenerator.objectFactory),
+                buildFromFactory("collectable", gp.eGenerator.collectableFactory)
+        ));
+    }
+    private ArrayList<UIEntity> buildFromFactory(String path, Map<String, ? extends Supplier<Entity>> factory) {
+        ArrayList<UIEntity> list = new ArrayList<>();
+
+        for (String name : factory.keySet()) {
+            list.add(new UIEntity(name, path, gp));
+        }
+
+        return list;
     }
 
     /**
@@ -95,7 +139,12 @@ public class UI {
         g2.setFont(PK_DS);
         g2.setColor(Color.white);
 
-        drawHUD();
+        if (gp.gameState == gp.playState) {
+            drawHUD();
+        }
+        else if (gp.gameState == gp.editState) {
+            drawEditState();
+        }
     }
 
     /**
@@ -270,7 +319,6 @@ public class UI {
 
         return rupeeCount;
     }
-
     public void setRupeeChange(int rupees) {
         rupeeChange += rupees;
     }
@@ -429,7 +477,6 @@ public class UI {
         drawPlayerHitbox();
         drawPathFinding();
     }
-
     private void drawCoordinates() {
 
         int x = 10;
@@ -447,7 +494,6 @@ public class UI {
         y += lineHeight;
         g2.drawString("Row: " + gp.player.getAI().getCenterY(gp.player) / gp.tileSize, x, y);
     }
-
     private void drawPlayerHitbox() {
 
         g2.setColor(Color.RED);
@@ -458,7 +504,6 @@ public class UI {
                 gp.player.getHitbox().width,
                 gp.player.getHitbox().height);
     }
-
     private void drawPathFinding() {
 
         g2.setColor(new Color(255, 0, 0, 100));
@@ -471,6 +516,211 @@ public class UI {
             int screenY = worldY - gp.player.getWorldPoint().y + gp.player.getScreenPoint().y;
 
             g2.fillRect(screenX, screenY, gp.tileSize, gp.tileSize);
+        }
+    }
+
+    /** EDITING */
+    private void drawEditState() {
+
+        // User holding down Y
+        if (gp.keyH.yPressed) {
+            drawEditing_Menu();
+        }
+        // User let go of Y, run once
+        else if (wasYPressed) {
+            editing_GetEntity();
+        }
+        else {
+            drawEditing_Map();
+        }
+
+        // Detect if Y is pressed
+        wasYPressed = gp.keyH.yPressed;
+
+        if (gp.keyH.startPressed) {
+            gp.keyH.startPressed = false;
+        }
+    }
+
+    private void drawEditing_Menu() {
+        editing_menu();
+        editing_menu_Input_Dir();
+    }
+    private void editing_menu() {
+
+        int baseX = (int) (gp.tileSize * 12.5);
+        int baseY = (int) (gp.tileSize * 6.5);
+        int width = (int) (gp.tileSize * 6.5);
+        int height = gp.tileSize * 2;
+        g2.setColor(new Color(0, 0, 0, 235));
+        g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
+
+        int listSpacingX = (int) (gp.tileSize * 1.50);
+        int entitySpacingY = (int) (gp.tileSize * 1.75);
+
+        int cursorX = baseX + (entityListIndex * listSpacingX + 25);
+        int cursorY = (gp.screenHeight / 2) - gp.tileSize;
+
+        int scrollOffsetY = cursorY - (entityIndex * entitySpacingY);
+
+        for (int i = 0; i < entityLibrary.size(); i++) {
+
+            int x = baseX + (i * listSpacingX + 25);
+            int y = (i == entityListIndex) ? scrollOffsetY : cursorY;
+
+            for (int c = 0; c < entityLibrary.get(i).size(); c++) {
+
+                if (i == entityListIndex) {
+                    if (Math.abs(c - entityIndex) > 2) {
+                        y += entitySpacingY;
+                        continue;
+                    }
+                }
+                else if (c != 0) {
+                    continue;
+                }
+
+                if (i == entityListIndex && c == entityIndex) {
+                    g2.drawImage(cursor,cursorX - 10, cursorY - 10,gp.tileSize + 20, gp.tileSize + 20,null);
+                }
+
+                if (i == entityListIndex && c != entityIndex) {
+                    g2.setColor(new Color(28, 28, 28, 200));
+                    g2.fillRoundRect(x - 10, y - 10,gp.tileSize + 20, gp.tileSize + 20,0, 0);
+                }
+
+                if (i != entityListIndex || c != entityIndex) {
+                    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
+                }
+                g2.drawImage(entityLibrary.get(i).get(c).getSpirte(), x, y, gp.tileSize, gp.tileSize,null);
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+                y += entitySpacingY;
+            }
+        }
+    }
+    private void editing_menu_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            entityIndex--;
+            if (entityIndex < 0) {
+                entityIndex = entityLibrary.get(entityListIndex).size() - 1;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            entityIndex++;
+            if (entityIndex > entityLibrary.get(entityListIndex).size() - 1) {
+                entityIndex = 0;
+            }
+        }
+        else if (gp.keyH.leftPressed) {
+            gp.keyH.leftPressed = false;
+
+            entityListIndex--;
+            entityIndex = 0;
+            if (entityListIndex < 0) {
+                entityListIndex = entityLibrary.size() - 1;
+            }
+        }
+        else if (gp.keyH.rightPressed) {
+            gp.keyH.rightPressed = false;
+
+            entityListIndex++;
+            entityIndex = 0;
+            if (entityListIndex > entityLibrary.size() - 1) {
+                entityListIndex = 0;
+            }
+        }
+    }
+
+    private void editing_GetEntity() {
+        UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+
+        currentEntity = gp.eGenerator.getEntity(uiEntity.getName());
+        if (currentEntity == null) return;
+
+        currentEntity.setWorldPoint(new Point(slotCol, slotRow));
+    }
+
+    private void drawEditing_Map() {
+        editing_Map_Cursor();
+        editing_Map_HUD();
+
+        editing_Map_Input_A();
+        editing_Map_Input_Dir();
+    }
+    private void editing_Map_Cursor() {
+
+        // Entity currently selected, draw sprite under cursor
+        if (selectedEntity != null) {
+            g2.drawImage(selectedEntity.getSprite(), slotCol, slotRow, gp.tileSize, gp.tileSize, null);
+            g2.drawImage(cursor_select, slotCol - 6, slotRow - 6, gp.tileSize + 13, gp.tileSize + 13, null);
+        }
+        else {
+            g2.drawImage(cursor, slotCol, slotRow, gp.tileSize, gp.tileSize, null);
+        }
+    }
+    private void editing_Map_HUD() {
+        if (selectedEntity == null) {
+            drawCurrentEntity();
+        }
+    }
+    private void drawCurrentEntity() {
+        UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+        g2.drawImage(uiEntity.getSpirte(), slotCol + 7, slotRow + 7, gp.tileSize - 14, gp.tileSize - 14, null);
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+    }
+    private void editing_Map_Input_A() {
+        if (gp.keyH.aPressed) {
+            gp.keyH.aPressed = false;
+
+            editing_GetEntity();
+            editing_PlaceEntity(currentEntity);
+            currentEntity = null;
+        }
+    }
+    private void editing_PlaceEntity(Entity entity) {
+
+        Entity[][] entityList = gp.getEntityList(entity);
+        int index = gp.findOpenSlot(entityList);
+
+        if (index != -1) {
+            entity.setWorldPoint(new Point(slotCol, slotRow));
+            entityList[gp.currentMap][index] = entity;
+        }
+        else if (entity.getName().equals(Player.playerName)) {
+            gp.player.setWorldPoint(new Point(slotCol, slotRow));
+        }
+    }
+    private void editing_Map_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+            if (slotRow - gp.tileSize >= 0) {
+                slotRow -= gp.tileSize;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+            if (slotRow + gp.tileSize <= gp.screenHeight - gp.tileSize) {
+                slotRow += gp.tileSize;
+            }
+        }
+        else if (gp.keyH.leftPressed) {
+            gp.keyH.leftPressed = false;
+            if (slotCol - gp.tileSize >= 0) {
+                slotCol -= gp.tileSize;
+            }
+        }
+        else if (gp.keyH.rightPressed) {
+            gp.keyH.rightPressed = false;
+            if (slotCol + gp.tileSize <= gp.screenWidth - gp.tileSize) {
+                slotCol += gp.tileSize;
+            }
         }
     }
 

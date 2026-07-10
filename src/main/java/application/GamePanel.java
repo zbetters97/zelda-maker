@@ -7,6 +7,8 @@ import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
+import entity.item.Item;
+import entity.npc.NPC;
 import entity.object.Object;
 import entity.projectile.Projectile;
 import tile.TileManager;
@@ -35,6 +37,10 @@ public class GamePanel extends JPanel implements Runnable {
     private Thread gameThread;
     public static UtilityTool utility = new UtilityTool();
 
+    /** DATA */
+    public SaveLoad saveLoad = new SaveLoad(this);
+    public final EntityGenerator eGenerator = new EntityGenerator(this);
+
     /** CONTROLS / SOUND / UI */
     public KeyHandler keyH = new KeyHandler();
     public UI ui = new UI(this);
@@ -43,14 +49,14 @@ public class GamePanel extends JPanel implements Runnable {
     private final int originalTileSize = 16; // 16x16 tile
     private final int scale = 3; // scale rate to accommodate for large screen
     public final int tileSize = originalTileSize * scale; // scaled tile (16*3 = 48px)
-    public final int maxScreenCol = 16; // columns (width)
-    public final int maxScreenRow = 12; // rows (height)
+    public final int maxScreenCol = 33; // columns (width)
+    public final int maxScreenRow = 18; // rows (height)
     public final int screenWidth = tileSize * maxScreenCol; // screen width (in tiles) 768px
     public final int screenHeight = tileSize * maxScreenRow;
 
     /** WORLD SIZE */
-    public int maxWorldCol = 100;
-    public int maxWorldRow = 100;
+    public int maxWorldCol = 33;
+    public int maxWorldRow = 18;
     public int worldWidth = tileSize * maxWorldCol;
     public int worldHeight  = tileSize * maxWorldRow;
 
@@ -68,6 +74,7 @@ public class GamePanel extends JPanel implements Runnable {
     /** GAME STATES */
     public int gameState;
     public final int playState = 1;
+    public final int editState = 2;
 
     /** AREA STATES */
     public int currentArea;
@@ -78,10 +85,6 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
-
-    /** DATA */
-    public SaveLoad saveLoad = new SaveLoad(this);
-    public final EntityGenerator eGenerator = new EntityGenerator(this);
 
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
@@ -111,7 +114,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     protected void setupGame() {
 
-        gameState = playState;
+        gameState = editState;
         currentArea = outside;
         currentMap = 0;
 
@@ -119,7 +122,7 @@ public class GamePanel extends JPanel implements Runnable {
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D) tempScreen.getGraphics();
 
-        tileM.loadMap();
+        //tileM.loadMap();
         aSetter.setup();
 
         player.setDefaultValues();
@@ -203,12 +206,14 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
 
-        player.update();
-        updateNPCs();
-        updateEnemies();
-        updateObjects();
-        updateCollectables();
-        updateProjectiles();
+        if (gameState == playState) {
+            player.update();
+            updateNPCs();
+            updateEnemies();
+            updateObjects();
+            updateCollectables();
+            updateProjectiles();
+        }
     }
 
     /** UPDATERS **/
@@ -342,5 +347,38 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics g = getGraphics();
         g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
         g.dispose();
+    }
+
+    public Entity[][] getEntityList(Entity entity) {
+
+        if (entity instanceof NPC) {
+            return npc;
+        }
+        else if (entity instanceof Enemy) {
+            return enemy;
+        }
+        else if (entity instanceof Object) {
+            return obj;
+        }
+        else if (entity instanceof Collectable) {
+            return col;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public int findOpenSlot(Entity[][] list) {
+
+        if (list == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < list[currentMap].length; i++) {
+            if (list[currentMap][i] == null) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

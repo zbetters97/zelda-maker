@@ -5,7 +5,7 @@ import entity.Entity;
 
 public class COL_Rupee_Green extends Collectable {
 
-    public static final String colName = "Green Rupee";
+    public static final String colName = "Rupee_Green";
 
     public COL_Rupee_Green(GamePanel gp) {
         super(gp, colName);

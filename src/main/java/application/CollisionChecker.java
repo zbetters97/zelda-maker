@@ -1,6 +1,8 @@
 package application;
 
 import entity.Entity;
+import entity.enemy.Enemy;
+import entity.npc.NPC;
 import tile.Tile;
 
 import java.awt.*;
@@ -82,7 +84,7 @@ public record CollisionChecker(GamePanel gp) {
             }
 
             // NPCs and enemies
-            if (entity.getType() == entity.type_npc || entity.getType() == entity.type_enemy) {
+            if (entity instanceof NPC || entity instanceof Enemy) {
                 entity.setCollision(true);
             }
         }
@@ -95,7 +97,7 @@ public record CollisionChecker(GamePanel gp) {
             }
 
             // NPCs and enemies
-            if (entity.getType() == entity.type_npc || entity.getType() == entity.type_enemy) {
+            if (entity instanceof NPC || entity instanceof Enemy) {
                 entity.setCollision(true);
             }
         }

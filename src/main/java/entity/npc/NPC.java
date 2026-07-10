@@ -11,8 +11,6 @@ public class NPC extends Entity {
     public NPC(GamePanel gp, int worldX, int worldY, String npcName) {
         super(gp, worldX, worldY, npcName);
 
-        entity_type = type_npc;
-
         animationSpeed = 15;
 
         defaultSpeed = 1;

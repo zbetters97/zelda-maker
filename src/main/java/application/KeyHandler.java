@@ -16,13 +16,14 @@ public class KeyHandler implements KeyListener {
     public final int btn_A = KeyEvent.VK_A;
     public final int btn_B = KeyEvent.VK_S;
     public final int btn_X = KeyEvent.VK_D;
+    public final int btn_Y = KeyEvent.VK_F;
     public final int btn_R = KeyEvent.VK_E;
     public final int btn_L = KeyEvent.VK_W;
     public final int btn_START = KeyEvent.VK_SPACE;
 
     /* CONFIG VALUES */
     public boolean startPressed, upPressed, downPressed, leftPressed, rightPressed,
-            aPressed, bPressed, xPressed, rPressed, lPressed;
+            aPressed, bPressed, xPressed, yPressed, rPressed, lPressed;
 
     /**
      * CONSTRUCTOR
@@ -74,6 +75,10 @@ public class KeyHandler implements KeyListener {
             xPressed = true;
             lock = false;
         }
+        if (code == btn_Y && lock) {
+            yPressed = true;
+            lock = false;
+        }
         if (code == btn_R && lock) {
             rPressed = true;
             lock = false;
@@ -117,6 +122,10 @@ public class KeyHandler implements KeyListener {
         }
         if (code == btn_X) {
             xPressed = false;
+            lock = true;
+        }
+        if (code == btn_Y) {
+            yPressed = false;
             lock = true;
         }
         if (code == btn_R) {

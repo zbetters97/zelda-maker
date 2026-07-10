@@ -16,8 +16,6 @@ public class Enemy extends Entity {
     public Enemy(GamePanel gp, int worldX, int worldY, String emyName) {
         super(gp, worldX, worldY, emyName);
 
-        entity_type = type_enemy;
-
         animationSpeed = 12;
 
         defaultAttack = 1;
@@ -123,12 +121,6 @@ public class Enemy extends Entity {
 
         // Draw hitbox (debug)
         g2.drawRect(tempScreenPoint.x + hitbox.x, tempScreenPoint.y + hitbox.y, hitbox.width, hitbox.height);
-
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 20));
-
-        g2.drawString(onPath + "" , tempScreenPoint.x, tempScreenPoint.y + 20);
-        g2.setColor(Color.RED);
 
         // Reset opacity
         changeAlpha(g2, 1f);

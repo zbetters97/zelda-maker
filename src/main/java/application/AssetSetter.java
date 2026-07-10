@@ -1,7 +1,6 @@
 package application;
 
 import entity.enemy.*;
-import entity.npc.NPC_OldMan;
 import entity.object.*;
 
 import java.awt.*;
@@ -9,17 +8,8 @@ import java.awt.*;
 public record AssetSetter(GamePanel gp) {
 
     public void setup() {
-        setNPCs();
         setEnemies();
         setObjects();
-    }
-
-    private void setNPCs() {
-
-        int mapNum = 0;
-        int i = 0;
-
-        gp.npc[mapNum][i] = new NPC_OldMan(gp, 30, 26);
     }
 
     private void setEnemies() {
