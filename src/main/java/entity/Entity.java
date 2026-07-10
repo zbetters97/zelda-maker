@@ -729,9 +729,6 @@ public class Entity {
         // Draw sprite
         g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
 
-        // Draw hitbox (debug)
-        g2.drawRect(tempScreenPoint.x + hitbox.x, tempScreenPoint.y + hitbox.y, hitbox.width, hitbox.height);
-
         // Reset opacity
         changeAlpha(g2, 1f);
     }

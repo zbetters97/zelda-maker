@@ -4,7 +4,7 @@ import application.GamePanel;
 
 public class EMY_Goblin_Combat extends Enemy {
 
-    public static final String emyName = "Combat Goblin";
+    public static final String emyName = "Goblin_Combat";
 
     public EMY_Goblin_Combat(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);

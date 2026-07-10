@@ -32,6 +32,17 @@ public class EntityGenerator {
         enemyFactory.put(EMY_Beamos.emyName, () -> new EMY_Beamos(gp, 0, 0));
         enemyFactory.put(EMY_Beetle.emyName, () -> new EMY_Beetle(gp, 0, 0));
         enemyFactory.put(EMY_Buzzblob.emyName, () -> new EMY_Buzzblob(gp, 0, 0));
+        enemyFactory.put(EMY_ChuChu_Green.emyName, () -> new EMY_ChuChu_Green(gp, 0, 0));
+        enemyFactory.put(EMY_ChuChu_Red.emyName, () -> new EMY_ChuChu_Red(gp, 0, 0));
+        enemyFactory.put(EMY_Goblin_Archer.emyName, () -> new EMY_Goblin_Archer(gp, 0, 0));
+        enemyFactory.put(EMY_Goblin_Boomerang.emyName, () -> new EMY_Goblin_Boomerang(gp, 0, 0));
+        enemyFactory.put(EMY_Goblin_Combat.emyName, () -> new EMY_Goblin_Combat(gp, 0, 0));
+        enemyFactory.put(EMY_Keese.emyName, () -> new EMY_Keese(gp, 0, 0));
+        enemyFactory.put(EMY_Octorok.emyName, () -> new EMY_Octorok(gp, 0, 0));
+        enemyFactory.put(EMY_Stalfos.emyName, () -> new EMY_Stalfos(gp, 0, 0));
+        enemyFactory.put(EMY_Tektite.emyName, () -> new EMY_Tektite(gp, 0, 0));
+        enemyFactory.put(EMY_Wizrobe.emyName, () -> new EMY_Wizrobe(gp, 0, 0));
+        enemyFactory.put(EMY_Zora.emyName, () -> new EMY_Zora(gp, 0, 0));
 
         // Objects
         objectFactory.put(OBJ_Block_Blue.objName, () -> new OBJ_Block_Blue(gp, 0, 0));

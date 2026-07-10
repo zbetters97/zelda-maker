@@ -474,7 +474,6 @@ public class UI {
      */
     private void drawDebug() {
         drawCoordinates();
-        drawPlayerHitbox();
         drawPathFinding();
     }
     private void drawCoordinates() {
@@ -493,16 +492,6 @@ public class UI {
         g2.drawString("Column: " + gp.player.getAI().getCenterX(gp.player) / gp.tileSize, x, y);
         y += lineHeight;
         g2.drawString("Row: " + gp.player.getAI().getCenterY(gp.player) / gp.tileSize, x, y);
-    }
-    private void drawPlayerHitbox() {
-
-        g2.setColor(Color.RED);
-
-        g2.drawRect(
-                gp.player.getScreenPoint().x + gp.player.getHitbox().x,
-                gp.player.getScreenPoint().y + gp.player.getHitbox().y,
-                gp.player.getHitbox().width,
-                gp.player.getHitbox().height);
     }
     private void drawPathFinding() {
 
@@ -644,14 +633,51 @@ public class UI {
 
         currentEntity.setWorldPoint(new Point(slotCol, slotRow));
     }
+    private boolean editing_GrabEntity() {
+
+        // If player is selected
+        if (gp.player.getWorldPoint().equals(new Point(slotCol, slotRow))) {
+
+            // Move player offscreen when selected
+            gp.player.setWorldPoint(new Point(0, -48));
+            selectedEntity = gp.player;
+
+            return true;
+        }
+
+        for (Entity[][] list : gp.getAllEntities()) {
+            for (int i = 0; i < list[gp.currentMap].length; i++) {
+
+                Entity e = list[gp.currentMap][i];
+                if (e == null) continue;
+
+                // Entity found at same X/Y
+                if (e.getWorldPoint().equals(new Point(slotCol, slotRow))) {
+
+                    // Trying to place selected entity on top of existing, not allowed
+                    if (selectedEntity != null) return true;
+
+                    // Grab new entity, remove from level
+                    selectedEntity = e;
+
+                    list[gp.currentMap][i] = null;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     private void drawEditing_Map() {
         editing_Map_Cursor();
         editing_Map_HUD();
 
         editing_Map_Input_A();
+        editing_Map_Input_B();
         editing_Map_Input_Dir();
     }
+
     private void editing_Map_Cursor() {
 
         // Entity currently selected, draw sprite under cursor
@@ -675,15 +701,53 @@ public class UI {
         g2.drawImage(uiEntity.getSpirte(), slotCol + 7, slotRow + 7, gp.tileSize - 14, gp.tileSize - 14, null);
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
+
     private void editing_Map_Input_A() {
         if (gp.keyH.aPressed) {
             gp.keyH.aPressed = false;
 
-            editing_GetEntity();
-            editing_PlaceEntity(currentEntity);
-            currentEntity = null;
+            // Cursor on existing entity and grabbed, return
+            if (editing_GrabEntity()) return;
+
+            // Entity currently grabbed, place down
+            if (selectedEntity != null) {
+                editing_PlaceEntity(selectedEntity);
+                selectedEntity = null;
+            }
+            // Not currently holding entity, place down new one
+            else {
+                editing_GetEntity();
+                editing_PlaceEntity(currentEntity);
+                currentEntity = null;
+            }
         }
     }
+    private void editing_Map_Input_B() {
+        if (gp.keyH.bPressed) {
+            gp.keyH.bPressed = false;
+
+            // Can't delete player
+            if (gp.player.getWorldPoint().equals(new Point(slotCol, slotRow))) {
+                return;
+            }
+
+            // Find entity at X/Y
+            for (Entity[][] list : gp.getAllEntities()) {
+                for (int i = 0; i < list[gp.currentMap].length; i++) {
+
+                    Entity e = list[gp.currentMap][i];
+                    if (e == null) continue;
+
+                    // Entity found, delete from list
+                    if (e.getWorldPoint().equals(new Point(slotCol, slotRow))) {
+                        list[gp.currentMap][i] = null;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     private void editing_PlaceEntity(Entity entity) {
 
         Entity[][] entityList = gp.getEntityList(entity);

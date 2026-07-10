@@ -5,7 +5,7 @@ import entity.projectile.PRJ_Boomerang;
 
 public class EMY_Goblin_Boomerang extends Enemy {
 
-    public static final String emyName = "Boomerang Goblin";
+    public static final String emyName = "Goblin_Boomerang";
 
     public EMY_Goblin_Boomerang(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);

@@ -5,7 +5,7 @@ import entity.projectile.PRJ_Arrow;
 
 public class EMY_Goblin_Archer extends Enemy {
 
-    public static final String emyName = "Archer Goblin";
+    public static final String emyName = "Goblin_Archer";
 
     public EMY_Goblin_Archer(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);

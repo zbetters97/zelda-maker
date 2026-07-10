@@ -4,7 +4,7 @@ import application.GamePanel;
 
 public class EMY_ChuChu_Green extends Enemy {
 
-    public static final String emyName = "Green Chu Chu";
+    public static final String emyName = "ChuChu_Green";
 
     public EMY_ChuChu_Green(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, emyName);

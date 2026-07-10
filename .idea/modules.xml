@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../baba-is-you-editor/baba-is-you-editor.iml" filepath="$PROJECT_DIR$/../baba-is-you-editor/baba-is-you-editor.iml" />
       <module fileurl="file://$PROJECT_DIR$/zelda-maker.iml" filepath="$PROJECT_DIR$/zelda-maker.iml" />
     </modules>
   </component>

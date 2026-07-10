@@ -7,7 +7,6 @@ import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
-import entity.item.Item;
 import entity.npc.NPC;
 import entity.object.Object;
 import entity.projectile.Projectile;
@@ -38,7 +37,6 @@ public class GamePanel extends JPanel implements Runnable {
     public static UtilityTool utility = new UtilityTool();
 
     /** DATA */
-    public SaveLoad saveLoad = new SaveLoad(this);
     public final EntityGenerator eGenerator = new EntityGenerator(this);
 
     /** CONTROLS / SOUND / UI */
@@ -280,6 +278,8 @@ public class GamePanel extends JPanel implements Runnable {
         drawEntities();
         drawProjectiles();
         ui.draw(g2);
+
+        drawGrid();
     }
 
     /** DRAW METHODS **/
@@ -349,6 +349,33 @@ public class GamePanel extends JPanel implements Runnable {
         g.dispose();
     }
 
+    private void drawGrid() {
+        // Semi-transparent white
+        g2.setColor(new Color(255, 255, 255, 50));
+        g2.setStroke(new BasicStroke(1));
+
+        // Vertical lines
+        for (int col = 0; col <= maxWorldCol; col++) {
+            int x = col * tileSize;
+            g2.drawLine(x, 0, x, maxWorldRow * tileSize);
+        }
+
+        // Horizontal lines
+        for (int row = 0; row <= maxWorldRow; row++) {
+            int y = row * tileSize;
+            g2.drawLine(0, y, maxWorldCol * tileSize, y);
+        }
+    }
+
+    public Entity[][][] getAllEntities() {
+        return new Entity[][][] {
+                npc,
+                enemy,
+                obj,
+                col,
+                proj
+        };
+    }
     public Entity[][] getEntityList(Entity entity) {
 
         if (entity instanceof NPC) {
