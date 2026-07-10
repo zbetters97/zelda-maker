@@ -20,7 +20,7 @@ public class PRJ_Fireball extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/fireball_down_1", 35, 35);
+        sprite = up1 = setupImage("/projectiles/fireball_down_1", 35, 35);
         up2 = setupImage("/projectiles/fireball_down_2", 35, 35);
     }
 

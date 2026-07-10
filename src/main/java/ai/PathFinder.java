@@ -85,7 +85,7 @@ public class PathFinder {
 
             // Check tiles
             Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
-            if (tile.hasCollision || tile.isPit || tile.isWater) {
+            if (tile.isNotTraversable()) {
                 node[col][row].solid = true;
             }
 

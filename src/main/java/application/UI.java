@@ -55,8 +55,8 @@ public class UI {
      * Called by Constructor
      */
     private void importFont() {
-        try {
-            InputStream is = getClass().getResourceAsStream("/font/pokemon-ds.ttf");
+
+        try (InputStream is = getClass().getResourceAsStream("/font/pokemon-ds.ttf")) {
             PK_DS = Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(is));
         }
         catch (FontFormatException | IOException e) {
@@ -176,7 +176,7 @@ public class UI {
         if (gp.player.getItem() != null) {
             x += 10;
             y += 10;
-            g2.drawImage(gp.player.getItem().image, x, y, gp.tileSize + 10, gp.tileSize + 10, null);
+            g2.drawImage(gp.player.getItem().getSprite(), x, y, gp.tileSize + 10, gp.tileSize + 10, null);
         }
 
         // DRAW ITEM BUTTON
@@ -443,9 +443,9 @@ public class UI {
         y += lineHeight;
         g2.drawString("World Y: " + gp.player.getWorldPoint().y, x, y);
         y += lineHeight;
-        g2.drawString("Column: " + gp.player.getCenterX() / gp.tileSize, x, y);
+        g2.drawString("Column: " + gp.player.getAI().getCenterX(gp.player) / gp.tileSize, x, y);
         y += lineHeight;
-        g2.drawString("Row: " + gp.player.getCenterY() / gp.tileSize, x, y);
+        g2.drawString("Row: " + gp.player.getAI().getCenterY(gp.player) / gp.tileSize, x, y);
     }
 
     private void drawPlayerHitbox() {

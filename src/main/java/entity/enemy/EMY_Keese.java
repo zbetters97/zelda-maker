@@ -22,12 +22,23 @@ public class EMY_Keese extends Enemy {
 
     @Override
     protected void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/enemy/keese_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/enemy/keese_down_2");
+        sprite = up1 = setupImage("/enemy/keese_down_1");
+        up2 = setupImage("/enemy/keese_down_2");
     }
 
     @Override
     protected void setAction() {
         setDirection(25);
+    }
+
+    @Override
+    protected void getSpriteImage() {
+
+        if (spriteNum == 1) {
+            image = up1;
+        }
+        else {
+            image = up2;
+        }
     }
 }

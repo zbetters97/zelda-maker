@@ -42,7 +42,7 @@ public class EMY_Octorok extends Enemy {
     protected void getImages() {
         up1 = setupImage("/enemy/octo_up_1");
         up2 = setupImage("/enemy/octo_up_2");
-        down1 = setupImage("/enemy/octo_down_1");
+        sprite = down1 = setupImage("/enemy/octo_down_1");
         down2 = setupImage("/enemy/octo_down_2");
         left1 = setupImage("/enemy/octo_left_1");
         left2 = setupImage("/enemy/octo_left_2");
@@ -85,18 +85,18 @@ public class EMY_Octorok extends Enemy {
     private void setDirection() {
         switch (direction) {
             case UP, DOWN -> {
-                if (gp.player.getCenterX() >= getCenterX()) {
+                if (ai.getCenterX(gp.player) >= ai.getCenterX(this)) {
                     lockonDirection = RIGHT;
                 }
-                else if (gp.player.getCenterX() < getCenterX()) {
+                else if (ai.getCenterX(gp.player) < ai.getCenterX(this)) {
                     lockonDirection = LEFT;
                 }
             }
             case LEFT, RIGHT -> {
-                if (gp.player.getCenterY() >= getCenterY()) {
+                if (ai.getCenterY(gp.player) >= ai.getCenterY(this)) {
                     lockonDirection = DOWN;
                 }
-                else if (gp.player.getCenterY() < getCenterY()) {
+                else if (ai.getCenterY(gp.player) < ai.getCenterY(this)) {
                     lockonDirection = UP;
                 }
             }

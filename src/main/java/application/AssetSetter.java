@@ -4,6 +4,8 @@ import entity.enemy.*;
 import entity.npc.NPC_OldMan;
 import entity.object.*;
 
+import java.awt.*;
+
 public record AssetSetter(GamePanel gp) {
 
     public void setup() {
@@ -33,12 +35,5 @@ public record AssetSetter(GamePanel gp) {
         int i = 0;
 
         gp.obj[mapNum][i] = new OBJ_Chest(gp, 14, 21);
-        i++;
-
-        gp.obj[mapNum][i] = new OBJ_Switch(gp, 21, 21);
-        i++;
-        gp.obj[mapNum][i] = new OBJ_Block_Blue(gp, 22, 20);
-        i++;
-        gp.obj[mapNum][i] = new OBJ_Block_Red(gp, 22, 21);
     }
 }

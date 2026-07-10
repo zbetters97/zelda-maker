@@ -13,6 +13,6 @@ public class ITM_Shovel extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_shovel");
+        sprite = setupImage("/items/itm_shovel");
     }
 }

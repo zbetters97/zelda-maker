@@ -27,7 +27,7 @@ public class PRJ_Arrow extends Projectile {
     @Override
     public void getImages() {
         up1 = setupImage("/projectiles/arrow_up_1", 35, 35);
-        down1 = setupImage("/projectiles/arrow_down_1", 35, 35);
+        sprite = down1 = setupImage("/projectiles/arrow_down_1", 35, 35);
         left1 = setupImage("/projectiles/arrow_left_1", 35, 35);
         right1 = setupImage("/projectiles/arrow_right_1", 35, 35);
     }

@@ -23,9 +23,9 @@ public class EMY_ChuChu_Green extends Enemy {
 
     @Override
     protected void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/enemy/chuchu_green_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/enemy/chuchu_green_down_2");
-        up3 = down3 = left3 = right3 = setupImage("/enemy/chuchu_green_down_3");
+        up1 = setupImage("/enemy/chuchu_green_down_1");
+        sprite = up2 = setupImage("/enemy/chuchu_green_down_2");
+        up3 = setupImage("/enemy/chuchu_green_down_3");
     }
 
     @Override

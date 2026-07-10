@@ -8,16 +8,13 @@ public class NPC_OldMan extends NPC {
 
     public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
-
-        speed = 1;
-        defaultSpeed = speed;
     }
 
     @Override
     protected void getImages() {
         up1 = setupImage("/npc/oldman_up_1");
         up2 = setupImage("/npc/oldman_up_2");
-        down1 = setupImage("/npc/oldman_down_1");
+        sprite = down1 = setupImage("/npc/oldman_down_1");
         down2 = setupImage("/npc/oldman_down_2");
         left1 = setupImage("/npc/oldman_left_1");
         left2 = setupImage("/npc/oldman_left_2");

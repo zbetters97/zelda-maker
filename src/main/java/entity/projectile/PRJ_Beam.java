@@ -21,7 +21,7 @@ public class PRJ_Beam extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/beam_down_1");
+        sprite = up1 = setupImage("/projectiles/beam_down_1");
         left1 = setupImage("/projectiles/beam_left_1");
     }
 

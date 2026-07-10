@@ -16,4 +16,9 @@ public class Item extends Entity {
     protected void use() {
         user.setAction(action);
     }
+
+    @Override
+    protected void getSpriteImage() {
+        image = sprite;
+    }
 }

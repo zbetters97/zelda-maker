@@ -18,7 +18,7 @@ public class OBJ_Chest extends Object {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/objects/obj_chest_closed");
+        sprite = up1 = setupImage("/objects/obj_chest_closed");
         up2 = setupImage("/objects/obj_chest_opened");
     }
 

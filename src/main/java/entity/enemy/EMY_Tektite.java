@@ -31,8 +31,8 @@ public class EMY_Tektite extends Entity {
 
     @Override
     protected void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/enemy/tektite_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/enemy/tektite_down_2");
+        sprite = up1 = setupImage("/enemy/tektite_down_1");
+        up2 = setupImage("/enemy/tektite_down_2");
     }
 
     @Override
@@ -62,6 +62,17 @@ public class EMY_Tektite extends Entity {
         if (24 <= ++actionLockCounter) {
             actionLockCounter = 0;
             speed = 0;
+        }
+    }
+
+    @Override
+    protected void getSpriteImage() {
+
+        if (spriteNum == 1) {
+            image = up1;
+        }
+        else {
+            image = up2;
         }
     }
 }

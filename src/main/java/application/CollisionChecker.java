@@ -74,7 +74,7 @@ public record CollisionChecker(GamePanel gp) {
     private void checkTileCollision(Entity entity, Tile tile) {
 
         // Bottomless pits
-        if (tile.isPit) {
+        if (tile.isPit()) {
 
             // Entity in air
             if (entity.getElevated()) {
@@ -87,7 +87,7 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
         // Water
-        else if (tile.isWater) {
+        else if (tile.isWater()) {
 
             // Entity in air or can swim
             if (entity.getElevated() || entity.getCanSwim()) {
@@ -100,7 +100,7 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
         // Collision titles
-        else if (tile.hasCollision) {
+        else if (tile.hasCollision()) {
             entity.setCollision(true);
         }
         // Fish enemies cannot move outside of water
@@ -112,10 +112,10 @@ public record CollisionChecker(GamePanel gp) {
     public void checkHazard(Entity entity) {
         Tile tile = getCurrentTile(entity);
 
-        if (tile.isPit) {
+        if (tile.isPit()) {
             handlePit(entity);
         }
-        else if (tile.isWater) {
+        else if (tile.isWater()) {
             handleWater(entity);
         }
         // Player is on ground, set safe X/Y

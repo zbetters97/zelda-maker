@@ -97,7 +97,7 @@ public class Player extends Entity {
     protected void getImages() {
         up1 = setupImage("/player/boy_up_1");
         up2 = setupImage("/player/boy_up_2");
-        down1 = setupImage("/player/boy_down_1");
+        sprite = down1 = setupImage("/player/boy_down_1");
         down2 = setupImage("/player/boy_down_2");
         left1 = setupImage("/player/boy_left_1");
         left2 = setupImage("/player/boy_left_2");

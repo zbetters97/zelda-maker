@@ -32,7 +32,7 @@ public class PRJ_Claw extends Projectile {
     @Override
     public void getImages() {
         up1 = setupImage("/projectiles/hookshot_up_1");
-        down1 = setupImage("/projectiles/hookshot_down_1");
+        sprite = down1 = setupImage("/projectiles/hookshot_down_1");
         left1 = setupImage("/projectiles/hookshot_left_1");
         right1 = setupImage("/projectiles/hookshot_right_1");
     }

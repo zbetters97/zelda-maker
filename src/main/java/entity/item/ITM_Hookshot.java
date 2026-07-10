@@ -15,7 +15,7 @@ public class ITM_Hookshot extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_hookshot");
+        sprite = setupImage("/items/itm_hookshot");
     }
 
     @Override

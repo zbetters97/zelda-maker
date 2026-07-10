@@ -13,7 +13,7 @@ public class ITM_Feather extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_feather");
+        sprite = setupImage("/items/itm_feather");
     }
 
     @Override

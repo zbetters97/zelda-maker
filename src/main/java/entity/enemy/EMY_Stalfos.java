@@ -30,7 +30,7 @@ public class EMY_Stalfos extends Enemy {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/enemy/stalfos_down_1");
+        sprite = up1 = setupImage("/enemy/stalfos_down_1");
         up2 = setupImage("/enemy/stalfos_down_2");
     }
 

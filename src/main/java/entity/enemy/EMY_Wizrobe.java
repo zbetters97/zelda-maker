@@ -28,11 +28,11 @@ public class EMY_Wizrobe extends Enemy {
     @Override
     protected void getImages() {
         up1 = setupImage("/enemy/wizzrobe_up_1");
-        down1 = setupImage("/enemy/wizzrobe_down_1");
+        sprite = down1 = setupImage("/enemy/wizzrobe_down_1");
         left1 = setupImage("/enemy/wizzrobe_left_1");
         right1 = setupImage("/enemy/wizzrobe_right_1");
 
-        up2 = setupImage("/enemy/wizzrobe_down_2");
+        down2 = setupImage("/enemy/wizzrobe_down_2");
     }
 
     @Override
@@ -162,7 +162,7 @@ public class EMY_Wizrobe extends Enemy {
             };
         }
         else {
-            image = up2;
+            image = down2;
         }
     }
 }

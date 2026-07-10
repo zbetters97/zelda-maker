@@ -14,7 +14,7 @@ public class ITM_Bow extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_bow");
+        sprite = setupImage("/items/itm_bow");
     }
 
     @Override

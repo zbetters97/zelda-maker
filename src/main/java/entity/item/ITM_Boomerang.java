@@ -15,7 +15,7 @@ public class ITM_Boomerang extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_boomerang");
+        sprite = setupImage("/items/itm_boomerang");
     }
 
     @Override

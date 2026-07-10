@@ -19,7 +19,7 @@ public class OBJ_Pot extends Object {
 
     @Override
     protected void getImages() {
-        down1 = setupImage("/objects/obj_pot");
+        sprite = setupImage("/objects/obj_pot");
     }
 
     @Override
@@ -41,5 +41,10 @@ public class OBJ_Pot extends Object {
     public void interact() {
         alive = false;
         dropItem(loot);
+    }
+
+    @Override
+    protected void getSpriteImage() {
+        image = sprite;
     }
 }

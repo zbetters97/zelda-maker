@@ -5,10 +5,39 @@ import java.awt.image.BufferedImage;
 /** TILE CLASS **/
 public class Tile {
     // Image file
-    public BufferedImage image;
+    protected BufferedImage image;
 
     // Attributes
-    public boolean hasCollision = false;
-    public boolean isWater = false;
-    public boolean isPit = false;
+    protected boolean collision = false;
+    protected boolean water = false;
+    protected boolean pit = false;
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public boolean hasCollision() {
+        return collision;
+    }
+    public void setCollision(boolean collision) {
+        this.collision = collision;
+    }
+
+    public boolean isWater() {
+        return water;
+    }
+    public void setWater(boolean water) {
+        this.water = water;
+    }
+
+    public boolean isPit() {
+        return pit;
+    }
+    public void setPit(boolean pit) {
+        this.pit = pit;
+    }
+
+    public boolean isNotTraversable() {
+        return collision || water || pit;
+    }
 }

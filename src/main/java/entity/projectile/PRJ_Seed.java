@@ -15,7 +15,7 @@ public class PRJ_Seed extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/seed_down_1", 35, 35);
+        sprite = setupImage("/projectiles/seed_down_1", 35, 35);
     }
 
     @Override
@@ -27,6 +27,6 @@ public class PRJ_Seed extends Projectile {
 
     @Override
     protected void getSpriteImage() {
-        image = up1;
+        image = sprite;
     }
 }

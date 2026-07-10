@@ -37,13 +37,13 @@ public class EMY_Zora extends Enemy {
 
     @Override
     protected void getImages() {
-        up1 = down1 = left1 = right1 = setupImage("/enemy/zora_down_1");
-        up2 = down2 = left2 = right2 = setupImage("/enemy/zora_down_2");
+        sprite = up1 = setupImage("/enemy/zora_down_1");
+        up2 = setupImage("/enemy/zora_down_2");
     }
 
     protected void getAttackImages() {
-        attackUp1 = attackDown1 = attackLeft1 = attackRight1 = setupImage("/enemy/zora_attack_down_1");
-        attackUp2 = attackDown2 = attackLeft2 = attackRight2 = setupImage("/enemy/zora_attack_down_1");
+        attackUp1 = setupImage("/enemy/zora_attack_down_1");
+        attackUp2 = setupImage("/enemy/zora_attack_down_1");
     }
 
     public void update() {
@@ -110,5 +110,25 @@ public class EMY_Zora extends Enemy {
         }
 
         super.manageValues();
+    }
+
+    protected void getSpriteImage() {
+
+        if (action == Action.ATTACKING) {
+            if (attackNum == 1) {
+                image = attackUp1;
+            }
+            else {
+                image = attackUp2;
+            }
+        }
+        else {
+            if (spriteNum == 1) {
+                image = up1;
+            }
+            else if (spriteNum == 2) {
+                image = up2;
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package application;
 
 import ai.PathFinder;
+import data.EntityGenerator;
 import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
@@ -76,6 +77,9 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
+
+    /** DATA */
+    public final EntityGenerator eGenerator = new EntityGenerator(this);
 
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();

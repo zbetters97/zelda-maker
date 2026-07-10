@@ -37,7 +37,7 @@ public class EMY_Beamos extends Enemy {
     protected void getImages() {
         up1 = setupImage("/enemy/beamos_up_1");
         up2 = setupImage("/enemy/beamos_up_2");
-        down1 = setupImage("/enemy/beamos_down_1");
+        sprite = down1 = setupImage("/enemy/beamos_down_1");
         down2 = setupImage("/enemy/beamos_down_2");
         left1 = setupImage("/enemy/beamos_left_1");
         left2 = setupImage("/enemy/beamos_left_2");

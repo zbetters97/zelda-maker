@@ -14,7 +14,7 @@ public class COL_Heart extends Collectable {
 
     @Override
     protected void getImages() {
-        down1 = setupImage("/collectables/col_heart");
+        sprite = setupImage("/collectables/col_heart");
     }
 
     @Override

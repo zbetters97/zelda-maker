@@ -14,7 +14,7 @@ public class COL_Rupee_Green extends Collectable {
 
     @Override
     protected void getImages() {
-        down1 = setupImage("/collectables/col_rupee_green");
+        sprite = setupImage("/collectables/col_rupee_green");
     }
 
     @Override

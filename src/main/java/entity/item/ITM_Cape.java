@@ -13,7 +13,7 @@ public class ITM_Cape extends Item {
 
     @Override
     protected void getImages() {
-        image = setupImage("/items/itm_cape");
+        sprite = setupImage("/items/itm_cape");
     }
 
     @Override

@@ -24,7 +24,7 @@ public class PRJ_Magic extends Projectile {
     @Override
     public void getImages() {
         up1 = setupImage("/projectiles/magic_up_1");
-        down1 = setupImage("/projectiles/magic_down_1");
+        sprite = down1 = setupImage("/projectiles/magic_down_1");
         left1 = setupImage("/projectiles/magic_left_1");
         right1 = setupImage("/projectiles/magic_right_1");
     }

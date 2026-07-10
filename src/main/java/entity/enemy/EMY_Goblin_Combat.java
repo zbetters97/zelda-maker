@@ -29,7 +29,7 @@ public class EMY_Goblin_Combat extends Enemy {
     protected void getImages() {
         up1 = setupImage("/enemy/goblin_up_1");
         up2 = setupImage("/enemy/goblin_up_2");
-        down1 = setupImage("/enemy/goblin_down_1");
+        sprite = down1 = setupImage("/enemy/goblin_down_1");
         down2 = setupImage("/enemy/goblin_down_2");
         left1 = setupImage("/enemy/goblin_left_1");
         left2 = setupImage("/enemy/goblin_left_2");

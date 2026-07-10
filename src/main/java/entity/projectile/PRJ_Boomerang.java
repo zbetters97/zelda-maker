@@ -28,7 +28,7 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/boomerang_down_1");
+        sprite = up1 = setupImage("/projectiles/boomerang_down_1");
         up2 = setupImage("/projectiles/boomerang_down_2");
     }
 
@@ -78,7 +78,7 @@ public class PRJ_Boomerang extends Projectile {
     private void returnToUser() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (getCenterY() < user.getCenterY()) {
+                if (ai.getCenterY(this) < ai.getCenterY(user)) {
                     worldPoint.y += 5;
                 }
                 else {
@@ -86,7 +86,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (getCenterY() > user.getCenterY()) {
+                if (ai.getCenterY(this) > ai.getCenterY(user)) {
                     worldPoint.y -= 5;
                 }
                 else {
@@ -94,7 +94,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case LEFT -> {
-                if (getCenterX() < user.getCenterX()) {
+                if (ai.getCenterX(this) < ai.getCenterX(user)) {
                     worldPoint.x += 5;
                 }
                 else {
@@ -102,7 +102,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (getCenterX() > user.getCenterX()) {
+                if (ai.getCenterX(this) > ai.getCenterX(user)) {
                     worldPoint.x -= 5;
                 }
                 else {

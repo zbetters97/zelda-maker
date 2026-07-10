@@ -22,7 +22,7 @@ public class PRJ_Bone extends Projectile {
 
     @Override
     public void getImages() {
-        up1 = setupImage("/projectiles/bone_down_1");
+        sprite = up1 = setupImage("/projectiles/bone_down_1");
         up2 = setupImage("/projectiles/bone_down_2");
     }
 

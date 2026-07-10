@@ -20,14 +20,9 @@ public class TileManager {
     /* [MAP NUMBER][ROW][COL] */
     public final int[][][] mapTileNum;
 
-    /* TILE NUMBERS */
-    private final int oceanTile1 = 19;
-    private final int oceanTile2 = 39;
-
     /* WATER ANIMATION COUNTER */
     private int waterNum = 1;
     private int waterCounter = 0;
-    private final int waterCounterMax = 45;
 
     /**
      * CONSTRUCTOR
@@ -145,9 +140,9 @@ public class TileManager {
 
             tiles[index].image = GamePanel.utility.scaleImage(tiles[index].image, gp.tileSize, gp.tileSize);
 
-            tiles[index].hasCollision = hasCollision;
-            tiles[index].isWater = isWater;
-            tiles[index].isPit = isPit;
+            tiles[index].setCollision(hasCollision);
+            tiles[index].setWater(isWater);
+            tiles[index].setPit(isPit);
         }
         catch (IOException e) {
             System.out.println(e.getMessage());
@@ -162,6 +157,7 @@ public class TileManager {
     public void draw(Graphics2D g2) {
 
         // Animate water
+        int waterCounterMax = 45;
         if (waterCounterMax <= ++waterCounter) {
             waterCounter = 0;
             if (waterNum == 1) {
@@ -218,6 +214,9 @@ public class TileManager {
             }
 
             // Draw tiles within player boundary
+            /* TILE NUMBERS */
+            int oceanTile1 = 19;
+            int oceanTile2 = 39;
             if (worldX + gp.tileSize > gp.player.getWorldPoint().x - gp.player.getScreenPoint().x &&
                     worldX - gp.tileSize < gp.player.getWorldPoint().x + gp.player.getScreenPoint().x &&
                     worldY + gp.tileSize > gp.player.getWorldPoint().y - gp.player.getScreenPoint().y &&

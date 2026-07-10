@@ -15,7 +15,7 @@ public class NPC extends Entity {
 
         animationSpeed = 15;
 
-        defaultSpeed = 0;
+        defaultSpeed = 1;
         speed = defaultSpeed;
 
         ai = new EntityAI(gp, this);

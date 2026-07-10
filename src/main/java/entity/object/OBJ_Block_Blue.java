@@ -15,7 +15,7 @@ public class OBJ_Block_Blue extends Object {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/objects/obj_block_blue_on");
+        sprite = up1 = setupImage("/objects/obj_block_blue_on");
         up2 = setupImage("/objects/obj_block_blue_off");
     }
 

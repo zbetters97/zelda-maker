@@ -140,9 +140,10 @@ public class Entity {
     /** SPRITE ATTRIBUTES */
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
-    public BufferedImage image;
+    protected BufferedImage sprite;
     protected BufferedImage
-            up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3,
+            image,
+            up1, up2, up3, down1, down2, left1, left2, right1, right2,
             attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
 
@@ -833,6 +834,10 @@ public class Entity {
     }
 
     /** GETTERS and SETTERS */
+    public BufferedImage getSprite() {
+        return sprite;
+    }
+
     public Point getScreenPoint() {
         return new Point(
                 worldPoint.x - gp.player.worldPoint.x + gp.player.screenPoint.x,
@@ -857,13 +862,6 @@ public class Entity {
     }
     public void setWorldPointY(int y) {
         this.worldPoint.y = y;
-    }
-
-    public int getCenterX() {
-        return worldPoint.x + up1.getWidth() / 2;
-    }
-    public int getCenterY() {
-        return worldPoint.y + up1.getHeight() / 2;
     }
 
     public Rectangle getHitbox() {
