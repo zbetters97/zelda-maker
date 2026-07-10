@@ -2,6 +2,7 @@ package application;
 
 import ai.PathFinder;
 import data.EntityGenerator;
+import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
@@ -79,6 +80,7 @@ public class GamePanel extends JPanel implements Runnable {
     public PathFinder pFinder = new PathFinder(this);
 
     /** DATA */
+    public SaveLoad saveLoad = new SaveLoad(this);
     public final EntityGenerator eGenerator = new EntityGenerator(this);
 
     /** ENTITIES */

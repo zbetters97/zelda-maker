@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../baba-is-you-editor/baba-is-you-editor.iml" filepath="$PROJECT_DIR$/../baba-is-you-editor/baba-is-you-editor.iml" />
       <module fileurl="file://$PROJECT_DIR$/legend-of-zelda.iml" filepath="$PROJECT_DIR$/legend-of-zelda.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../loz-links-reawakening/loz-links-reawakening.iml" filepath="$PROJECT_DIR$/../loz-links-reawakening/loz-links-reawakening.iml" />
     </modules>
   </component>
 </project>

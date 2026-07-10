@@ -360,7 +360,7 @@ public class Player extends Entity {
         }
         // Switch item
         else if (gp.keyH.startPressed) {
-           switchItem();
+            switchItem();
         }
     }
 
