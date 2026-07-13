@@ -113,7 +113,7 @@ public class EMY_Stalfos extends Enemy {
 
         if (action == Action.JUMPING) {
             g2.setColor(Color.BLACK);
-            g2.fillOval(tempScreenPoint.x + 10, tempScreenPoint.y + 50, 30, 10);
+            g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
         }
     }
 
@@ -122,6 +122,7 @@ public class EMY_Stalfos extends Enemy {
 
         if (action == Action.JUMPING) {
             image = attackUp1;
+            drawOffset.y -= 15;
         }
         else {
             if (spriteNum == 1) {

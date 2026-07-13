@@ -2,7 +2,6 @@ package data;
 
 import application.GamePanel;
 import entity.Entity;
-import entity.Player;
 import entity.collectable.*;
 import entity.enemy.*;
 import entity.npc.*;
@@ -14,16 +13,12 @@ import java.util.function.Supplier;
 
 public class EntityGenerator {
 
-    public final Map<String, Supplier<Entity>> playerFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> npcFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> enemyFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> objectFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> collectableFactory = new LinkedHashMap<>();
 
     public EntityGenerator(GamePanel gp) {
-
-        // Player
-        playerFactory.put(Player.playerName, () -> new Player(gp));
 
         // NPCs
         npcFactory.put(NPC_OldMan.npcName, () -> new NPC_OldMan(gp, 0, 0));
@@ -61,12 +56,7 @@ public class EntityGenerator {
 
     public Entity getEntity(String eName) {
 
-        Entity entity;
-
-        entity = getFromFactory(playerFactory, eName);
-        if (entity != null) return entity;
-
-        entity = getFromFactory(npcFactory, eName);
+        Entity entity = getFromFactory(npcFactory, eName);
         if (entity != null) return entity;
 
         entity = getFromFactory(enemyFactory, eName);

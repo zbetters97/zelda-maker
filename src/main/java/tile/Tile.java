@@ -4,13 +4,14 @@ import java.awt.image.BufferedImage;
 
 /** TILE CLASS **/
 public class Tile {
+
     // Image file
     protected BufferedImage image;
 
     // Attributes
-    protected boolean collision = false;
-    protected boolean water = false;
-    protected boolean pit = false;
+    private boolean collision = false;
+    private boolean water = false;
+    private boolean pit = false;
 
     public BufferedImage getImage() {
         return image;

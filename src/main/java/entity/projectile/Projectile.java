@@ -109,14 +109,14 @@ public class Projectile extends Entity {
 
         int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
         if (object != -1 ) {
-            gp.obj[gp.currentMap][object].interact();
+            gp.obj[object].interact();
             health = 0;
             collisionOn = true;
         }
         else {
             object = gp.cChecker.checkMovementCollision(this, gp.obj);
             if (object != -1 ) {
-                gp.obj[gp.currentMap][object].interact();
+                gp.obj[object].interact();
                 health = 0;
                 collisionOn = true;
             }

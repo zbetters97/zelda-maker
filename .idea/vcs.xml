@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../baba-is-you-editor" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../loz-links-reawakening" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>
 </project>

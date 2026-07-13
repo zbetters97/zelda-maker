@@ -84,27 +84,27 @@ public class PathFinder {
         while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
             // Check tiles
-            Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
+            Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
             if (tile.isNotTraversable()) {
                 node[col][row].solid = true;
             }
 
             // Check objects
-            for (int i = 0; i < gp.obj[0].length; i++) {
+            for (int i = 0; i < gp.obj.length; i++) {
 
-                if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getCollision()) {
-                    int iCol = gp.obj[gp.currentMap][i].getWorldPoint().x / gp.tileSize;
-                    int iRow = gp.obj[gp.currentMap][i].getWorldPoint().y / gp.tileSize;
+                if (gp.obj[i] != null && gp.obj[i].getCollision()) {
+                    int iCol = gp.obj[i].getWorldPoint().x / gp.tileSize;
+                    int iRow = gp.obj[i].getWorldPoint().y / gp.tileSize;
                     node[iCol][iRow].solid = true;
                 }
             }
 
             // Check NPCs
-            for (int i = 0; i < gp.npc[0].length; i++) {
+            for (int i = 0; i < gp.npc.length; i++) {
 
-                if (gp.npc[gp.currentMap][i] != null && gp.npc[gp.currentMap][i].getSpeed() == 0) {
-                    int iCol = gp.npc[gp.currentMap][i].getWorldPoint().x / gp.tileSize;
-                    int iRow = gp.npc[gp.currentMap][i].getWorldPoint().y / gp.tileSize;
+                if (gp.npc[i] != null && gp.npc[i].getSpeed() == 0) {
+                    int iCol = gp.npc[i].getWorldPoint().x / gp.tileSize;
+                    int iRow = gp.npc[i].getWorldPoint().y / gp.tileSize;
                     node[iCol][iRow].solid = true;
                 }
             }

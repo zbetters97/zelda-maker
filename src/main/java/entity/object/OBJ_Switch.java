@@ -32,12 +32,12 @@ public class OBJ_Switch extends Object {
     }
     
     private void flipSwitches() {
-        for (int i = 0; i < gp.obj[0].length; i++) {
+        for (int i = 0; i < gp.obj.length; i++) {
 
             // Find other switches in object list
-            if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getName().equals(name)) {
-                gp.obj[gp.currentMap][i].setOpened(opened);
-                gp.obj[gp.currentMap][i].setInvincible(true);
+            if (gp.obj[i] != null && gp.obj[i].getName().equals(name)) {
+                gp.obj[i].setOpened(opened);
+                gp.obj[i].setInvincible(true);
             }
         }
     }

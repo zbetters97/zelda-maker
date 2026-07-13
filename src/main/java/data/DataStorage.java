@@ -12,15 +12,15 @@ public class DataStorage implements Serializable {
     String file_date;
 
     // PLAYER DATA
-    int cMap, cArea, pWorldX, pWorldY;
+    int pWorldX, pWorldY;
     String direction;
     int maxHealth, health, attack;
 
     // ENEMIES
-    int[][] enemyWorldX, enemyWorldY, enemyHealth;
-    boolean[][] enemyAlive;
+    int[] enemyWorldX, enemyWorldY, enemyHealth;
+    boolean[] enemyAlive;
 
     // MAP OBJECTS
-    String[][] mapObjectNames, mapObjectDirections;
-    int[][] mapObjectWorldX, mapObjectWorldY;
+    String[] mapObjectNames, mapObjectDirections;
+    int[] mapObjectWorldX, mapObjectWorldY;
 }

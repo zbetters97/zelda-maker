@@ -1,4 +1,4 @@
-package entity;
+package UI;
 
 import application.GamePanel;
 

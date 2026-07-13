@@ -30,10 +30,8 @@ public class SaveLoad {
             ds.file_date = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date(System.currentTimeMillis()));
 
             // PLAYER DATA
-            ds.cMap = gp.currentMap;
             ds.pWorldX = gp.player.getWorldPoint().x;
             ds.pWorldY = gp.player.getWorldPoint().y;
-            ds.cArea = gp.currentArea;
 
             ds.direction = gp.player.getDirection().toString();
             ds.maxHealth = gp.player.getMaxHealth();
@@ -41,46 +39,45 @@ public class SaveLoad {
             ds.attack = gp.player.getAttack();
 
             // ENEMIES
-            ds.enemyWorldX = new int[gp.maxMap][gp.enemy[0].length];
-            ds.enemyWorldY = new int[gp.maxMap][gp.enemy[0].length];
-            ds.enemyHealth = new int[gp.maxMap][gp.enemy[0].length];
-            ds.enemyAlive = new boolean[gp.maxMap][gp.enemy[0].length];
+            ds.enemyWorldX = new int[gp.enemy.length];
+            ds.enemyWorldY = new int[gp.enemy.length];
+            ds.enemyHealth = new int[gp.enemy.length];
+            ds.enemyAlive = new boolean[gp.enemy.length];
 
             // MAP OBJECTS
-            ds.mapObjectNames = new String[gp.maxMap][gp.obj[0].length];
-            ds.mapObjectWorldX = new int[gp.maxMap][gp.obj[0].length];
-            ds.mapObjectWorldY = new int[gp.maxMap][gp.obj[0].length];
-            ds.mapObjectDirections = new String[gp.maxMap][gp.obj[0].length];
+            ds.mapObjectNames = new String[gp.obj.length];
+            ds.mapObjectWorldX = new int[gp.obj.length];
+            ds.mapObjectWorldY = new int[gp.obj.length];
+            ds.mapObjectDirections = new String[gp.obj.length];
 
-            for (int mapNum = 0; mapNum < gp.maxMap; mapNum++) {
-
-                // ENEMIES
-                for (int i = 0; i < gp.enemy[0].length; i++) {
-                    if (gp.enemy[mapNum][i] == null) {
-                        ds.enemyAlive[mapNum][i] = false;
-                    }
-                    else {
-                        ds.enemyWorldX[mapNum][i] = gp.enemy[mapNum][i].getWorldPoint().x;
-                        ds.enemyWorldY[mapNum][i] = gp.enemy[mapNum][i].getWorldPoint().y;
-                        ds.enemyHealth[mapNum][i] = gp.enemy[mapNum][i].getHealth();
-                        ds.enemyAlive[mapNum][i] = true;
-                    }
+           
+            // ENEMIES
+            for (int i = 0; i < gp.enemy.length; i++) {
+                if (gp.enemy[i] == null) {
+                    ds.enemyAlive[i] = false;
                 }
-
-                // MAP OBJECTS
-                for (int i = 0; i < gp.obj[0].length; i++) {
-
-                    if (gp.obj[mapNum][i] == null) {
-                        ds.mapObjectNames[mapNum][i] = "NULL";
-                    }
-                    else {
-                        ds.mapObjectNames[mapNum][i] = gp.obj[mapNum][i].getName();
-                        ds.mapObjectWorldX[mapNum][i] = gp.obj[mapNum][i].getWorldPoint().x;
-                        ds.mapObjectWorldY[mapNum][i] = gp.obj[mapNum][i].getWorldPoint().y;
-                        ds.mapObjectDirections[mapNum][i] = gp.obj[mapNum][i].getDirection().toString();
-                    }
+                else {
+                    ds.enemyWorldX[i] = gp.enemy[i].getWorldPoint().x;
+                    ds.enemyWorldY[i] = gp.enemy[i].getWorldPoint().y;
+                    ds.enemyHealth[i] = gp.enemy[i].getHealth();
+                    ds.enemyAlive[i] = true;
                 }
             }
+
+            // MAP OBJECTS
+            for (int i = 0; i < gp.obj.length; i++) {
+
+                if (gp.obj[i] == null) {
+                    ds.mapObjectNames[i] = "NULL";
+                }
+                else {
+                    ds.mapObjectNames[i] = gp.obj[i].getName();
+                    ds.mapObjectWorldX[i] = gp.obj[i].getWorldPoint().x;
+                    ds.mapObjectWorldY[i] = gp.obj[i].getWorldPoint().y;
+                    ds.mapObjectDirections[i] = gp.obj[i].getDirection().toString();
+                }
+            }
+            
 
             oos.writeObject(ds);
             oos.close();
@@ -98,8 +95,6 @@ public class SaveLoad {
             DataStorage ds = (DataStorage) ois.readObject();
 
             // PLAYER DATA
-            gp.currentMap = ds.cMap;
-            gp.currentArea = ds.cArea;
             gp.player.setWorldPoint(new Point(ds.pWorldX, ds.pWorldY));
 
 
@@ -107,39 +102,38 @@ public class SaveLoad {
             gp.player.setHealth(ds.health);
             gp.player.setAttack(ds.attack);
 
-            for (int mapNum = 0; mapNum < gp.maxMap; mapNum++) {
 
-                // ENEMIES
-                for (int i = 0; i < gp.enemy[0].length; i++) {
-                    if (!ds.enemyAlive[mapNum][i]) {
-                        gp.enemy[mapNum][i] = null;
-                    }
-                    else if (gp.enemy[mapNum][i] != null) {
-                        gp.enemy[mapNum][i].setWorldPoint(new Point(ds.enemyWorldX[mapNum][i], ds.enemyWorldY[mapNum][i]));
-                        gp.enemy[mapNum][i].setHealth(ds.enemyHealth[mapNum][i]);
-                    }
+            // ENEMIES
+            for (int i = 0; i < gp.enemy.length; i++) {
+                if (!ds.enemyAlive[i]) {
+                    gp.enemy[i] = null;
                 }
-
-                // MAP OBJECTS
-                for (int i = 0; i < gp.obj[0].length; i++) {
-
-                    if (ds.mapObjectNames[mapNum][i].equals("NULL")) {
-                        gp.obj[mapNum][i] = null;
-                    }
-                    else if (gp.obj[mapNum][i] != null) {
-                        gp.obj[mapNum][i] = (Object) gp.eGenerator.getEntity(
-                                ds.mapObjectNames[mapNum][i]
-                        );
-
-                        gp.obj[mapNum][i].setWorldPoint(new Point(
-                                ds.mapObjectWorldX[mapNum][i],
-                                ds.mapObjectWorldY[mapNum][i])
-                        );
-
-                        gp.obj[mapNum][i].setDirection(GamePanel.Direction.valueOf(ds.mapObjectDirections[mapNum][i]));
-                    }
+                else if (gp.enemy[i] != null) {
+                    gp.enemy[i].setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
+                    gp.enemy[i].setHealth(ds.enemyHealth[i]);
                 }
             }
+
+            // MAP OBJECTS
+            for (int i = 0; i < gp.obj.length; i++) {
+
+                if (ds.mapObjectNames[i].equals("NULL")) {
+                    gp.obj[i] = null;
+                }
+                else if (gp.obj[i] != null) {
+                    gp.obj[i] = (Object) gp.eGenerator.getEntity(
+                            ds.mapObjectNames[i]
+                    );
+
+                    gp.obj[i].setWorldPoint(new Point(
+                            ds.mapObjectWorldX[i],
+                            ds.mapObjectWorldY[i])
+                    );
+
+                    gp.obj[i].setDirection(GamePanel.Direction.valueOf(ds.mapObjectDirections[i]));
+                }
+            }
+
 
             ois.close();
         }

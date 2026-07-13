@@ -30,13 +30,13 @@ public class OBJ_Block_Blue extends Object {
      */
     private void detectSwitch() {
 
-        for (int i = 0; i < gp.obj[0].length; i++) {
+        for (int i = 0; i < gp.obj.length; i++) {
 
             // Find switch in objects list
-            if (gp.obj[gp.currentMap][i] != null && gp.obj[gp.currentMap][i].getName().equals(OBJ_Switch.objName)) {
+            if (gp.obj[i] != null && gp.obj[i].getName().equals(OBJ_Switch.objName)) {
 
                 // Turn switch off if on
-                if (gp.obj[gp.currentMap][i].getOpened()) {
+                if (gp.obj[i].getOpened()) {
                     opened = false;
                     collisionOn = false;
                 }

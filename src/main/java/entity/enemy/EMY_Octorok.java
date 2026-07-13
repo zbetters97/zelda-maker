@@ -85,18 +85,18 @@ public class EMY_Octorok extends Enemy {
     private void setDirection() {
         switch (direction) {
             case UP, DOWN -> {
-                if (ai.getCenterX(gp.player) >= ai.getCenterX(this)) {
+                if (gp.player.getCenterX() >= getCenterX()) {
                     lockonDirection = RIGHT;
                 }
-                else if (ai.getCenterX(gp.player) < ai.getCenterX(this)) {
+                else if (gp.player.getCenterX() < getCenterX()) {
                     lockonDirection = LEFT;
                 }
             }
             case LEFT, RIGHT -> {
-                if (ai.getCenterY(gp.player) >= ai.getCenterY(this)) {
+                if (gp.player.getCenterY() >= getCenterY()) {
                     lockonDirection = DOWN;
                 }
-                else if (ai.getCenterY(gp.player) < ai.getCenterY(this)) {
+                else if (gp.player.getCenterY() < getCenterY()) {
                     lockonDirection = UP;
                 }
             }

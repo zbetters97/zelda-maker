@@ -78,7 +78,7 @@ public class PRJ_Boomerang extends Projectile {
     private void returnToUser() {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (ai.getCenterY(this) < ai.getCenterY(user)) {
+                if (getCenterY() < user.getCenterY()) {
                     worldPoint.y += 5;
                 }
                 else {
@@ -86,7 +86,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (ai.getCenterY(this) > ai.getCenterY(user)) {
+                if (getCenterY() > user.getCenterY()) {
                     worldPoint.y -= 5;
                 }
                 else {
@@ -94,7 +94,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case LEFT -> {
-                if (ai.getCenterX(this) < ai.getCenterX(user)) {
+                if (getCenterX() < user.getCenterX()) {
                     worldPoint.x += 5;
                 }
                 else {
@@ -102,7 +102,7 @@ public class PRJ_Boomerang extends Projectile {
                 }
             }
             case RIGHT -> {
-                if (ai.getCenterX(this) > ai.getCenterX(user)) {
+                if (getCenterX() > user.getCenterX()) {
                     worldPoint.x -= 5;
                 }
                 else {

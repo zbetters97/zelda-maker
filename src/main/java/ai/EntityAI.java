@@ -155,7 +155,7 @@ public class EntityAI {
         if (rate <= ++counter) {
 
             if (getXDistance(gp.player) >= getYDistance(gp.player)) {
-                if (getCenterX(gp.player) < getCenterX(entity)) {
+                if (gp.player.getCenterX() < entity.getCenterX()) {
                     entity.setDirection(LEFT);
                 }
                 else {
@@ -163,7 +163,7 @@ public class EntityAI {
                 }
             }
             else if (getXDistance(gp.player) < getYDistance(gp.player)) {
-                if (getCenterY(gp.player) < getCenterY(entity)) {
+                if (gp.player.getCenterY() < entity.getCenterY()) {
                     entity.setDirection(UP);
                 }
                 else {
@@ -184,22 +184,22 @@ public class EntityAI {
         // If player is attacking within hitbox
         switch (entity.getDirection()) {
             case UP, UPLEFT, UPRIGHT -> {
-                if (getCenterY(gp.player) < getCenterY(entity) && yDis < straight && xDis < horizontal) {
+                if (gp.player.getCenterY() < entity.getCenterY() && yDis < straight && xDis < horizontal) {
                     targetInRange = true;
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (getCenterY(gp.player) > getCenterY(entity) && yDis < straight && xDis < horizontal) {
+                if (gp.player.getCenterY() > entity.getCenterY() && yDis < straight && xDis < horizontal) {
                     targetInRange = true;
                 }
             }
             case LEFT -> {
-                if (getCenterX(gp.player) < getCenterX(entity) && xDis < straight && yDis < horizontal) {
+                if (gp.player.getCenterX() < entity.getCenterX() && xDis < straight && yDis < horizontal) {
                     targetInRange = true;
                 }
             }
             case RIGHT -> {
-                if (getCenterX(gp.player) > getCenterX(entity) && xDis < straight && yDis < horizontal) {
+                if (gp.player.getCenterX() > entity.getCenterX() && xDis < straight && yDis < horizontal) {
                     targetInRange = true;
                 }
             }
@@ -233,8 +233,8 @@ public class EntityAI {
 
     public boolean withinRange(Entity target, int buffer) {
 
-        int dx = getCenterX(target) - getCenterX(entity);
-        int dy = getCenterY(target) - getCenterY(entity);
+        int dx = target.getCenterX() - entity.getCenterX();
+        int dy = target.getCenterY() - entity.getCenterY();
 
         return switch (entity.getDirection()) {
             case UP -> dy < 0 && Math.abs(dx) <= buffer;
@@ -248,25 +248,18 @@ public class EntityAI {
         };
     }
 
-    public int getCenterX(Entity target) {
-        return target.getWorldPoint().x + target.getSprite().getWidth() / 2;
-    }
-    public int getCenterY(Entity target) {
-        return target.getWorldPoint().y + target.getSprite().getHeight() / 2;
-    }
-
     private int getGoalCol(Entity target) {
-        return getCenterX(target) / gp.tileSize;
+        return target.getCenterX() / gp.tileSize;
     }
     private int getGoalRow(Entity target) {
-        return getCenterY(target) / gp.tileSize;
+        return target.getCenterY() / gp.tileSize;
     }
 
     private int getXDistance(Entity target) {
-        return Math.abs(getCenterX(entity) - getCenterX(target));
+        return Math.abs(entity.getCenterX() - target.getCenterX());
     }
     private int getYDistance(Entity target) {
-        return Math.abs(getCenterY(entity) - getCenterY(target));
+        return Math.abs(entity.getCenterY() - target.getCenterY());
     }
 
     private boolean withinBounds() {

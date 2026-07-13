@@ -260,12 +260,8 @@ public class Player extends Entity {
      * SET DEFAULT POSITON
      */
     private void setDefaultPosition() {
-
-        worldPoint = new Point(gp.tileSize * 23, gp.tileSize * 21);
+        worldPoint = new Point(0, 0);
         safePoint = new Point(worldPoint.x, worldPoint.y);
-
-        gp.currentMap = 0;
-        gp.currentArea = gp.outside;
     }
 
     private void setDefaultRPGValues() {
@@ -344,6 +340,7 @@ public class Player extends Entity {
         }
         // Z-target
         else if (gp.keyH.lPressed) {
+            gp.keyH.lPressed = false;
             startZTarget();
         }
         // Swing sword
@@ -361,7 +358,8 @@ public class Player extends Entity {
             useItem();
         }
         // Switch item
-        else if (gp.keyH.startPressed) {
+        else if (gp.keyH.yPressed) {
+            gp.keyH.yPressed = false;
             switchItem();
         }
     }
@@ -401,14 +399,12 @@ public class Player extends Entity {
         int object = gp.cChecker.checkMovementCollision(this, gp.obj);
 
         if (object != -1) {
-            gp.obj[gp.currentMap][object].interact(this);
+            gp.obj[object].interact(this);
         }
     }
 
     /** Z-TARGETING */
     private void startZTarget() {
-
-        gp.keyH.lPressed = false;
 
         // Find new target
         Entity newTarget = findZTarget();
@@ -446,7 +442,7 @@ public class Player extends Entity {
         Entity target = null;
         int currentDistance = maxZTargetDistance;
 
-        for (Entity e : gp.enemy[gp.currentMap]) {
+        for (Entity e : gp.enemy) {
 
             if (e != null && e != lockedOnTarget && e.isAvailable()) {
 
@@ -558,7 +554,6 @@ public class Player extends Entity {
     }
 
     private void switchItem() {
-        gp.keyH.startPressed = false;
 
         currentItemSlot++;
         if (items.size() <= currentItemSlot) {
@@ -698,12 +693,12 @@ public class Player extends Entity {
 
         int col = gp.cChecker.checkOverlapCollision(this, gp.col);
         if (col != -1) {
-            gp.col[gp.currentMap][col].use(this);
+            gp.col[col].use(this);
         }
 
         int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
         if (proj != -1) {
-            Projectile projectile = gp.proj[gp.currentMap][proj];
+            Projectile projectile = gp.proj[proj];
             if (projectile.getCanPickup()) {
                 projectile.pickup(this);
             }
@@ -716,7 +711,7 @@ public class Player extends Entity {
 
         int enemyIndex = gp.cChecker.checkMovementCollision(entity, gp.enemy);
         if (enemyIndex != -1) {
-            enemy = gp.enemy[gp.currentMap][enemyIndex];
+            enemy = gp.enemy[enemyIndex];
         }
 
         return enemy;
@@ -1168,52 +1163,27 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics2D g2) {
 
-        offCenter();
-        getSpriteImage(g2);
+        drawOffset.setLocation(0, 0);
+        getSpriteImage();
 
         if (invincible) {
            playHurtAnimation(g2);
         }
 
-        g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
+        gp.camera.worldToScreen(worldPoint, screenPoint);
+        g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
+
+        if (action == JUMPING || action == SOARING) {
+            g2.setColor(Color.BLACK);
+            g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
+        }
 
         // Reset opacity
         changeAlpha(g2, 1f);
     }
 
-    /**
-     * OFF CENTER
-     * Adjusts X, Y if near edge
-     */
-    private void offCenter() {
-        tempScreenPoint.setLocation(screenPoint);
-
-        if (worldPoint.x < screenPoint.x) {
-            tempScreenPoint.x = worldPoint.x;
-        }
-        if (worldPoint.y < screenPoint.y) {
-            tempScreenPoint.y = worldPoint.y;
-        }
-
-        // From player to right-edge of screen
-        int rightOffset = gp.screenWidth - screenPoint.x;
-
-        //  From player to right-edge of world
-        if (rightOffset > gp.worldWidth - worldPoint.x) {
-            tempScreenPoint.x = gp.screenWidth - (gp.worldWidth - worldPoint.x);
-        }
-
-        // From player to bottom-edge of screen
-        int bottomOffSet = gp.screenHeight - screenPoint.y;
-
-        //  From player to bottom-edge of world
-        if (bottomOffSet > gp.worldHeight - worldPoint.y) {
-            tempScreenPoint.y = gp.screenHeight - (gp.worldHeight - worldPoint.y);
-        }
-    }
-
-    /** GET CURRENT SPRITE TO DRAW */
-    private void getSpriteImage(Graphics2D g2) {
+    @Override
+    protected void getSpriteImage() {
         image = switch (action) {
             case IDLE -> getIdleSprite();
             case ROLLING -> getRollingSprite();
@@ -1223,7 +1193,7 @@ public class Player extends Entity {
             case THROWING -> getThrowSprite();
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
-            case JUMPING, SOARING -> getJumpSprite(g2);
+            case JUMPING, SOARING -> getJumpSprite();
             case FALLING -> getFallSprite();
             case DROWNING -> getDrownSprite();
         };
@@ -1313,7 +1283,7 @@ public class Player extends Entity {
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
                 if (attackNum > 1) {
-                    tempScreenPoint.y -= gp.tileSize;
+                    drawOffset.y -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackUp1;
@@ -1331,7 +1301,7 @@ public class Player extends Entity {
             }
             case DOWN, DOWNLEFT, DOWNRIGHT-> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenPoint.x -= gp.tileSize;
+                    drawOffset.x -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackDown1;
@@ -1349,10 +1319,10 @@ public class Player extends Entity {
             }
             case LEFT -> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenPoint.y -= gp.tileSize;
+                    drawOffset.y -= gp.tileSize;
                 }
                 if (attackNum == 2 || attackNum == 3) {
-                    tempScreenPoint.x -= gp.tileSize;
+                    drawOffset.x -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackLeft1;
@@ -1370,7 +1340,7 @@ public class Player extends Entity {
             }
             case RIGHT -> {
                 if (attackNum == 1 || attackNum == 2) {
-                    tempScreenPoint.y -= gp.tileSize;
+                    drawOffset.y -= gp.tileSize;
                 }
                 attackSprite = switch (attackNum) {
                     case 1 -> attackRight1;
@@ -1395,7 +1365,7 @@ public class Player extends Entity {
 
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
-                tempScreenPoint.y -= gp.tileSize;
+                drawOffset.y -= gp.tileSize;
                 spinSprite = switch (attackNum) {
                     case 1 -> spinUp1;
                     case 2 -> spinUp2;
@@ -1404,7 +1374,7 @@ public class Player extends Entity {
             }
             case DOWN, DOWNLEFT, DOWNRIGHT-> {
                 if (attackNum == 1) {
-                    tempScreenPoint.x -= gp.tileSize;
+                    drawOffset.x -= gp.tileSize;
                 }
                 spinSprite = switch (attackNum) {
                     case 1 -> spinDown1;
@@ -1413,9 +1383,9 @@ public class Player extends Entity {
                 };
             }
             case LEFT -> {
-                 tempScreenPoint.x -= gp.tileSize;
+                 drawOffset.x -= gp.tileSize;
                 if (attackNum == 1) {
-                    tempScreenPoint.y -= gp.tileSize;
+                    drawOffset.y -= gp.tileSize;
                 }
                 spinSprite = switch (attackNum) {
                     case 1 -> spinLeft1;
@@ -1496,10 +1466,10 @@ public class Player extends Entity {
 
         return aimSprite;
     }
-    private BufferedImage getJumpSprite(Graphics2D g2) {
+    private BufferedImage getJumpSprite() {
         BufferedImage jumpSprite;
 
-        tempScreenPoint.y -= 30;
+        drawOffset.y -= 30;
 
         if (jumpNum == 1) {
             jumpSprite = switch (direction) {
@@ -1531,9 +1501,6 @@ public class Player extends Entity {
                 case RIGHT -> soarRight1;
             };
         }
-
-        g2.setColor(Color.BLACK);
-        g2.fillOval(tempScreenPoint.x + 10, tempScreenPoint.y + 70, 30, 10);
 
         return jumpSprite;        
     }

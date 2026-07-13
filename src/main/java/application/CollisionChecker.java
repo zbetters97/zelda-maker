@@ -71,7 +71,7 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
     private Tile getTileAtColRow(int col, int row) {
-        return gp.tileM.tiles[gp.tileM.mapTileNum[gp.currentMap][col][row]];
+        return gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
     }
     private void checkTileCollision(Entity entity, Tile tile) {
 
@@ -170,7 +170,7 @@ public record CollisionChecker(GamePanel gp) {
         gp.player.safePoint = new Point(col * gp.tileSize, row * gp.tileSize);
     }
 
-    public int checkMovementCollision(Entity entity, Entity[][] targets) {
+    public int checkMovementCollision(Entity entity, Entity[] targets) {
 
         int entityIndex = -1;
 
@@ -201,9 +201,9 @@ public record CollisionChecker(GamePanel gp) {
 
         Rectangle currentRect = entity.getWorldHitbox();
 
-        for (int i = 0; i < targets[gp.currentMap].length; i++) {
+        for (int i = 0; i < targets.length; i++) {
 
-            Entity target = targets[gp.currentMap][i];
+            Entity target = targets[i];
 
             if (target == null || target == entity || target.isNotInteractable()) {
                 continue;
@@ -224,15 +224,15 @@ public record CollisionChecker(GamePanel gp) {
 
         return entityIndex;
     }
-    public int checkOverlapCollision(Entity entity, Entity[][] targets) {
+    public int checkOverlapCollision(Entity entity, Entity[] targets) {
 
         int entityIndex = -1;
 
         Rectangle entityRect = entity.getWorldHitbox();
 
-        for (int i = 0; i < targets[gp.currentMap].length; i++) {
+        for (int i = 0; i < targets.length; i++) {
 
-            Entity target = targets[gp.currentMap][i];
+            Entity target = targets[i];
 
             if (target == null || target == entity || target.isNotInteractable()) {
                 continue;

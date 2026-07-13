@@ -104,7 +104,7 @@ public class Enemy extends Entity {
     @Override
     public void draw(Graphics2D g2) {
 
-        adjustOffCenter();
+        drawOffset.setLocation(0, 0);
         getSpriteImage();
 
         // Flash sprite if hurt
@@ -117,10 +117,8 @@ public class Enemy extends Entity {
         }
 
         // Draw sprite
-        g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
-
-        // Draw hitbox (debug)
-        g2.drawRect(tempScreenPoint.x + hitbox.x, tempScreenPoint.y + hitbox.y, hitbox.width, hitbox.height);
+        gp.camera.worldToScreen(worldPoint, screenPoint);
+        g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
 
         // Reset opacity
         changeAlpha(g2, 1f);
@@ -155,12 +153,12 @@ public class Enemy extends Entity {
         if (attackNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenPoint.y -= up1.getHeight();
+                    drawOffset.y -= up1.getHeight();
                     yield attackUp1;
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown1;
                 case LEFT -> {
-                    tempScreenPoint.x -= left1.getWidth();
+                    drawOffset.x -= left1.getWidth();
                     yield attackLeft1;
                 }
                 case RIGHT -> attackRight1;
@@ -168,12 +166,12 @@ public class Enemy extends Entity {
         } else if (attackNum == 2) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    tempScreenPoint.y -= up1.getHeight();
+                    drawOffset.y -= up1.getHeight();
                     yield attackUp2;
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown2;
                 case LEFT -> {
-                    tempScreenPoint.x -= left1.getWidth();
+                    drawOffset.x -= left1.getWidth();
                     yield attackLeft2;
                 }
                 case RIGHT -> attackRight2;

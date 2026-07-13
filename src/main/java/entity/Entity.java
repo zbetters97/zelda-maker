@@ -61,7 +61,7 @@ public class Entity {
     protected Point worldPoint = new Point(),
             screenPoint = new Point(),
             startPoint = new Point(),
-            tempScreenPoint = new Point();
+            drawOffset = new Point();
 
     /** COLLISION VALUES */
     protected boolean collisionOn = true;
@@ -395,9 +395,9 @@ public class Entity {
         }
     }
     protected void addProjectile(Projectile projectile) {
-        for (int i = 0; i < gp.proj[0].length; i++) {
-            if (gp.proj[gp.currentMap][i] == null) {
-                gp.proj[gp.currentMap][i] = projectile;
+        for (int i = 0; i < gp.proj.length; i++) {
+            if (gp.proj[i] == null) {
+                gp.proj[i] = projectile;
                 break;
             }
         }
@@ -480,7 +480,7 @@ public class Entity {
 
         int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
         if (proj != -1) {
-            Projectile projectile = gp.proj[gp.currentMap][proj];
+            Projectile projectile = gp.proj[proj];
 
             if (projectile.canBeDeflected(false)) {
                 projectile.deflect(this);
@@ -489,7 +489,7 @@ public class Entity {
 
         int obj = gp.cChecker.checkOverlapCollision(this, gp.obj);
         if (obj != -1) {
-            gp.obj[gp.currentMap][obj].interact();
+            gp.obj[obj].interact();
         }
     }
     private void detectEnemySwordCollision() {
@@ -504,7 +504,7 @@ public class Entity {
 
         int enemyIndex = gp.cChecker.checkOverlapCollision(entity, gp.enemy);
         if (enemyIndex != -1) {
-            enemy = gp.enemy[gp.currentMap][enemyIndex];
+            enemy = gp.enemy[enemyIndex];
         }
 
         return enemy;
@@ -656,10 +656,10 @@ public class Entity {
     protected void checkDeath() { }
 
     protected void dropItem(Collectable droppedItem) {
-        for (int i = 0; i < gp.col[0].length; i++) {
-            if (gp.col[gp.currentMap][i] == null) {
-                gp.col[gp.currentMap][i] = droppedItem;
-                gp.col[gp.currentMap][i].setWorldPoint(worldPoint);
+        for (int i = 0; i < gp.col.length; i++) {
+            if (gp.col[i] == null) {
+                gp.col[i] = droppedItem;
+                gp.col[i].setWorldPoint(worldPoint);
                 break;
             }
         }
@@ -720,49 +720,15 @@ public class Entity {
      */
     public void draw(Graphics2D g2) {
 
-        // Adjust if camera is off center
-        adjustOffCenter();
-
         // Get sprite
         getSpriteImage();
 
         // Draw sprite
-        g2.drawImage(image, tempScreenPoint.x, tempScreenPoint.y, null);
+        gp.camera.worldToScreen(worldPoint, screenPoint);
+        g2.drawImage(image, screenPoint.x, screenPoint.y, null);
 
         // Reset opacity
         changeAlpha(g2, 1f);
-    }
-
-    /**
-     * OFF CENTER
-     * Adjusts X, Y if near edge
-     */
-    public void adjustOffCenter() {
-
-        tempScreenPoint = new Point(getScreenPoint());
-
-        if (gp.player.worldPoint.x < gp.player.screenPoint.x) {
-            tempScreenPoint.x = worldPoint.x;
-        }
-        if (gp.player.worldPoint.y < gp.player.screenPoint.y) {
-            tempScreenPoint.y = worldPoint.y;
-        }
-
-        // From player to right-edge of screen
-        int rightOffset = gp.screenWidth - gp.player.screenPoint.x;
-
-        //  From player to right-edge of world
-        if (rightOffset > gp.worldWidth - gp.player.worldPoint.x) {
-            tempScreenPoint.x = gp.screenWidth - (gp.worldWidth - worldPoint.x);
-        }
-
-        //  From player to bottom-edge of screen
-        int bottomOffSet = gp.screenHeight - gp.player.screenPoint.y;
-
-        //  From player to bottom-edge of world
-        if (bottomOffSet > gp.worldHeight - gp.player.worldPoint.y) {
-            tempScreenPoint.y = gp.screenHeight - (gp.worldHeight - worldPoint.y);
-        }
     }
 
     protected void getSpriteImage() {
@@ -829,9 +795,6 @@ public class Entity {
                 worldPoint.y - gp.player.worldPoint.y + gp.player.screenPoint.y
         );
     }
-    public Point getTempScreenPoint() {
-        return tempScreenPoint;
-    }
 
     public Point getWorldPoint() {
         return worldPoint;
@@ -847,6 +810,20 @@ public class Entity {
     }
     public void setWorldPointY(int y) {
         this.worldPoint.y = y;
+    }
+
+    public int getCol() {
+        return getCenterX() / gp.tileSize;
+    }
+    public int getRow() {
+        return getCenterY() / gp.tileSize;
+    }
+
+    public int getCenterX() {
+        return worldPoint.x + sprite.getWidth() / 2;
+    }
+    public int getCenterY() {
+        return worldPoint.y + sprite.getHeight() / 2;
     }
 
     public Rectangle getHitbox() {

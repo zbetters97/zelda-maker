@@ -99,8 +99,8 @@ public class PRJ_Claw extends Projectile {
     private void checkLatchableCollision() {
 
         int object = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (object != -1 && gp.obj[gp.currentMap][object].isLatchable()) {
-            grabbedEntity = gp.obj[gp.currentMap][object];
+        if (object != -1 && gp.obj[object].isLatchable()) {
+            grabbedEntity = gp.obj[object];
             returning = true;
             latched = true;
         }
