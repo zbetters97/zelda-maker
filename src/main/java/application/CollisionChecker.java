@@ -19,12 +19,7 @@ public record CollisionChecker(GamePanel gp) {
     public void checkTile(Entity entity) {
 
         Rectangle box = entity.getWorldHitbox();
-
-        // Prevent collision detection out of bounds
-        if (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
-                box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize) {
-            return;
-        }
+        if (outOfBounds(box)) return;
 
         Point delta = new Point();
 
@@ -52,6 +47,11 @@ public record CollisionChecker(GamePanel gp) {
         }
 
         box.translate(delta.x, delta.y);
+
+        if (outOfBounds(box)) {
+            entity.setCollision(true);
+            return;
+        }
 
         int leftCol = box.x / gp.tileSize;
         int rightCol = (box.x + box.width - 1) / gp.tileSize;
@@ -112,6 +112,9 @@ public record CollisionChecker(GamePanel gp) {
     }
 
     public void checkHazard(Entity entity) {
+
+        if (outOfBounds(entity.getWorldHitbox())) return;
+
         Tile tile = getCurrentTile(entity);
 
         if (tile.isPit()) {
@@ -124,6 +127,10 @@ public record CollisionChecker(GamePanel gp) {
         else if (entity == gp.player && !gp.player.getElevated()) {
             setSafePoint();
         }
+    }
+    private boolean outOfBounds(Rectangle box) {
+        return (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
+                box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize);
     }
     private Tile getCurrentTile(Entity entity) {
 
