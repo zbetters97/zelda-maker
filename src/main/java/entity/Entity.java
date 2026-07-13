@@ -5,6 +5,7 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
+import entity.object.Object;
 import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
@@ -30,6 +31,8 @@ public class Entity {
         GUARDING(true, false, false),
         DIGGING(false, false, false),
         AIMING(true, true, true),
+        GRABBING(false, false, true),
+        CARRYING(true, true, false),
         THROWING(false, false, false),
         JUMPING(true, true, false),
         SOARING(true, true, false),
@@ -113,6 +116,8 @@ public class Entity {
     protected boolean canSwim = false;
     protected boolean needsWater = false;
     protected boolean shielded = false;
+
+    protected Object grabbedObject;
 
     /** COMBAT VALUES */
     protected int attack;
@@ -988,5 +993,9 @@ public class Entity {
 
     public boolean getBuzzing() {
         return buzzing;
+    }
+
+    public void setGrabbedObject(Object grabbedObject) {
+        this.grabbedObject = grabbedObject;
     }
 }

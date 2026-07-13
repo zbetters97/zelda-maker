@@ -3,15 +3,12 @@ package entity.object;
 import application.GamePanel;
 import entity.Entity;
 import entity.collectable.*;
+import entity.enemy.Enemy;
 
 public class OBJ_Pot extends Object {
 
     public static final String objName = "Pot";
 
-    public OBJ_Pot(GamePanel gp, int worldX, int worldY, Collectable loot) {
-        super(gp, worldX, worldY, objName);
-        this.loot = loot;
-    }
     public OBJ_Pot(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
         setLoot();
@@ -38,9 +35,31 @@ public class OBJ_Pot extends Object {
     }
 
     @Override
+    public void interact(Entity user) {
+        user.setAction(Action.GRABBING);
+        user.setGrabbedObject(this);
+    }
+
+    @Override
     public void interact() {
         alive = false;
         dropItem(loot);
+    }
+
+    @Override
+    protected void endThrow() {
+
+        Enemy enemy = overlapEnemy(this);
+        if (enemy != null) {
+            enemy.takeDamage(this);
+        }
+
+        boolean contactPlayer = gp.cChecker.checkPlayer(this);
+        if (contactPlayer) {
+            gp.player.takeDamage(this);
+        }
+
+        alive = false;
     }
 
     @Override

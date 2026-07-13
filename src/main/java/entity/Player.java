@@ -33,6 +33,7 @@ public class Player extends Entity {
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
             aimNum = 1, aimCounter = 0,
+            grabNum = 1, grabCounter = 0,
             throwNum = 1, throwCounter = 0,
             jumpNum = 1, jumpCounter = 0,
             damageNum = 1, damageCounter = 0;
@@ -47,6 +48,12 @@ public class Player extends Entity {
 
             spinUp1, spinUp2, spinDown1, spinDown2,
             spinLeft1, spinLeft2, spinRight1, spinRight2,
+
+            grabUp1, grabUp2, grabUp3, grabDown1, grabDown2, grabDown3,
+            grabLeft1, grabLeft2, grabLeft3, grabRight1, grabRight2, grabRight3,
+
+            carryUp1, carryUp2, carryDown1, carryDown2,
+            carryLeft1, carryLeft2, carryRight1, carryRight2,
 
             throwUp1, throwUp2, throwDown1, throwDown2,
             throwLeft1, throwLeft2, throwRight1, throwRight2,
@@ -97,6 +104,25 @@ public class Player extends Entity {
     /** GET IMAGES */
     @Override
     protected void getImages() {
+        getAllImages();
+    }
+    private void getAllImages() {
+        getIdleImages();
+        getRollImages();
+        getGuardImages();
+        getAttackImages();
+        getSpinImages();
+        getGrabImages();
+        getCarryImages();
+        getThrowImages();
+        getDigImages();
+        getAimImages();
+        getJumpImages();
+        getSoarImages();
+        getFallImages();
+        getDrownImages();
+    }
+    private void getIdleImages() {
         up1 = setupImage("/player/boy_up_1");
         up2 = setupImage("/player/boy_up_2");
         sprite = down1 = setupImage("/player/boy_down_1");
@@ -105,20 +131,6 @@ public class Player extends Entity {
         left2 = setupImage("/player/boy_left_2");
         right1 = setupImage("/player/boy_right_1");
         right2 = setupImage("/player/boy_right_2");
-        getAllImages();
-    }
-    private void getAllImages() {
-        getRollImages();
-        getGuardImages();
-        getAttackImages();
-        getSpinImages();
-        getThrowImages();
-        getDigImages();
-        getAimImages();
-        getJumpImages();
-        getSoarImages();
-        getFallImages();
-        getDrownImages();
     }
     private void getRollImages() {
         rollUp1 = setupImage("/player/boy_roll_up_1");
@@ -175,6 +187,30 @@ public class Player extends Entity {
         spinLeft2 = setupImage("/player/boy_spin_kokiri_left_2", gp.tileSize * 2, gp.tileSize);
         spinRight1 = setupImage("/player/boy_spin_kokiri_right_1", gp.tileSize * 2, gp.tileSize * 2);
         spinRight2 = setupImage("/player/boy_spin_kokiri_right_2", gp.tileSize * 2, gp.tileSize);
+    }
+    private void getGrabImages() {
+        grabUp1 = setupImage("/player/boy_grab_up_1");
+        grabUp2 = setupImage("/player/boy_grab_up_2");
+        grabUp3 = setupImage("/player/boy_grab_up_3");
+        grabDown1 = setupImage("/player/boy_grab_down_1");
+        grabDown2 = setupImage("/player/boy_grab_down_2");
+        grabDown3 = setupImage("/player/boy_grab_down_3");
+        grabLeft1 = setupImage("/player/boy_grab_left_1");
+        grabLeft2 = setupImage("/player/boy_grab_left_2");
+        grabLeft3 = setupImage("/player/boy_grab_left_3");
+        grabRight1 = setupImage("/player/boy_grab_right_1");
+        grabRight2 = setupImage("/player/boy_grab_right_2");
+        grabRight3 = setupImage("/player/boy_grab_right_3");
+    }
+    private void getCarryImages() {
+        carryUp1 = setupImage("/player/boy_carry_up_1");
+        carryUp2 = setupImage("/player/boy_carry_up_2");
+        carryDown1 = setupImage("/player/boy_carry_down_1");
+        carryDown2 = setupImage("/player/boy_carry_down_2");
+        carryLeft1 = setupImage("/player/boy_carry_left_1");
+        carryLeft2 = setupImage("/player/boy_carry_left_2");
+        carryRight1 = setupImage("/player/boy_carry_right_1");
+        carryRight2 = setupImage("/player/boy_carry_right_2");
     }
     private void getThrowImages() {
         throwUp1 = setupImage("/player/boy_throw_up_1");
@@ -303,9 +339,7 @@ public class Player extends Entity {
         }
 
         // Allow A press only when Idle
-        if (action == IDLE) {
-            handleActionInput();
-        }
+        handleActionInput();
 
         // Update player behavior based on current action
         updateAction();
@@ -371,15 +405,20 @@ public class Player extends Entity {
      */
     private void startAction() {
 
-        gp.keyH.aPressed = false;
-
         // Different action based on current status
         if (action == IDLE) {
             // Cooldown needed for rolling
             if (moving && actionLockCounter == 0) {
+                gp.keyH.aPressed = false;
                 startRoll();
-            } else {
+            }
+            else {
                 interactObject();
+            }
+        }
+        else if (action == CARRYING) {
+            if (moving) {
+                throwEntity();
             }
         }
     }
@@ -396,11 +435,21 @@ public class Player extends Entity {
         actionLockCounter = 30;
     }
     private void interactObject() {
-        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
 
+        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
         if (object != -1) {
             gp.obj[object].interact(this);
         }
+    }
+
+    private void throwEntity() {
+
+        gp.keyH.aPressed = false;
+
+        if (grabbedObject == null) return;
+
+        grabbedObject.toss(this);
+        grabbedObject = null;
     }
 
     /** Z-TARGETING */
@@ -575,6 +624,8 @@ public class Player extends Entity {
             case ATTACKING -> attacking();
             case SPINCHARGING -> spinCharging();
             case SPINNING -> spinning();
+            case GRABBING -> grabbing();
+            case CARRYING -> carrying();
             case THROWING -> throwing();
             case DIGGING -> digging();
             case AIMING -> aiming();
@@ -928,6 +979,61 @@ public class Player extends Entity {
     }
 
     /**
+     * GRABBING
+     * Runs grabbing animation and logic
+     * Called by startAction() when player action is GRABBING
+     */
+    private void grabbing() {
+
+        if (!gp.keyH.aPressed) {
+            resetGrab();
+            return;
+        }
+
+        if (++grabCounter <= 12) {
+            grabNum = 1;
+        }
+        else if (grabCounter <= 18) {
+            grabNum = 2;
+        }
+        else if (grabCounter <= 27) {
+            grabNum = 3;
+        }
+        else {
+            if (grabbedObject != null) {
+                grabNum = 1;
+                grabCounter = 0;
+                action = Action.CARRYING;
+            }
+            else {
+                resetGrab();
+            }
+
+            gp.keyH.aPressed = false;
+        }
+    }
+    private void resetGrab() {
+        grabNum = 1;
+        grabCounter = 0;
+        grabbedObject = null;
+        action = Action.IDLE;
+    }
+
+    /**
+     * CARRYING
+     * Runs carrying animation and logic
+     * Called by startAction() when player action is CARRYING
+     */
+    private void carrying() {
+
+        if (grabbedObject == null) return;
+
+        grabbedObject.setGrabbed(true);
+        grabbedObject.setCanMove(false);
+        grabbedObject.setWorldPoint(worldPoint);
+    }
+
+    /**
      * THROWING
      * Runs throwing animation and logic
      * Called by startAction() when player action is THROWING
@@ -937,13 +1043,13 @@ public class Player extends Entity {
         if (++throwCounter <= 6) {
             throwNum = 1;
         }
-        else {
+        else if (throwCounter <= 20){
             throwNum = 2;
         }
-
-        if (28 < throwCounter && action == IDLE) {
+        else {
             throwNum = 1;
             throwCounter = 0;
+            action = IDLE;
         }
     }
 
@@ -1149,6 +1255,7 @@ public class Player extends Entity {
         spinCharge = 0;
         digNum = 1; digCounter = 0;
         aimNum = 1; aimCounter = 0;
+        grabNum = 1; grabCounter = 0;
         throwNum = 1; throwCounter = 0;
         jumpNum = 1; jumpCounter = 0;
         damageNum = 1; damageCounter = 0;
@@ -1177,6 +1284,9 @@ public class Player extends Entity {
             g2.setColor(Color.BLACK);
             g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
         }
+        else if (action == CARRYING && grabbedObject != null) {
+            g2.drawImage(grabbedObject.getSprite(), screenPoint.x, screenPoint.y - sprite.getHeight() + 6, null);
+        }
 
         // Reset opacity
         changeAlpha(g2, 1f);
@@ -1190,6 +1300,8 @@ public class Player extends Entity {
             case GUARDING -> getGuardSprite();
             case ATTACKING, SPINCHARGING -> getAttackSprite();
             case SPINNING ->  getSpinSprite();
+            case GRABBING -> getGrabSprite();
+            case CARRYING -> getCarrySprite();
             case THROWING -> getThrowSprite();
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
@@ -1402,6 +1514,55 @@ public class Player extends Entity {
         }
 
         return spinSprite;
+    }
+    private BufferedImage getGrabSprite() {
+        BufferedImage grabSprite;
+
+        if (grabNum == 1) {
+            grabSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> grabUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown1;
+                case LEFT -> grabLeft1;
+                case RIGHT -> grabRight1;
+            };
+        } else if (grabNum == 2){
+            grabSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> grabUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown2;
+                case LEFT -> grabLeft2;
+                case RIGHT -> grabRight2;
+            };
+        } else {
+            grabSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> grabUp3;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown3;
+                case LEFT -> grabLeft3;
+                case RIGHT -> grabRight3;
+            };
+        }
+
+        return grabSprite;
+    }
+    private BufferedImage getCarrySprite() {
+        BufferedImage carrySprite;
+
+        if (spriteNum == 1) {
+            carrySprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> carryUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> carryDown1;
+                case LEFT -> carryLeft1;
+                case RIGHT -> carryRight1;
+            };
+        } else {
+            carrySprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> carryUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> carryDown2;
+                case LEFT -> carryLeft2;
+                case RIGHT -> carryRight2;
+            };
+        }
+
+        return carrySprite;
     }
     private BufferedImage getThrowSprite() {
         BufferedImage throwSprite;
