@@ -135,6 +135,7 @@ public class Entity {
 
     /** INVENTORY VALUES */
     protected int arrows = 0;
+    protected int bombs = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -979,6 +980,13 @@ public class Entity {
         this.arrows += arrows;
     }
 
+    public int getBombs() {
+        return bombs;
+    }
+    public void addBombs(int bombs) {
+        this.bombs += bombs;
+    }
+
     public boolean isLatchable() {
         return latchable;
     }
@@ -995,6 +1003,9 @@ public class Entity {
         return buzzing;
     }
 
+    public Object getGrabbedObject() {
+        return grabbedObject;
+    }
     public void setGrabbedObject(Object grabbedObject) {
         this.grabbedObject = grabbedObject;
     }

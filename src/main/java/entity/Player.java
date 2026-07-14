@@ -5,6 +5,7 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.enemy.Enemy;
 import entity.item.*;
+import entity.object.OBJ_Bomb;
 import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
@@ -310,8 +311,10 @@ public class Player extends Entity {
         knockbackPower = 1;
 
         arrows = 50;
+        bombs = 50;
 
         items.addAll(Arrays.asList(
+                new ITM_Bomb(gp, this),
                 new ITM_Shovel(gp, this),
                 new ITM_Boomerang(gp, this),
                 new ITM_Feather(gp, this),
@@ -581,7 +584,7 @@ public class Player extends Entity {
         // Item equipped
         if (item != null) {
             switch (item.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Hookshot.itmName -> {
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName -> {
                     gp.keyH.xPressed = false;
                     item.use();
                 }
@@ -985,7 +988,14 @@ public class Player extends Entity {
      */
     private void grabbing() {
 
-        if (!gp.keyH.aPressed) {
+        if (grabbedObject == null) {
+            resetGrab();
+            return;
+        }
+
+        boolean isBomb = grabbedObject.getName().equals(OBJ_Bomb.objName);
+
+        if (!isBomb && !gp.keyH.aPressed) {
             resetGrab();
             return;
         }
@@ -1285,7 +1295,7 @@ public class Player extends Entity {
             g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
         }
         else if (action == CARRYING && grabbedObject != null) {
-            g2.drawImage(grabbedObject.getSprite(), screenPoint.x, screenPoint.y - sprite.getHeight() + 6, null);
+            g2.drawImage(grabbedObject.getSprite(), screenPoint.x, screenPoint.y - sprite.getHeight() + 12, null);
         }
 
         // Reset opacity

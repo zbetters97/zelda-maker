@@ -70,7 +70,7 @@ public class Object extends Entity {
     }
     private void handleToss() {
 
-        if (++tossCounter <= 29) {
+        if (++tossCounter < 32) {
 
             tTime += 25;
             switch (direction) {
