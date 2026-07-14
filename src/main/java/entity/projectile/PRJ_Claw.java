@@ -2,7 +2,7 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
-import entity.enemy.Enemy;
+import entity.object.OBJ_Cucco;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -82,7 +82,7 @@ public class PRJ_Claw extends Projectile {
     }
     private void checkGrabbableCollision() {
 
-        Enemy target = overlapEnemy(this);
+        Entity target = overlapEnemy(this);
         if (target != null) {
 
             collisionOn = true;
@@ -96,13 +96,19 @@ public class PRJ_Claw extends Projectile {
             }
         }
     }
+
     private void checkLatchableCollision() {
 
-        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (object != -1 && gp.obj[object].isLatchable()) {
-            grabbedEntity = gp.obj[object];
+        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
+        if (objIndex != -1 && gp.obj[objIndex].isLatchable()) {
+            grabbedEntity = gp.obj[objIndex];
             returning = true;
-            latched = true;
+
+            // Pull Cucco towards self, otherwise pull towards object
+            boolean isCucco = gp.obj[objIndex].getName().equals(OBJ_Cucco.objName);
+            if (!isCucco) {
+                latched = true;
+            }
         }
     }
     private void checkObstacleCollision() {

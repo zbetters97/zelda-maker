@@ -69,7 +69,7 @@ public class Object extends Entity {
 
         user.setAction(THROWING);
     }
-    private void handleToss() {
+    protected void handleToss() {
 
         if (++tossCounter < 32) {
 

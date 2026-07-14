@@ -43,6 +43,7 @@ public class EntityGenerator {
         objectFactory.put(OBJ_Block_Blue.objName, () -> new OBJ_Block_Blue(gp, 0, 0));
         objectFactory.put(OBJ_Block_Red.objName, () -> new OBJ_Block_Red(gp, 0, 0));
         objectFactory.put(OBJ_Chest.objName, () -> new OBJ_Chest(gp, 0, 0));
+        objectFactory.put(OBJ_Cucco.objName, () -> new OBJ_Cucco(gp, 0, 0));
         objectFactory.put(OBJ_Pot.objName, () -> new OBJ_Pot(gp, 0, 0));
         objectFactory.put(OBJ_Switch.objName, () -> new OBJ_Switch(gp, 0, 0));
 
