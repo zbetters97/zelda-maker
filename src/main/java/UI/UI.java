@@ -759,17 +759,22 @@ public class UI {
             // Cursor on existing entity and grabbed, return
             if (editing_GrabEntity()) return;
 
-            // Tile at selected X/Y is not traversable
-            if (cannotPlaceEntity()) return;
-
             // Entity currently grabbed, place down
             if (selectedEntity != null) {
+
+                // Tile at selected X/Y is not traversable
+                if (cannotPlaceEntity(selectedEntity)) return;
+
                 editing_PlaceEntity(selectedEntity);
                 selectedEntity = null;
             }
             // Not currently holding entity, place down new one
             else {
                 editing_GetEntity();
+
+                // Tile at selected X/Y is not traversable
+                if (cannotPlaceEntity(currentEntity)) return;
+
                 editing_PlaceEntity(currentEntity);
                 currentEntity = null;
             }
@@ -777,18 +782,20 @@ public class UI {
     }
     private void editing_PlaceEntity(Entity entity) {
 
-        Entity[] entityList = gp.getEntityList(entity);
-        int index = gp.findOpenSlot(entityList);
-
-        if (index != -1) {
-            entity.setWorldPoint(cursor.getWorldPoint());
-            entityList[index] = entity;
-        }
-        else if (entity.getName().equals(Player.playerName)) {
+        if (entity.getName().equals(Player.playerName)) {
             gp.player.setWorldPoint(cursor.getWorldPoint());
+            return;
+        }
+
+        Entity[] entityList = gp.getEntityList(entity);
+        int entityIndex = gp.findOpenSlot(entityList);
+
+        if (entityIndex != -1) {
+            entity.setWorldPoint(cursor.getWorldPoint());
+            entityList[entityIndex] = entity;
         }
     }
-    private boolean cannotPlaceEntity() {
+    private boolean cannotPlaceEntity(Entity entity) {
 
         int col = cursor.getWorldPoint().x / gp.tileSize;
         int row = cursor.getWorldPoint().y / gp.tileSize;
@@ -796,7 +803,7 @@ public class UI {
 
         Tile tile = gp.tileM.tiles[tileNum];
 
-        return tile.isNotTraversable() || tileNum == 0;
+        return tileNum == 0 || tile.isNotTraversable(entity);
     }
 
     private void editing_Map_Input_B() {

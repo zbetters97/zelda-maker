@@ -825,6 +825,11 @@ public class Player extends Entity {
         if (projIndex != -1 && gp.proj[projIndex].getCanPickup()){
             gp.proj[projIndex].pickup(this);
         }
+
+        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
+        if (objIndex != -1) {
+            gp.obj[objIndex].interact(this);
+        }
     }
 
     private Enemy moveIntoEnemy(Entity entity) {
@@ -1349,6 +1354,8 @@ public class Player extends Entity {
      */
     @Override
     public void draw(Graphics2D g2) {
+
+        if (!drawing) return;
 
         drawOffset.setLocation(0, 0);
         getSpriteImage();

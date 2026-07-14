@@ -1,5 +1,7 @@
 package tile;
 
+import entity.Entity;
+
 import java.awt.image.BufferedImage;
 
 /** TILE CLASS **/
@@ -39,6 +41,16 @@ public class Tile {
     }
 
     public boolean isNotTraversable() {
+        return collision || water || pit;
+    }
+
+    public boolean isNotTraversable(Entity entity) {
+
+        // Entity needs water, false if water
+        if (entity.getNeedsWater()) {
+            return !water;
+        }
+
         return collision || water || pit;
     }
 }

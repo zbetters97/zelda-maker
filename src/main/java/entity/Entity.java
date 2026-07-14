@@ -146,6 +146,7 @@ public class Entity {
     protected boolean latchable = false;
 
     /** SPRITE ATTRIBUTES */
+    protected boolean drawing = true;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
     protected BufferedImage sprite;
@@ -728,6 +729,8 @@ public class Entity {
      */
     public void draw(Graphics2D g2) {
 
+        if (!drawing) return;
+
         // Get sprite
         getSpriteImage();
 
@@ -795,6 +798,10 @@ public class Entity {
     /** GETTERS and SETTERS */
     public BufferedImage getSprite() {
         return sprite;
+    }
+
+    public void setDrawing(boolean drawing) {
+        this.drawing = drawing;
     }
 
     public Point getScreenPoint() {

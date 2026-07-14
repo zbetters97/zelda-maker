@@ -43,6 +43,9 @@ public class OBJ_Bomb extends Object {
 
     @Override
     public void interact(Entity user) {
+
+        if (!gp.keyH.aPressed) return;
+
         user.setAction(Action.GRABBING);
         user.setGrabbedObject(this);
         resetValues();
@@ -93,7 +96,6 @@ public class OBJ_Bomb extends Object {
         return false;
     }
 
-
     @Override
     public void resetValues() {
 
@@ -106,6 +108,8 @@ public class OBJ_Bomb extends Object {
 
     @Override
     public void draw(Graphics2D g2) {
+
+        if (!drawing) return;
 
         if (spriteNum == 2) {
            changeAlpha(g2, 0.5f);

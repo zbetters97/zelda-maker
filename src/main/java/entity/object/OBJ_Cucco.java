@@ -132,7 +132,7 @@ public class OBJ_Cucco extends Object {
     public void interact(Entity user) {
 
         // Can be picked up if not aggressive
-        if (0 < health) {
+        if (0 < health && gp.keyH.aPressed) {
             user.setAction(Action.GRABBING);
             user.setGrabbedObject(this);
         }
@@ -192,9 +192,7 @@ public class OBJ_Cucco extends Object {
     @Override
     public void draw(Graphics2D g2) {
 
-        if (grabbed) {
-            return;
-        }
+        if (grabbed || !drawing) return;
 
         drawOffset.setLocation(0, 0);
         getSpriteImage();

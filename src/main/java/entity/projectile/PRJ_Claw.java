@@ -252,6 +252,9 @@ public class PRJ_Claw extends Projectile {
 
     @Override
     public void draw(Graphics2D g2) {
+
+        if (!drawing) return;
+
         drawChain(g2);
         super.draw(g2);
     }

@@ -159,7 +159,7 @@ public class Object extends Entity {
 
     @Override
     public void draw(Graphics2D g2) {
-        if (!grabbed) {
+        if (!grabbed && drawing) {
             super.draw(g2);
         }
     }

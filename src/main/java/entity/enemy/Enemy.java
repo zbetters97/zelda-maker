@@ -104,6 +104,8 @@ public class Enemy extends Entity {
     @Override
     public void draw(Graphics2D g2) {
 
+        if (!drawing) return;
+
         drawOffset.setLocation(0, 0);
         getSpriteImage();
 

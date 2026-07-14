@@ -1,11 +1,10 @@
 package entity.enemy;
 
 import application.GamePanel;
-import entity.Entity;
 
 import java.awt.*;
 
-public class EMY_Tektite extends Entity {
+public class EMY_Tektite extends Enemy {
 
     public static final String emyName = "Tektite";
 
