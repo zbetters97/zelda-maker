@@ -19,8 +19,7 @@ public class OBJ_Cucco extends Object {
 
         animationSpeed = 10;
 
-        maxHealth = 10;
-       // maxHealth = 99;
+        maxHealth = 99;
         health = maxHealth;
 
         latchable = true;
@@ -192,6 +191,10 @@ public class OBJ_Cucco extends Object {
 
     @Override
     public void draw(Graphics2D g2) {
+
+        if (grabbed) {
+            return;
+        }
 
         drawOffset.setLocation(0, 0);
         getSpriteImage();

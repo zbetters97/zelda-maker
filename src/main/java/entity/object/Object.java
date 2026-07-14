@@ -158,9 +158,9 @@ public class Object extends Entity {
     }
 
     @Override
-    public void draw(Graphics2D g) {
+    public void draw(Graphics2D g2) {
         if (!grabbed) {
-            super.draw(g);
+            super.draw(g2);
         }
     }
 

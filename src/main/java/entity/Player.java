@@ -8,7 +8,6 @@ import entity.item.*;
 import entity.npc.NPC;
 import entity.object.OBJ_Bomb;
 import entity.object.Object;
-import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
 
@@ -496,9 +495,9 @@ public class Player extends Entity {
 
         NPC npc = null;
 
-        int n = gp.cChecker.checkMovementCollision(this, gp.npc);
-        if (n != -1) {
-            npc = gp.npc[n];
+        int npcIndex = gp.cChecker.checkMovementCollision(this, gp.npc);
+        if (npcIndex != -1) {
+            npc = gp.npc[npcIndex];
         }
 
         return npc;
@@ -507,13 +506,12 @@ public class Player extends Entity {
 
         Object object = null;
 
-        int obj = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (obj == -1) {
-            obj = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
+        if (objIndex == -1) {
+            objIndex = gp.cChecker.checkOverlapCollision(this, gp.obj);
         }
-
-        if (obj != -1) {
-            object = gp.obj[obj];
+        if (objIndex != -1) {
+            object = gp.obj[objIndex];
         }
 
         return object;
@@ -526,7 +524,6 @@ public class Player extends Entity {
         if (grabbedObject == null) return;
 
         grabbedObject.toss(this);
-        grabbedObject = null;
     }
 
     /** Z-TARGETING */
@@ -819,17 +816,14 @@ public class Player extends Entity {
     }
     private void checkInteractiveCollision() {
 
-        int col = gp.cChecker.checkOverlapCollision(this, gp.col);
-        if (col != -1) {
-            gp.col[col].use(this);
+        int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
+        if (colIndex != -1) {
+            gp.col[colIndex].use(this);
         }
 
-        int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
-        if (proj != -1) {
-            Projectile projectile = gp.proj[proj];
-            if (projectile.getCanPickup()) {
-                projectile.pickup(this);
-            }
+        int projIndex = gp.cChecker.checkOverlapCollision(this, gp.proj);
+        if (projIndex != -1 && gp.proj[projIndex].getCanPickup()){
+            gp.proj[projIndex].pickup(this);
         }
     }
 
@@ -1130,9 +1124,11 @@ public class Player extends Entity {
         else if (throwCounter <= 20){
             throwNum = 2;
         }
-        else {
+        // Do not reset throw animation if using Hookshot/Boomerang
+        else if (grabbedObject != null) {
             throwNum = 1;
             throwCounter = 0;
+            grabbedObject = null;
             action = IDLE;
         }
     }

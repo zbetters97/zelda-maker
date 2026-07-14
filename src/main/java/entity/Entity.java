@@ -486,18 +486,18 @@ public class Entity {
             enemy.takeDamage(this);
         }
 
-        int proj = gp.cChecker.checkOverlapCollision(this, gp.proj);
-        if (proj != -1) {
-            Projectile projectile = gp.proj[proj];
+        int projIndex = gp.cChecker.checkOverlapCollision(this, gp.proj);
+        if (projIndex != -1) {
+            Projectile projectile = gp.proj[projIndex];
 
             if (projectile.canBeDeflected(false)) {
                 projectile.deflect(this);
             }
         }
 
-        int obj = gp.cChecker.checkOverlapCollision(this, gp.obj);
-        if (obj != -1) {
-            gp.obj[obj].interact();
+        int objIndex = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        if (objIndex != -1) {
+            gp.obj[objIndex].interact();
         }
     }
     private void detectEnemySwordCollision() {
