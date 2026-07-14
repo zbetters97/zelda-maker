@@ -5,7 +5,9 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.enemy.Enemy;
 import entity.item.*;
+import entity.npc.NPC;
 import entity.object.OBJ_Bomb;
+import entity.object.Object;
 import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
@@ -334,6 +336,8 @@ public class Player extends Entity {
     @Override
     public void update() {
 
+        updateAvailableAction();
+
         if (knockback) {
             checkCollision();
             handleKnockback();
@@ -341,8 +345,8 @@ public class Player extends Entity {
             return;
         }
 
-        // Allow A press only when Idle
-        handleActionInput();
+        // Handle button presses
+        handleInput();
 
         // Update player behavior based on current action
         updateAction();
@@ -364,12 +368,48 @@ public class Player extends Entity {
         manageValues();
     }
 
-    /**
-     * HANDLE ACTION INPUT
-     * Updates action based on button pressed
-     * Called by update() if player is IDLE
-     */
-    private void handleActionInput() {
+    private void updateAvailableAction() {
+
+        availableAction = "";
+
+        if (knockback) return;
+
+        if (action == IDLE) {
+
+            if (moving) {
+                availableAction = "ROLL";
+                return;
+            }
+
+            NPC npc = getInteractableNPCs();
+            if (npc != null) {
+                availableAction = npc.getAvailableAction(this);
+                return;
+            }
+
+            Object object = getInteractableObject();
+            if (object != null) {
+                availableAction = object.getAvailableAction(this);
+            }
+        }
+        else if (action == CARRYING && moving) {
+            availableAction = "THROW";
+        }
+    }
+
+    private void handleInput() {
+
+        switch (action) {
+            case IDLE -> handleIdleAction();
+            case CARRYING -> {
+                if (gp.keyH.aPressed) {
+                    startAction();
+                }
+            }
+        }
+    }
+
+    private void handleIdleAction() {
 
         // Action button
         if (gp.keyH.aPressed) {
@@ -408,23 +448,24 @@ public class Player extends Entity {
      */
     private void startAction() {
 
-        // Different action based on current status
-        if (action == IDLE) {
-            // Cooldown needed for rolling
-            if (moving && actionLockCounter == 0) {
-                gp.keyH.aPressed = false;
-                startRoll();
+        switch (action) {
+            case IDLE -> {
+                if (moving && actionLockCounter == 0) {
+                    gp.keyH.aPressed = false;
+                    startRoll();
+                }
+                else {
+                    findInteraction();
+                }
             }
-            else {
-                interactObject();
-            }
-        }
-        else if (action == CARRYING) {
-            if (moving) {
-                throwEntity();
+            case CARRYING -> {
+                if (moving) {
+                    throwEntity();
+                }
             }
         }
     }
+
     /**
      * START ROLL
      * Initiates roll logic
@@ -437,12 +478,45 @@ public class Player extends Entity {
         lockonDirection = direction;
         actionLockCounter = 30;
     }
-    private void interactObject() {
 
-        int object = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (object != -1) {
-            gp.obj[object].interact(this);
+    private void findInteraction() {
+
+        NPC npc = getInteractableNPCs();
+        if (npc != null) {
+            npc.interact(this);
         }
+        else {
+            Object object = getInteractableObject();
+            if (object != null) {
+                object.interact(this);
+            }
+        }
+    }
+    private NPC getInteractableNPCs() {
+
+        NPC npc = null;
+
+        int n = gp.cChecker.checkMovementCollision(this, gp.npc);
+        if (n != -1) {
+            npc = gp.npc[n];
+        }
+
+        return npc;
+    }
+    private Object getInteractableObject() {
+
+        Object object = null;
+
+        int obj = gp.cChecker.checkMovementCollision(this, gp.obj);
+        if (obj == -1) {
+            obj = gp.cChecker.checkOverlapCollision(this, gp.obj);
+        }
+
+        if (obj != -1) {
+            object = gp.obj[obj];
+        }
+
+        return object;
     }
 
     private void throwEntity() {

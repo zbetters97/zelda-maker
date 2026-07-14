@@ -14,6 +14,8 @@ public class OBJ_Chest extends Object {
     public OBJ_Chest(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
         latchable = true;
+
+        availableAction = "OPEN";
     }
 
     @Override
@@ -35,6 +37,7 @@ public class OBJ_Chest extends Object {
 
         if (user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT) {
             opened = true;
+            availableAction = "";
         }
     }
 
@@ -46,5 +49,15 @@ public class OBJ_Chest extends Object {
         else {
             image = up1;
         }
+    }
+
+    @Override
+    public String getAvailableAction(Entity user) {
+
+        if (user.getDirection() != UP) {
+            return "";
+        }
+
+        return availableAction;
     }
 }

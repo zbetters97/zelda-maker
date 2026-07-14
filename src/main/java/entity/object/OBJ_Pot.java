@@ -12,6 +12,8 @@ public class OBJ_Pot extends Object {
     public OBJ_Pot(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
         setLoot();
+
+        availableAction = "GRAB";
     }
 
     @Override

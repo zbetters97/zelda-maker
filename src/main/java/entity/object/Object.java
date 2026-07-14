@@ -41,6 +41,7 @@ public class Object extends Entity {
         grabbed = false;
         canMove = false;
         collisionOn = false;
+        tWorldY = user.getWorldPoint().y;
 
         worldPoint.setLocation(user.getWorldPoint());
 
@@ -126,7 +127,8 @@ public class Object extends Entity {
             xT = 0;
             yT = 0;
 
-            endThrow();
+            gp.cChecker.checkHazard(this);
+            if (alive) endThrow();
         }
     }
     private void checkTossCollision() {
@@ -164,5 +166,11 @@ public class Object extends Entity {
 
     public void setGrabbed(boolean grabbed) {
         this.grabbed = grabbed;
+    }
+    public boolean getTossed() {
+        return tossed;
+    }
+    public int getTWorldY() {
+        return tWorldY;
     }
 }

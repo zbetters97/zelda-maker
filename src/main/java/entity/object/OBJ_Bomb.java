@@ -23,6 +23,8 @@ public class OBJ_Bomb extends Object {
         defaultAttack = 6;
         attack = defaultAttack;
         knockbackPower = 2;
+
+        availableAction = "GRAB";
     }
 
     @Override
@@ -85,6 +87,12 @@ public class OBJ_Bomb extends Object {
     private void explode() {
         alive = false;
     }
+
+    @Override
+    public boolean canCollideWith(Entity target) {
+        return false;
+    }
+
 
     @Override
     public void resetValues() {

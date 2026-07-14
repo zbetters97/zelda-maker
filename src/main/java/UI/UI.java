@@ -4,6 +4,8 @@ import application.GamePanel;
 import application.UtilityTool;
 import entity.Entity;
 import entity.Player;
+import entity.item.ITM_Bomb;
+import entity.item.ITM_Bow;
 import tile.Tile;
 
 import javax.imageio.ImageIO;
@@ -31,6 +33,7 @@ public class UI {
 
     /** UI COLORS */
     private final Color itm_brown_1 = new Color(168, 127, 89);
+    private final Color itm_brown_2 = new Color(247, 219, 167);
     private final Color itm_green = new Color(95, 190, 80);
 
     /** HUD HANDLERS */
@@ -153,6 +156,7 @@ public class UI {
         drawPlayerHealth();
         drawPlayerItem();
         drawRupeeCount();
+        drawAvailableAction();
         drawDebug();
     }
 
@@ -204,8 +208,9 @@ public class UI {
      * Called by drawHUD()
      */
     private void drawPlayerItem() {
-        int x = gp.tileSize * 14 - 15;
-        int y = gp.tileSize / 2 - 15;
+
+        int x = gp.tileSize * 15;
+        int y = gp.tileSize / 3;
         int width = gp.tileSize + 30;
         int height = gp.tileSize + 30;
 
@@ -218,14 +223,26 @@ public class UI {
         g2.drawOval(x, y, width, height);
 
         if (gp.player.getItem() != null) {
+
             x += 10;
             y += 10;
             g2.drawImage(gp.player.getItem().getSprite(), x, y, gp.tileSize + 10, gp.tileSize + 10, null);
+
+            // DRAW ARROW COUNT
+            x += 45;
+            y += 43;
+            if (gp.player.getItem().getName().equals(ITM_Bow.itmName)) {
+                drawItemCount(x, y, Integer.toString(gp.player.getArrows()));
+            }
+            // DRAW BOMB COUNT
+            else if (gp.player.getItem().getName().equals(ITM_Bomb.itmName)) {
+                drawItemCount(x, y, Integer.toString(gp.player.getBombs()));
+            }
         }
 
         // DRAW ITEM BUTTON
-        x = gp.tileSize * 13 + 28;
-        y = gp.tileSize + 12;
+        x = gp.tileSize * 16 + 8;
+        y = 10;
         width = 35;
         height = 35;
         g2.setColor(itm_green);
@@ -241,6 +258,47 @@ public class UI {
         g2.setStroke(new BasicStroke(1));
     }
 
+    private void drawItemCount(int x, int y, String text) {
+
+        int width = 28;
+        int height = 28;
+        g2.setColor(itm_brown_2);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
+        x = getXForCenteredTextOnWidth(text, width, x);
+        y += 24;
+        g2.drawString(text, x, y);
+    }
+
+    private void drawAvailableAction() {
+
+        String availableAction = gp.player.getAvailableAction(gp.player);
+
+        int x = gp.tileSize * 13;
+        int y = gp.tileSize / 3;
+        int width = gp.tileSize + 30;
+        int height = gp.tileSize + 30;
+
+        g2.setColor(Color.WHITE);
+        g2.fillOval(x, y, width, height);
+
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(x, y, width, height);
+
+        g2.setColor(Color.BLUE);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
+        x = getXForCenteredTextOnWidth(availableAction, width, x);
+        y += gp.tileSize;
+        g2.drawString(availableAction, x + 2, y);
+
+        g2.setStroke(new BasicStroke(1));
+    }
+
     /**
      * DRAW RUPEE COUNT
      * Draws the current player's rupee count in the bottom-right corner of the screen
@@ -249,8 +307,8 @@ public class UI {
     private void drawRupeeCount() {
 
         // Draw rupee image
-        int x = gp.tileSize * 14 - 20;
-        int y = gp.tileSize * 10 + 20;
+        int x = gp.tileSize * 15;
+        int y = gp.tileSize * 11 + 20;
         g2.drawImage(rupee, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
 
         x += gp.tileSize - 8;

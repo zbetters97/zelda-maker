@@ -3,6 +3,7 @@ package application;
 import entity.Entity;
 import entity.enemy.Enemy;
 import entity.npc.NPC;
+import entity.object.Object;
 import tile.Tile;
 
 import java.awt.*;
@@ -26,8 +27,20 @@ public record CollisionChecker(GamePanel gp) {
         switch (entity.getMoveDirection()) {
             case UP -> delta.y -= entity.getSpeed();
             case DOWN -> delta.y = entity.getSpeed();
-            case LEFT -> delta.x -= entity.getSpeed();
-            case RIGHT -> delta.x = entity.getSpeed();
+            case LEFT -> {
+                delta.x -= entity.getSpeed();
+
+                if (entity instanceof Object obj && obj.getTossed()) {
+                    delta.y += obj.getTWorldY();
+                }
+            }
+            case RIGHT -> {
+                delta.x = entity.getSpeed();
+
+                if (entity instanceof Object obj && obj.getTossed()) {
+                    delta.y += obj.getTWorldY();
+                }
+            }
             case UPLEFT -> {
                 delta.x -= entity.getSpeed();
                 delta.y -= entity.getSpeed();
@@ -220,11 +233,16 @@ public record CollisionChecker(GamePanel gp) {
 
             boolean alreadyIntersecting = currentRect.intersects(targetRect);
             boolean willIntersect = futureRect.intersects(targetRect);
-            boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
 
-            if (!alreadyIntersecting && willIntersect && canCollide) {
-                entity.setCollision(true);
+            if (!alreadyIntersecting && willIntersect) {
+
                 entityIndex = i;
+
+                boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
+                if (canCollide) {
+                    entity.setCollision(true);
+                }
+
                 break;
             }
         }
@@ -245,10 +263,9 @@ public record CollisionChecker(GamePanel gp) {
                 continue;
             }
 
+            //  boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
             Rectangle targetRect = target.getWorldHitbox();
-            boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
-
-            if (entityRect.intersects(targetRect) && canCollide) {
+            if (entityRect.intersects(targetRect)) {
                 entityIndex = i;
                 break;
             }

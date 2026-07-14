@@ -23,4 +23,9 @@ public class NPC extends Entity {
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
     }
+
+    public void interact(Entity user) {
+        gp.keyH.aPressed = false;
+        direction = getOppositeDirection(user.getDirection());
+    }
 }

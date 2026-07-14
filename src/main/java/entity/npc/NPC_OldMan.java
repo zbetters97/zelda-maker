@@ -1,6 +1,7 @@
 package entity.npc;
 
 import application.GamePanel;
+import entity.Entity;
 
 public class NPC_OldMan extends NPC {
 
@@ -8,6 +9,7 @@ public class NPC_OldMan extends NPC {
 
     public NPC_OldMan(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
+        availableAction = "TALK";
     }
 
     @Override
@@ -23,7 +25,19 @@ public class NPC_OldMan extends NPC {
     }
 
     @Override
+    public void update() {
+        setAction();
+    }
+
+
+    @Override
     protected void setAction() {
         setDirection(60);
+    }
+
+    @Override
+    public void interact(Entity user) {
+        super.interact(user);
+        System.out.println("Hello there, " + user.getName() + "!");
     }
 }

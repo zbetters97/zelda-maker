@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements Runnable {
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
     public final Player player = new Player(this);
-    public final Entity[] npc = new Entity[10];
+    public final NPC[] npc = new NPC[10];
     public final Enemy[] enemy = new Enemy[25];
     public final Object[] obj = new Object[25];
     public final Collectable[] col = new Collectable[25];
@@ -318,7 +318,7 @@ public class GamePanel extends JPanel implements Runnable {
         entityList.add(player);
 
         // NPCs
-        for (Entity n : npc) {
+        for (NPC n : npc) {
             if (n != null) {
                 entityList.add(n);
             }

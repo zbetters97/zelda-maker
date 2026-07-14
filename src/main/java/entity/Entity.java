@@ -85,6 +85,8 @@ public class Entity {
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
 
+    protected String availableAction = "";
+
     /** Z-TARGETING */
     protected boolean lockedOn;
     protected Entity lockedOnTarget;
@@ -1008,5 +1010,9 @@ public class Entity {
     }
     public void setGrabbedObject(Object grabbedObject) {
         this.grabbedObject = grabbedObject;
+    }
+
+    public String getAvailableAction(Entity user) {
+        return availableAction;
     }
 }
