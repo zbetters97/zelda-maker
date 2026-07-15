@@ -82,7 +82,7 @@ public class PRJ_Claw extends Projectile {
     }
     private void checkGrabbableCollision() {
 
-        Entity target = overlapEnemy(this);
+        Entity target = checkGrabbableEntity();
         if (target != null) {
 
             collisionOn = true;
@@ -95,6 +95,19 @@ public class PRJ_Claw extends Projectile {
                 grabbedEntity = target;
             }
         }
+    }
+    private Entity checkGrabbableEntity() {
+
+        Entity target = overlapEnemy(this);
+
+        if (target == null) {
+            int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
+            if (colIndex != -1) {
+                target = gp.col[colIndex];
+            }
+        }
+
+        return target;
     }
 
     private void checkLatchableCollision() {
@@ -167,61 +180,12 @@ public class PRJ_Claw extends Projectile {
         }
     }
 
-    private void returnToUser() {
-
-        // Move backwards to user
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> {
-                if (worldPoint.y + gp.tileSize / 2 <= gp.player.getWorldPoint().y) {
-                    worldPoint.y += 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (worldPoint.y - gp.tileSize / 2 >= gp.player.getWorldPoint().y) {
-                    worldPoint.y -= 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case LEFT -> {
-                if (worldPoint.x + gp.tileSize / 2 <= gp.player.getWorldPoint().x) {
-                    worldPoint.x += 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case RIGHT -> {
-                if (worldPoint.x - gp.tileSize / 2 >= gp.player.getWorldPoint().x) {
-                    worldPoint.x -= 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-        }
+    @Override
+    protected void returnToUser() {
+        super.returnToUser();
 
         if (grabbedEntity != null) {
-            pullEntity();
-        }
-    }
-    private void pullEntity() {
-
-        grabbedEntity.resetValues();
-        grabbedEntity.setCanMove(false);
-        grabbedEntity.setDirection(getOppositeDirection(direction));
-        grabbedEntity.setElevated(true);
-
-        // Offset X/Y so entity isn't on top of player
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y - gp.tileSize / 2);
-            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y + gp.tileSize / 2);
-            case LEFT -> grabbedEntity.setWorldPointX(worldPoint.x - gp.tileSize / 2);
-            case RIGHT -> grabbedEntity.setWorldPointX(worldPoint.x + gp.tileSize / 2);
+            pullEntity(grabbedEntity);
         }
     }
 

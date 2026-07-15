@@ -123,6 +123,60 @@ public class Projectile extends Entity {
         }
     }
 
+    protected void returnToUser() {
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (getCenterY() < user.getCenterY()) {
+                    worldPoint.y += 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                if (getCenterY() > user.getCenterY()) {
+                    worldPoint.y -= 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case LEFT -> {
+                if (getCenterX() < user.getCenterX()) {
+                    worldPoint.x += 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+            case RIGHT -> {
+                if (getCenterX() > user.getCenterX()) {
+                    worldPoint.x -= 5;
+                }
+                else {
+                    alive = false;
+                }
+            }
+        }
+    }
+
+    protected void pullEntity(Entity grabbedEntity) {
+
+        grabbedEntity.resetValues();
+        grabbedEntity.setCanMove(false);
+        grabbedEntity.setDirection(getOppositeDirection(direction));
+        grabbedEntity.setElevated(true);
+
+        // Offset X/Y so entity isn't on top of player
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y - gp.tileSize / 2);
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y + gp.tileSize / 2);
+            case LEFT -> grabbedEntity.setWorldPointX(worldPoint.x - gp.tileSize / 2);
+            case RIGHT -> grabbedEntity.setWorldPointX(worldPoint.x + gp.tileSize / 2);
+        }
+    }
+
     @Override
     public boolean canCollideWith(Entity target) {
 

@@ -2,6 +2,7 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.collectable.Collectable;
 import entity.enemy.Enemy;
 
 import java.awt.*;
@@ -11,6 +12,7 @@ public class PRJ_Boomerang extends Projectile {
     public static final String prjName = "Boomerang Projectile";
 
     private boolean returning = false;
+    private Collectable grabbedEntity;
 
     public PRJ_Boomerang(GamePanel gp) {
         super(gp, prjName);
@@ -52,6 +54,16 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     @Override
+    public void checkCollision() {
+        super.checkCollision();
+
+        int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
+        if (colIndex != -1) {
+            grabbedEntity = gp.col[colIndex];
+        }
+    }
+
+    @Override
     protected boolean checkEnemyCollision() {
 
         Enemy enemy = overlapEnemy(this);
@@ -75,40 +87,12 @@ public class PRJ_Boomerang extends Projectile {
         }
     }
 
-    private void returnToUser() {
-        switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> {
-                if (getCenterY() < user.getCenterY()) {
-                    worldPoint.y += 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                if (getCenterY() > user.getCenterY()) {
-                    worldPoint.y -= 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case LEFT -> {
-                if (getCenterX() < user.getCenterX()) {
-                    worldPoint.x += 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
-            case RIGHT -> {
-                if (getCenterX() > user.getCenterX()) {
-                    worldPoint.x -= 5;
-                }
-                else {
-                    alive = false;
-                }
-            }
+    @Override
+    protected void returnToUser() {
+        super.returnToUser();
+
+        if (grabbedEntity != null) {
+            pullEntity(grabbedEntity);
         }
     }
 
