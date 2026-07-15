@@ -306,10 +306,7 @@ public class GamePanel extends JPanel implements Runnable {
     private void drawToTempScreen() {
 
         drawTiles();
-        drawObjects();
         drawEntities();
-        drawProjectiles();
-        drawParticles();
 
         if (gameState == editState) {
             drawGrid();
@@ -321,20 +318,6 @@ public class GamePanel extends JPanel implements Runnable {
     /** DRAW METHODS **/
     private void drawTiles() {
         tileM.draw(g2);
-    }
-    private void drawObjects() {
-
-        for (Object obj : obj) {
-            if (obj != null) {
-                obj.draw(g2);
-            }
-        }
-
-        for (Collectable col : col) {
-            if (col != null) {
-                col.draw(g2);
-            }
-        }
     }
     private void drawEntities() {
 
@@ -354,32 +337,54 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        // Sort draw order by Y coordinate
-        entityList.sort(Comparator.comparingInt(Entity::getWorldPointY));
+        // Objects
+        for (Object o : obj) {
+            if (o != null) {
+                entityList.add(o);
+            }
+        }
 
-        // Draw all entities
+        // Projectiles
+        for (Projectile p : proj) {
+            if (p != null) {
+                entityList.add(p);
+            }
+        }
+
+        // Collectables
+        for (Collectable c : col) {
+            if (c != null) {
+                entityList.add(c);
+            }
+        }
+
+        // Particles
+        for (Particle pa : particleList) {
+            if (pa != null) {
+                entityList.add(pa);
+            }
+        }
+
         for (Entity e : entityList) {
-            e.draw(g2);
+            if (e.getDrawLayer() == Entity.DrawLayer.GROUND) {
+                e.draw(g2);
+            }
+        }
+
+        entityList.stream()
+                .filter(e -> e.getDrawLayer() == Entity.DrawLayer.ENTITY)
+                .sorted(Comparator.comparing(Entity::getIsGrabbed)
+                .thenComparingInt(Entity::getWorldPointY))
+                .forEach(e -> e.draw(g2));
+
+        for (Entity e : entityList) {
+            if (e.getDrawLayer() == Entity.DrawLayer.ABOVE) {
+                e.draw(g2);
+            }
         }
 
         // Empty list
         entityList.clear();
-    }
-    private void drawProjectiles() {
-
-        for (Projectile proj : proj) {
-            if (proj != null) {
-                proj.draw(g2);
-            }
-        }
-    }
-    private void drawParticles() {
-
-        for (Particle par : particleList) {
-            if (par != null) {
-                par.draw(g2);
-            }
-        }
     }
 
     /**

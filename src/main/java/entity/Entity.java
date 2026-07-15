@@ -58,6 +58,13 @@ public class Entity {
         public boolean locksFacing() { return locksFacing; }
     }
 
+    /** DRAW LAYER enum */
+    public enum DrawLayer {
+        GROUND,
+        ENTITY,
+        ABOVE
+    }
+
     protected GamePanel gp;
 
     /** GENERAL ATTRIBUTES */
@@ -123,6 +130,7 @@ public class Entity {
     protected boolean needsWater = false;
     protected boolean shielded = false;
 
+    protected boolean grabbed = false;
     protected Object grabbedObject;
 
     /** COMBAT VALUES */
@@ -808,6 +816,10 @@ public class Entity {
         this.drawing = drawing;
     }
 
+    public DrawLayer getDrawLayer() {
+        return DrawLayer.ENTITY;
+    }
+
     public Point getScreenPoint() {
         return new Point(
                 worldPoint.x - gp.player.worldPoint.x + gp.player.screenPoint.x,
@@ -1016,6 +1028,9 @@ public class Entity {
         return buzzing;
     }
 
+    public boolean getIsGrabbed() {
+        return grabbed;
+    }
     public Object getGrabbedObject() {
         return grabbedObject;
     }

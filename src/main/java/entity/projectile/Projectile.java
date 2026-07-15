@@ -216,4 +216,9 @@ public class Projectile extends Entity {
     public void pickup(Entity user) {
 
     }
+
+    @Override
+    public DrawLayer getDrawLayer() {
+        return DrawLayer.ABOVE;
+    }
 }

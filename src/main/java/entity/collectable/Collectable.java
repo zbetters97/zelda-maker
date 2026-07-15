@@ -24,4 +24,8 @@ public class Collectable extends Entity {
     protected void getSpriteImage() {
         image = sprite;
     }
+
+    public DrawLayer getDrawLayer() {
+        return DrawLayer.GROUND;
+    }
 }

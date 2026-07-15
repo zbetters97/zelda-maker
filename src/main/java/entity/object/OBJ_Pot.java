@@ -15,6 +15,11 @@ public class OBJ_Pot extends Object {
         super(gp, worldX, worldY, objName);
         setLoot();
 
+        hitbox = new Rectangle(4, 16, 40, 32);
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
+
         availableAction = "GRAB";
     }
 
@@ -69,7 +74,7 @@ public class OBJ_Pot extends Object {
 
         alive = false;
         dropItem(loot);
-        super.landOnGround();
+        createParticles();
     }
 
     @Override

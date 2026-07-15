@@ -17,12 +17,18 @@ public class OBJ_Bomb extends Object {
         defaultSpeed = gp.tileSize / 2;
         speed = defaultSpeed;
 
-        maxHealth = 240;
+        maxHealth = 300;
         health = maxHealth;
+        opened = true;
 
         defaultAttack = 6;
         attack = defaultAttack;
         knockbackPower = 2;
+
+        hitbox = new Rectangle(12, 15, 24, 27);
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
 
         availableAction = "GRAB";
     }
@@ -49,16 +55,12 @@ public class OBJ_Bomb extends Object {
         user.setAction(Action.GRABBING);
         user.setGrabbedObject(this);
         resetValues();
+        opened = true;
     }
 
     @Override
     public void interact() {
         explode();
-    }
-
-    @Override
-    protected void landOnGround() {
-        opened = true;
     }
 
     private void lightFuse() {
@@ -75,7 +77,7 @@ public class OBJ_Bomb extends Object {
     protected void cycleSprites() {
 
         if (animationSpeed < ++spriteCounter) {
-            if (spriteNum == 1) {
+            if (spriteNum == 1 && health < 240) {
                 spriteNum = 2;
             }
             else {
@@ -99,7 +101,6 @@ public class OBJ_Bomb extends Object {
 
     @Override
     public void resetValues() {
-
         animationSpeed = 30;
         spriteCounter = 0;
         spriteNum = 1;

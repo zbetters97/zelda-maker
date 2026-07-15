@@ -11,7 +11,6 @@ import static entity.Entity.Action.THROWING;
 
 public class Object extends Entity {
 
-    protected boolean grabbed = false;
     protected boolean tossed = false;
     private int tossCounter;
     private double tTime = 0;
@@ -148,7 +147,7 @@ public class Object extends Entity {
     }
 
     protected void landOnGround() {
-        createParticles();
+
     }
     protected void createParticles() {
         Particle.generateParticles(gp, worldPoint, getParticleMaxHealth(), getParticleSpeed(), getParticleColor(), getParticleSize());
@@ -163,9 +162,10 @@ public class Object extends Entity {
 
     @Override
     public void draw(Graphics2D g2) {
-        if (!grabbed && drawing) {
-            super.draw(g2);
-        }
+        super.draw(g2);
+
+        g2.setColor(Color.RED);
+        g2.drawRect(screenPoint.x + hitbox.x, screenPoint.y + hitbox.y, hitbox.width, hitbox.height);
     }
 
     public void setGrabbed(boolean grabbed) {

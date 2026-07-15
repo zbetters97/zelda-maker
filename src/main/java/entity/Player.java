@@ -515,7 +515,10 @@ public class Player extends Entity {
 
         gp.keyH.aPressed = false;
 
-        if (grabbedObject == null) return;
+        if (grabbedObject == null) {
+            action = THROWING;
+            return;
+        }
 
         grabbedObject.toss(this);
     }
@@ -1116,7 +1119,7 @@ public class Player extends Entity {
      */
     private void grabbing() {
 
-        if (grabbedObject == null) {
+        if (grabbedObject == null || !grabbedObject.getAlive()) {
             resetGrab();
             return;
         }
@@ -1138,14 +1141,9 @@ public class Player extends Entity {
             grabNum = 3;
         }
         else {
-            if (grabbedObject != null) {
-                grabNum = 1;
-                grabCounter = 0;
-                action = Action.CARRYING;
-            }
-            else {
-                resetGrab();
-            }
+            grabNum = 1;
+            grabCounter = 0;
+            action = Action.CARRYING;
 
             gp.keyH.aPressed = false;
         }
@@ -1164,11 +1162,14 @@ public class Player extends Entity {
      */
     private void carrying() {
 
-        if (grabbedObject == null) return;
+        if (grabbedObject == null || !grabbedObject.getAlive()) {
+            resetGrab();
+            return;
+        }
 
         grabbedObject.setGrabbed(true);
         grabbedObject.setCanMove(false);
-        grabbedObject.setWorldPoint(worldPoint);
+        grabbedObject.setWorldPoint(new Point(worldPoint.x, worldPoint.y - sprite.getHeight() + 12));
     }
 
     /**
@@ -1425,9 +1426,6 @@ public class Player extends Entity {
         if (action == JUMPING || action == SOARING) {
             g2.setColor(Color.BLACK);
             g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
-        }
-        else if (action == CARRYING && grabbedObject != null) {
-            g2.drawImage(grabbedObject.getSprite(), screenPoint.x, screenPoint.y - sprite.getHeight() + 12, null);
         }
 
         // Reset opacity

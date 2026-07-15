@@ -15,6 +15,11 @@ public class OBJ_Chest extends Object {
         super(gp, worldX, worldY, objName);
         latchable = true;
 
+        hitbox = new Rectangle(4, 16, 40, 32);
+        hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
+        hitboxDefaultWidth = hitbox.width;
+        hitboxDefaultHeight = hitbox.height;
+
         availableAction = "OPEN";
     }
 
@@ -31,7 +36,7 @@ public class OBJ_Chest extends Object {
 
     @Override
     public void interact(Entity user) {
-        if (opened) {
+        if (opened || !gp.keyH.aPressed) {
             return;
         }
 

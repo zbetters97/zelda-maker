@@ -192,7 +192,7 @@ public class OBJ_Cucco extends Object {
     @Override
     public void draw(Graphics2D g2) {
 
-        if (grabbed || !drawing) return;
+        if (!drawing) return;
 
         drawOffset.setLocation(0, 0);
         getSpriteImage();

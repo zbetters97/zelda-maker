@@ -11,6 +11,7 @@ public class OBJ_Block_Red extends Object {
 
     public OBJ_Block_Red(GamePanel gp, int col, int row) {
         super(gp, col, row, objName);
+        collisionOn = false;
     }
 
     @Override
@@ -39,11 +40,13 @@ public class OBJ_Block_Red extends Object {
                 if (!gp.obj[i].getOpened()) {
                     opened = false;
                     collisionOn = false;
+                    return;
                 }
                 // Turn off if no collision
                 else if (noOverlap()) {
                     opened = true;
                     collisionOn = true;
+                    return;
                 }
             }
         }
@@ -72,11 +75,11 @@ public class OBJ_Block_Red extends Object {
 
     @Override
     protected void getSpriteImage() {
-        if (opened) {
-            image = up1;
-        }
-        else {
-            image = up2;
-        }
+        image = opened ? up1 : up2;
+    }
+
+    @Override
+    public DrawLayer getDrawLayer() {
+        return collisionOn ? DrawLayer.ENTITY : DrawLayer.GROUND;
     }
 }
