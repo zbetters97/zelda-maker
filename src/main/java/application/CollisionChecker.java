@@ -5,6 +5,7 @@ import entity.enemy.Enemy;
 import entity.npc.NPC;
 import entity.object.Object;
 import tile.Tile;
+import tile.TileManager;
 
 import java.awt.*;
 
@@ -122,6 +123,16 @@ public record CollisionChecker(GamePanel gp) {
         else if (entity.getNeedsWater()) {
             entity.setCollision(true);
         }
+    }
+
+    public boolean checkIce(Entity entity) {
+
+        Point center = entity.getCenterPoint();
+
+        int col = center.x / gp.tileSize;
+        int row = center.y / gp.tileSize;
+
+        return gp.tileM.mapTileNum[col][row] == TileManager.iceTile;
     }
 
     public void checkHazard(Entity entity) {

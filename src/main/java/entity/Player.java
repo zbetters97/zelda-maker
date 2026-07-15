@@ -355,14 +355,8 @@ public class Player extends Entity {
             zTargeting();
         }
 
-        // Read directional input if current action allows
-        if (action.allowsFacing()) {
-            handleMovementInput();
-        }
-        // Auto-move player if action denies input but allows movement
-        else if (action.allowsTranslation()) {
-            move();
-        }
+        // Handle player movement and input
+        updateMovement();
 
         manageValues();
     }
@@ -713,37 +707,22 @@ public class Player extends Entity {
      * Calls directionPressed() to update direction when an arrow key is pressed
      * Called by update() if current action allows
      */
+    private void updateMovement() {
+
+        if (action.allowsFacing()) {
+            handleMovementInput();
+        }
+        else if (action.allowsTranslation()) {
+            move();
+        }
+
+        // Always check for ice
+        handleIceSliding();
+    }
     private void handleMovementInput() {
 
         if (hasMovementInput()) {
-
             updateDirection();
-
-            // TODO if ice...
-            slideDirection = getMoveDirection();
-            slideCounter = 24;
-
-            animationSpeed = 6;
-
-            // TODO else animationSpeed = 10;
-        }
-        // TODO & ice
-        else if (slideCounter > 0) {
-
-            collisionOn = false;
-            checkCollision();
-
-            animationSpeed = 6;
-            super.move(slideDirection);
-            cycleSprites();
-
-            if (collisionOn) {
-                slideCounter = 0;
-                animationSpeed = 10;
-            }
-            else {
-                slideCounter--;
-            }
         }
         else {
             moving = false;
@@ -753,6 +732,44 @@ public class Player extends Entity {
         return gp.keyH.upPressed || gp.keyH.downPressed || gp.keyH.leftPressed || gp.keyH.rightPressed;
     }
 
+    private void handleIceSliding() {
+
+        boolean onIce = gp.cChecker.checkIce(this);
+        if (!onIce || action == ROLLING) {
+            slideCounter = 0;
+            animationSpeed = 10;
+            return;
+        }
+
+        animationSpeed = 4;
+
+        // Slide for 30 frames in direction of input
+        if (hasMovementInput() && action.allowsTranslation()) {
+            slideDirection = getMoveDirection();
+            slideCounter = 30;
+        }
+        // Sliding with no input while IDLE
+        else if (slideCounter > 0 && action != SPINNING) {
+            cycleSprites();
+        }
+
+        // Sliding
+        if (slideCounter > 0) {
+
+            collisionOn = false;
+            checkCollision();
+            super.move(slideDirection);
+
+            // Hit collision, stop sliding
+            if (collisionOn) {
+                slideCounter = 0;
+            }
+            else {
+                slideCounter--;
+            }
+        }
+    }
+
     /**
      * UPDATE DIRECTION
      * Handles player movement logic
@@ -760,10 +777,17 @@ public class Player extends Entity {
      */
     @Override
     protected void updateDirection() {
+
        updateFacing();
 
        if (!action.allowsTranslation()) {
            moving = false;
+           return;
+       }
+
+       // Don't move extra while on ice
+       if (gp.cChecker.checkIce(this)) {
+           cycleSprites();
            return;
        }
 
