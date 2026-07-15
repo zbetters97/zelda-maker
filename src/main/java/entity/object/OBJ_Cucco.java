@@ -149,7 +149,7 @@ public class OBJ_Cucco extends Object {
     }
 
     @Override
-    protected void endThrow() {
+    protected void landOnGround() {
         health -= 2;
         speed = 0;
         directionRate = 10;

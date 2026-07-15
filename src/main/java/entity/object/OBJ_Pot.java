@@ -5,6 +5,8 @@ import entity.Entity;
 import entity.collectable.*;
 import entity.enemy.Enemy;
 
+import java.awt.*;
+
 public class OBJ_Pot extends Object {
 
     public static final String objName = "Pot";
@@ -48,11 +50,12 @@ public class OBJ_Pot extends Object {
     @Override
     public void interact() {
         alive = false;
+        super.landOnGround();
         dropItem(loot);
     }
 
     @Override
-    protected void endThrow() {
+    protected void landOnGround() {
 
         Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
@@ -65,10 +68,29 @@ public class OBJ_Pot extends Object {
         }
 
         alive = false;
+        dropItem(loot);
+        super.landOnGround();
     }
 
     @Override
     protected void getSpriteImage() {
         image = sprite;
+    }
+
+    @Override
+    protected Color getParticleColor() {
+        return new Color(150, 83, 23);
+    }
+    @Override
+    protected int getParticleSize() {
+        return 9;
+    }
+    @Override
+    protected int getParticleSpeed() {
+        return 1;
+    }
+    @Override
+    protected int getParticleMaxHealth() {
+        return 16;
     }
 }

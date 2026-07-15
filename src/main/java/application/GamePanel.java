@@ -10,6 +10,7 @@ import entity.collectable.Collectable;
 import entity.enemy.Enemy;
 import entity.npc.NPC;
 import entity.object.Object;
+import entity.object.Particle;
 import entity.projectile.Projectile;
 import tile.TileManager;
 
@@ -18,6 +19,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -89,6 +91,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final Object[] obj = new Object[25];
     public final Collectable[] col = new Collectable[25];
     public final Projectile[] proj = new Projectile[50];
+    public final ArrayList<Particle> particleList = new ArrayList<>();
 
     /**
      * CONSTRUCTOR
@@ -202,11 +205,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (gameState == playState) {
             camera.follow(player.getWorldPoint());
             player.update();
-            updateNPCs();
-            updateEnemies();
-            updateObjects();
-            updateCollectables();
-            updateProjectiles();
+            updateEntities();
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
@@ -225,6 +224,14 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     /** UPDATERS **/
+    private void updateEntities() {
+        updateNPCs();
+        updateEnemies();
+        updateObjects();
+        updateCollectables();
+        updateProjectiles();
+        updateParticles();
+    }
     private void updateNPCs() {
         for (Entity entity : npc) {
             if (entity != null) {
@@ -276,6 +283,20 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+    private void updateParticles() {
+        Iterator<Particle> iterator = particleList.iterator();
+
+        while (iterator.hasNext()) {
+
+            Particle particle = iterator.next();
+            if (particle != null) {
+                particle.update();
+                if (!particle.getAlive()) {
+                    iterator.remove();
+                }
+            }
+        }
+    }
 
     /**
      * DRAW TO TEMP SCREEN
@@ -283,10 +304,12 @@ public class GamePanel extends JPanel implements Runnable {
      * Called by run()
      */
     private void drawToTempScreen() {
+
         drawTiles();
         drawObjects();
         drawEntities();
         drawProjectiles();
+        drawParticles();
 
         if (gameState == editState) {
             drawGrid();
@@ -350,6 +373,14 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+    private void drawParticles() {
+
+        for (Particle par : particleList) {
+            if (par != null) {
+                par.draw(g2);
+            }
+        }
+    }
 
     /**
      * DRAW TO SCREEN
@@ -392,21 +423,13 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public Entity[] getEntityList(Entity entity) {
 
-        if (entity instanceof NPC) {
-            return npc;
-        }
-        else if (entity instanceof Enemy) {
-            return enemy;
-        }
-        else if (entity instanceof Object) {
-            return obj;
-        }
-        else if (entity instanceof Collectable) {
-            return col;
-        }
-        else {
-            return null;
-        }
+        return switch (entity) {
+            case NPC _ -> npc;
+            case Enemy _ -> enemy;
+            case Object _ -> obj;
+            case Collectable _ -> col;
+            case null, default -> null;
+        };
     }
 
     public int findOpenSlot(Entity[] list) {

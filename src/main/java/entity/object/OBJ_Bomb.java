@@ -57,7 +57,7 @@ public class OBJ_Bomb extends Object {
     }
 
     @Override
-    protected void endThrow() {
+    protected void landOnGround() {
         opened = true;
     }
 
@@ -88,6 +88,7 @@ public class OBJ_Bomb extends Object {
     }
 
     private void explode() {
+        createParticles();
         alive = false;
     }
 
@@ -118,6 +119,19 @@ public class OBJ_Bomb extends Object {
         super.draw(g2);
 
         changeAlpha(g2, 1f);
+    }
+
+    @Override
+    protected int getParticleSize() {
+        return 7;
+    }
+    @Override
+    protected int getParticleSpeed() {
+        return 1;
+    }
+    @Override
+    protected int getParticleMaxHealth() {
+        return 20;
     }
 
     @Override

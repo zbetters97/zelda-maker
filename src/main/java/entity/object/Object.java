@@ -128,7 +128,9 @@ public class Object extends Entity {
             yT = 0;
 
             gp.cChecker.checkHazard(this);
-            if (alive) endThrow();
+            if (alive) {
+                landOnGround();
+            }
         }
     }
     private void checkTossCollision() {
@@ -145,14 +147,16 @@ public class Object extends Entity {
         worldPoint.y = (int) (0.5 * tG * tTime * tTime + tSpeed * Math.sin(angle * Math.PI / 180.0) * tTime + yT);
     }
 
-    protected void endThrow() {
-
+    protected void landOnGround() {
+        createParticles();
+    }
+    protected void createParticles() {
+        Particle.generateParticles(gp, worldPoint, getParticleMaxHealth(), getParticleSpeed(), getParticleColor(), getParticleSize());
     }
 
     public void interact(Entity user) {
 
     }
-
     public void interact() {
 
     }
@@ -172,5 +176,18 @@ public class Object extends Entity {
     }
     public int getTWorldY() {
         return tWorldY;
+    }
+
+    protected int getParticleMaxHealth() {
+        return 0;
+    }
+    protected int getParticleSpeed() {
+        return 0;
+    }
+    protected Color getParticleColor() {
+        return new Color(0, 0, 0);
+    }
+    protected int getParticleSize() {
+        return 0;
     }
 }
