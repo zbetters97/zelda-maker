@@ -85,6 +85,10 @@ public class Entity {
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
 
+    /** ICE VALUES */
+    protected int slideCounter = 0;
+    protected Direction slideDirection;
+
     protected String availableAction = "";
 
     /** Z-TARGETING */

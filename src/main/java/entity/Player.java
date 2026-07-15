@@ -714,12 +714,43 @@ public class Player extends Entity {
      * Called by update() if current action allows
      */
     private void handleMovementInput() {
-        if (gp.keyH.upPressed || gp.keyH.downPressed || gp.keyH.leftPressed || gp.keyH.rightPressed) {
+
+        if (hasMovementInput()) {
+
             updateDirection();
+
+            // TODO if ice...
+            slideDirection = getMoveDirection();
+            slideCounter = 24;
+
+            animationSpeed = 6;
+
+            // TODO else animationSpeed = 10;
+        }
+        // TODO & ice
+        else if (slideCounter > 0) {
+
+            collisionOn = false;
+            checkCollision();
+
+            animationSpeed = 6;
+            super.move(slideDirection);
+            cycleSprites();
+
+            if (collisionOn) {
+                slideCounter = 0;
+                animationSpeed = 10;
+            }
+            else {
+                slideCounter--;
+            }
         }
         else {
             moving = false;
         }
+    }
+    private boolean hasMovementInput() {
+        return gp.keyH.upPressed || gp.keyH.downPressed || gp.keyH.leftPressed || gp.keyH.rightPressed;
     }
 
     /**
