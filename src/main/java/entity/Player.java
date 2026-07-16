@@ -29,6 +29,11 @@ public class Player extends Entity {
     private final ArrayList<Item> items = new ArrayList<>();
     private int currentItemSlot = 0;
 
+
+    /** ICE VALUES */
+    private int slideCounter = 0;
+    private Direction slideDirection;
+
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
     private int
@@ -777,7 +782,7 @@ public class Player extends Entity {
         }
 
         // Sliding
-        if (slideCounter > 0) {
+        if (slideCounter > 0 && slideDirection != null) {
 
             collisionOn = false;
             checkCollision();
@@ -1190,7 +1195,6 @@ public class Player extends Entity {
 
         grabbedObject.setGrabbed(true);
         grabbedObject.setCanMove(false);
-        grabbedObject.setWorldPoint(new Point(worldPoint.x, worldPoint.y - sprite.getHeight() + 12));
     }
 
     /**
@@ -1447,6 +1451,9 @@ public class Player extends Entity {
         if (action == JUMPING || action == SOARING) {
             g2.setColor(Color.BLACK);
             g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
+        }
+        else if (action == CARRYING && grabbedObject != null) {
+            grabbedObject.setWorldPoint(new Point(worldPoint.x, worldPoint.y - sprite.getHeight() + 12));
         }
 
         // Reset opacity

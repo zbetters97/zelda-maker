@@ -20,6 +20,8 @@ public class OBJ_Pot extends Object {
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
 
+        attack = 1;
+
         availableAction = "GRAB";
     }
 

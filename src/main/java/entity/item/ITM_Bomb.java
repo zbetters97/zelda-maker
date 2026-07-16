@@ -23,7 +23,7 @@ public class ITM_Bomb extends Item {
 
         if (0 < user.getBombs() && user.getGrabbedObject() == null) {
 
-            Object bomb = new OBJ_Bomb(gp, user.getWorldPoint().x, user.getWorldPoint().y);
+            Object bomb = new OBJ_Bomb(gp, -gp.tileSize, -gp.tileSize);
             addBomb(bomb);
 
             user.addBombs(-1);

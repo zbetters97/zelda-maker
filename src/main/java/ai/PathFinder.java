@@ -89,22 +89,26 @@ public class PathFinder {
                 node[col][row].solid = true;
             }
 
-            // Check objects
-            for (int i = 0; i < gp.obj.length; i++) {
-
-                if (gp.obj[i] != null && gp.obj[i].getCollision()) {
-                    int iCol = gp.obj[i].getWorldPoint().x / gp.tileSize;
-                    int iRow = gp.obj[i].getWorldPoint().y / gp.tileSize;
-                    node[iCol][iRow].solid = true;
-                }
-            }
-
             // Check NPCs
             for (int i = 0; i < gp.npc.length; i++) {
 
                 if (gp.npc[i] != null && gp.npc[i].getSpeed() == 0) {
                     int iCol = gp.npc[i].getWorldPoint().x / gp.tileSize;
                     int iRow = gp.npc[i].getWorldPoint().y / gp.tileSize;
+                    if (iCol < 0 || iRow < 0) continue;
+
+                    node[iCol][iRow].solid = true;
+                }
+            }
+
+            // Check objects
+            for (int i = 0; i < gp.obj.length; i++) {
+
+                if (gp.obj[i] != null && gp.obj[i].getCollision()) {
+                    int iCol = gp.obj[i].getWorldPoint().x / gp.tileSize;
+                    int iRow = gp.obj[i].getWorldPoint().y / gp.tileSize;
+                    if (iCol < 0 || iRow < 0) continue;
+
                     node[iCol][iRow].solid = true;
                 }
             }

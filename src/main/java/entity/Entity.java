@@ -31,7 +31,7 @@ public class Entity {
         GUARDING(true, false, false),
         DIGGING(false, false, false),
         AIMING(true, true, true),
-        GRABBING(false, false, true),
+        GRABBING(false, false, false),
         CARRYING(true, true, false),
         THROWING(false, false, false),
         JUMPING(true, true, false),
@@ -91,10 +91,6 @@ public class Entity {
     protected boolean moving = false;
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
-
-    /** ICE VALUES */
-    protected int slideCounter = 0;
-    protected Direction slideDirection;
 
     protected String availableAction = "";
 

@@ -41,6 +41,7 @@ public class Object extends Entity {
 
         // Direction same as user
         direction = user.getDirection();
+        worldPoint.y = user.getWorldPoint().y;
 
         user.setAction(THROWING);
 
