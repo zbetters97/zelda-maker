@@ -34,6 +34,7 @@ public class OBJ_Pot extends Object {
     }
 
     private void setLoot() {
+
         int rand = (int) (Math.random() * 10);
         loot = switch (rand) {
             case 0, 1, 2, 3, 4 -> new COL_Rupee_Green(gp);
@@ -54,24 +55,31 @@ public class OBJ_Pot extends Object {
 
     @Override
     public void interact() {
-        alive = false;
-        dropItem(loot);
+
+        // Break if hit by entity
+        shatter();
     }
 
     @Override
     protected void landOnGround() {
         super.landOnGround();
 
+        // Damage enemy if landed
         Enemy enemy = overlapEnemy(this);
         if (enemy != null) {
             enemy.takeDamage(this);
         }
 
+        // Damage player if landed
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
             gp.player.takeDamage(this);
         }
 
+        shatter();
+    }
+
+    private void shatter() {
         alive = false;
         dropItem(loot);
         createParticles();

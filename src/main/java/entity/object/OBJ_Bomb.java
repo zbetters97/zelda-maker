@@ -9,6 +9,8 @@ public class OBJ_Bomb extends Object {
 
     public static final String objName = "Bomb";
 
+    private boolean lit = false;
+
     public OBJ_Bomb(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
 
@@ -35,14 +37,15 @@ public class OBJ_Bomb extends Object {
 
     @Override
     protected void getImages() {
-        sprite = setupImage("/objects/obj_bomb");
+        sprite = up1 = setupImage("/objects/obj_bomb_off");
+        up2 = setupImage("/objects/obj_bomb_on");
     }
 
     @Override
     public void update() {
         super.update();
 
-        if (opened) {
+        if (lit) {
             lightFuse();
         }
     }
@@ -55,11 +58,15 @@ public class OBJ_Bomb extends Object {
         user.setAction(Action.GRABBING);
         user.setGrabbedObject(this);
         resetValues();
-        opened = true;
+
+        // Light the fuse
+        lit = true;
     }
 
     @Override
     public void interact() {
+
+        // Explode if hit by entity
         explode();
     }
 
@@ -67,8 +74,8 @@ public class OBJ_Bomb extends Object {
 
         cycleSprites();
 
-        health--;
-        if (health <= 0) {
+        // Timer ran out, explode
+        if (--health <= 0) {
             explode();
         }
     }
@@ -77,6 +84,8 @@ public class OBJ_Bomb extends Object {
     protected void cycleSprites() {
 
         if (animationSpeed < ++spriteCounter) {
+
+            // Don't start ticking animation until 240 frames left
             if (spriteNum == 1 && health < 240) {
                 spriteNum = 2;
             }
@@ -84,8 +93,9 @@ public class OBJ_Bomb extends Object {
                 spriteNum = 1;
             }
 
-            spriteCounter = 0;
+            // Speed up animation speed
             animationSpeed -= 3;
+            spriteCounter = 0;
         }
     }
 
@@ -105,22 +115,8 @@ public class OBJ_Bomb extends Object {
         spriteCounter = 0;
         spriteNum = 1;
         health = maxHealth;
-        opened = false;
+        lit = false;
         interactable = true;
-    }
-
-    @Override
-    public void draw(Graphics2D g2) {
-
-        if (!drawing) return;
-
-        if (spriteNum == 2) {
-           changeAlpha(g2, 0.5f);
-        }
-
-        super.draw(g2);
-
-        changeAlpha(g2, 1f);
     }
 
     @Override
@@ -138,6 +134,11 @@ public class OBJ_Bomb extends Object {
 
     @Override
     protected void getSpriteImage() {
-        image = sprite;
+        if (spriteNum == 1) {
+            image = up1;
+        }
+        else {
+            image = up2;
+        }
     }
 }

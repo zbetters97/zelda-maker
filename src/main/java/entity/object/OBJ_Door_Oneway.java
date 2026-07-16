@@ -70,9 +70,10 @@ public class OBJ_Door_Oneway extends Object {
 
     private void letUserThrough() {
 
+        // Shift to center of door
         user.setWorldPointX(worldPoint.x);
 
-        // Shift player past door
+        // Move player in front of door
         switch (direction) {
             case UP -> user.setWorldPointY(worldPoint.y + gp.tileSize);
             case DOWN -> user.setWorldPointY(worldPoint.y - gp.tileSize);
@@ -101,6 +102,7 @@ public class OBJ_Door_Oneway extends Object {
     }
 
     private void getOpeningSprite() {
+
         if (spriteNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> attackUp1;
@@ -128,6 +130,7 @@ public class OBJ_Door_Oneway extends Object {
     }
 
     private void getIdleSprite() {
+
         if (spriteNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up1;

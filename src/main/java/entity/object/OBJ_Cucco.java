@@ -68,6 +68,7 @@ public class OBJ_Cucco extends Object {
     @Override
     public void update() {
 
+        // Can't move if in the air
         if (tossed) {
             super.handleToss();
             return;
@@ -81,15 +82,19 @@ public class OBJ_Cucco extends Object {
 
     protected void setAction() {
 
-        if (health <= 0) {
-            handleAggression();
+        // If hostile, chase after player
+        if (action == Action.ATTACKING) {
+            handleHostile();
         }
+        // If idle, move around
         else {
             setDirection(directionRate);
         }
     }
 
-    private void handleAggression() {
+    private void handleHostile() {
+
+        // Search for player
         ai.isOffPath(gp.player, 12);
 
         if (onPath && ai.playerWithinRange()) {
@@ -106,6 +111,8 @@ public class OBJ_Cucco extends Object {
     }
 
     private void checkPlayerCollision() {
+
+        // Hurt player if contact
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) {
             gp.player.takeDamage(this);
@@ -113,6 +120,7 @@ public class OBJ_Cucco extends Object {
     }
 
     private void searchForPlayer() {
+
         if (ai.playerWithinRange()) {
             ai.isOnPath(gp.player, 10);
         }
@@ -124,15 +132,15 @@ public class OBJ_Cucco extends Object {
     @Override
     public boolean canCollideWith(Entity target) {
 
-        // Can collide if aggresive
-        return health <= 0;
+        // Can collide if hostile
+        return action == Action.ATTACKING;
     }
 
     @Override
     public void interact(Entity user) {
 
-        // Can be picked up if not aggressive
-        if (0 < health && gp.keyH.aPressed) {
+        // Can be picked up if not hostile
+        if (gp.keyH.aPressed && action != Action.ATTACKING) {
             user.setAction(Action.GRABBING);
             user.setGrabbedObject(this);
         }
@@ -152,6 +160,7 @@ public class OBJ_Cucco extends Object {
     protected void landOnGround() {
         super.landOnGround();
 
+        // Take damage and look around rapidly
         health -= 2;
         speed = 0;
         directionRate = 10;
@@ -163,18 +172,20 @@ public class OBJ_Cucco extends Object {
     protected void manageValues() {
         super.manageValues();
 
+        // No longer stunned, reset to defaults
         if (!stunned) {
+            animationSpeed = 10;
             speed = defaultSpeed;
             directionRate = 60;
-            animationSpeed = 10;
         }
 
+        // Lost all health, increase speed and stay hostile for 999 frames
         if (health <= 0) {
 
+            action = Action.ATTACKING;
             speed = 2;
 
-            int aggressiveTime = 999;
-            if (aggressiveTime < ++aggressiveCounter) {
+            if (999 < ++aggressiveCounter) {
                 resetValues();
             }
         }
@@ -187,9 +198,11 @@ public class OBJ_Cucco extends Object {
         health = maxHealth;
         directionRate = 60;
         aggressiveCounter = 0;
+
         stunned = false;
         invincible = false;
         interactable = true;
+        action = Action.IDLE;
     }
 
     @Override
@@ -208,33 +221,40 @@ public class OBJ_Cucco extends Object {
     @Override
     protected void getSpriteImage() {
 
-        if (health <= 0) {
-            if (spriteNum == 1) {
-                image = switch (direction) {
-                    case UP, UPLEFT, UPRIGHT -> attackUp1;
-                    case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown1;
-                    case LEFT -> attackLeft1;
-                    case RIGHT -> attackRight1;
-                };
-            }
-            else {
-                image = switch (direction) {
-                    case UP, UPLEFT, UPRIGHT -> attackUp2;
-                    case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown2;
-                    case LEFT -> attackLeft2;
-                    case RIGHT -> attackRight2;
-                };
-            }
+        // If hostile, get attack images
+        if (action == Action.ATTACKING) {
+            getAttackSprite();
         }
         else {
             super.getSpriteImage();
         }
     }
 
+    private void getAttackSprite() {
+
+        if (spriteNum == 1) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> attackUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown1;
+                case LEFT -> attackLeft1;
+                case RIGHT -> attackRight1;
+            };
+        }
+        else {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> attackUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown2;
+                case LEFT -> attackLeft2;
+                case RIGHT -> attackRight2;
+            };
+        }
+    }
+
     @Override
     public String getAvailableAction(Entity user) {
 
-        if (health <= 0) {
+        // Cannot pick up if hostile
+        if (action == Action.ATTACKING) {
             return "";
         }
 

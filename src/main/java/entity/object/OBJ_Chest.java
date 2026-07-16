@@ -36,10 +36,12 @@ public class OBJ_Chest extends Object {
 
     @Override
     public void interact(Entity user) {
+
         if (opened || !gp.keyH.aPressed) {
             return;
         }
 
+        // User must be looking up at chest
         if (user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT) {
             opened = true;
             availableAction = "";

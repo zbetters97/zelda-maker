@@ -38,48 +38,38 @@ public class Object extends Entity {
 
         grabbed = false;
         interactable = true;
+
+        // Direction same as user
         direction = user.getDirection();
 
         user.setAction(THROWING);
 
-        Point destination = new Point(user.getWorldPoint());
-
+        // Place in front of user
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> destination.y -= gp.tileSize;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> destination.y += gp.tileSize;
-            case LEFT -> destination.x -= gp.tileSize;
-            case RIGHT -> destination.x += gp.tileSize;
+            case UP, UPLEFT, UPRIGHT -> worldPoint.y -= gp.tileSize;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> worldPoint.y += gp.tileSize;
+            case LEFT -> worldPoint.x -= gp.tileSize;
+            case RIGHT -> worldPoint.x += gp.tileSize;
         }
 
-        worldPoint.setLocation(destination);
-
+        // If collision detected, place on top of user
         checkCollision();
         if (collisionOn) {
             worldPoint.setLocation(user.getWorldPoint());
         }
     }
 
-    @Override
-    public void checkCollision() {
-
-        collisionOn = false;
-
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.enemy);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
-    }
-
     public void toss(Entity user) {
 
-        tossed = true;
         grabbed = false;
+        tossed = true;
         canMove = false;
-        collisionOn = false;
         tWorldY = user.getWorldPoint().y;
 
+        // Start at user's location
         worldPoint.setLocation(user.getWorldPoint());
 
+        // Shift starting point based on user's direction
         direction = switch (user.getDirection()) {
             case UP, UPLEFT, UPRIGHT -> {
                 worldPoint.y -= user.getSprite().getHeight() + 6;
@@ -99,6 +89,7 @@ public class Object extends Entity {
             }
         };
 
+        // Starting values for toss physics
         xT = worldPoint.x;
         yT = worldPoint.y;
 
@@ -106,12 +97,13 @@ public class Object extends Entity {
     }
     protected void handleToss() {
 
+        // Toss for 32 frames, run toss physics
         if (++tossCounter < 32) {
 
             tTime += 25;
             switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
-                    checkTossCollision();
+                    checkCollision();
                     if (collisionOn) {
                         tossed = false;
                     }
@@ -120,7 +112,7 @@ public class Object extends Entity {
                     }
                 }
                 case DOWN, DOWNLEFT, DOWNRIGHT -> {
-                    checkTossCollision();
+                    checkCollision();
                     if (collisionOn) {
                         tossed = false;
                     }
@@ -129,7 +121,7 @@ public class Object extends Entity {
                     }
                 }
                 case LEFT -> {
-                    checkTossCollision();
+                    checkCollision();
                     if (collisionOn) {
                         worldPoint.y = tWorldY;
                         tossed = false;
@@ -139,7 +131,7 @@ public class Object extends Entity {
                     }
                 }
                 case RIGHT -> {
-                    checkTossCollision();
+                    checkCollision();
                     if (collisionOn) {
                         worldPoint.y = tWorldY;
                         tossed = false;
@@ -154,6 +146,7 @@ public class Object extends Entity {
             tossed = false;
         }
 
+        // Toss disrupted, end toss
         if (!tossed) {
             canMove = true;
             tossCounter = 0;
@@ -162,17 +155,11 @@ public class Object extends Entity {
             xT = 0;
             yT = 0;
 
-            gp.cChecker.checkHazard(this);
+            // If not killed by hazard, run land on ground logic
             if (alive) {
                 landOnGround();
             }
         }
-    }
-    private void checkTossCollision() {
-        gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.enemy);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
     }
     private void getTrajectory(double angle) {
         double tSpeed = 0.25;
@@ -187,6 +174,20 @@ public class Object extends Entity {
     }
     protected void createParticles() {
         Particle.generateParticles(gp, worldPoint, getParticleMaxHealth(), getParticleSpeed(), getParticleColor(), getParticleSize());
+    }
+
+    @Override
+    public void checkCollision() {
+
+        collisionOn = false;
+
+        gp.cChecker.checkTile(this);
+
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.enemy);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
+
+        gp.cChecker.checkHazard(this);
     }
 
     public void interact(Entity user) {
