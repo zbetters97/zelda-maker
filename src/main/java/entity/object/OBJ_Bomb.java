@@ -9,15 +9,10 @@ public class OBJ_Bomb extends Object {
 
     public static final String objName = "Bomb";
 
-    private boolean lit = false;
-
     public OBJ_Bomb(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
 
         animationSpeed = 30;
-
-        defaultSpeed = gp.tileSize / 2;
-        speed = defaultSpeed;
 
         maxHealth = 300;
         health = maxHealth;
@@ -45,9 +40,7 @@ public class OBJ_Bomb extends Object {
     public void update() {
         super.update();
 
-        if (lit) {
-            lightFuse();
-        }
+        lightFuse();
     }
 
     @Override
@@ -58,9 +51,6 @@ public class OBJ_Bomb extends Object {
         user.setAction(Action.GRABBING);
         user.setGrabbedObject(this);
         resetValues();
-
-        // Light the fuse
-        lit = true;
     }
 
     @Override
@@ -115,7 +105,6 @@ public class OBJ_Bomb extends Object {
         spriteCounter = 0;
         spriteNum = 1;
         health = maxHealth;
-        lit = false;
         interactable = true;
     }
 

@@ -47,15 +47,17 @@ public record CollisionChecker(GamePanel gp) {
             case LEFT -> {
                 delta.x -= entity.getSpeed();
 
+                // Shift thrown objects down to avoid top wall collision
                 if (entity instanceof Object obj && obj.getTossed()) {
-                    delta.y += obj.getTWorldY();
+                    delta.y += obj.getTWorldY() - obj.getWorldPoint().y;
                 }
             }
             case RIGHT -> {
                 delta.x = entity.getSpeed();
 
+                // Shift thrown objects down to avoid top wall collision
                 if (entity instanceof Object obj && obj.getTossed()) {
-                    delta.y += obj.getTWorldY();
+                    delta.y += obj.getTWorldY() - obj.getWorldPoint().y;
                 }
             }
         }

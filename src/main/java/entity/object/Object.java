@@ -64,10 +64,12 @@ public class Object extends Entity {
         grabbed = false;
         tossed = true;
         canMove = false;
-        tWorldY = user.getWorldPoint().y;
 
         // Start at user's location
         worldPoint.setLocation(user.getWorldPoint());
+
+        // Save starting Y for wall collision
+        tWorldY = worldPoint.y;
 
         // Shift starting point based on user's direction
         direction = switch (user.getDirection()) {
@@ -156,6 +158,7 @@ public class Object extends Entity {
             yT = 0;
 
             // If not killed by hazard, run land on ground logic
+            gp.cChecker.checkHazard(this);
             if (alive) {
                 landOnGround();
             }
@@ -187,7 +190,10 @@ public class Object extends Entity {
         gp.cChecker.checkMovementCollision(this, gp.enemy);
         gp.cChecker.checkMovementCollision(this, gp.obj);
 
-        gp.cChecker.checkHazard(this);
+        // Check hazard at end of toss
+        if (!tossed) {
+            gp.cChecker.checkHazard(this);
+        }
     }
 
     public void interact(Entity user) {
