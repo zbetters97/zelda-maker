@@ -385,8 +385,8 @@ public class Player extends Entity {
                 availableAction = object.getAvailableAction(this);
             }
         }
-        else if (action == CARRYING && moving) {
-            availableAction = "THROW";
+        else if (action == CARRYING) {
+            availableAction = moving ? "THROW" : "PLACE";
         }
     }
 
@@ -397,6 +397,12 @@ public class Player extends Entity {
             case CARRYING -> {
                 if (gp.keyH.aPressed) {
                     startAction();
+                }
+                else if (gp.keyH.xPressed) {
+                    boolean holdingBomb = grabbedObject != null && grabbedObject.getName().equals(OBJ_Bomb.objName);
+                    if (holdingBomb) {
+                        startAction();
+                    }
                 }
             }
         }
@@ -453,7 +459,10 @@ public class Player extends Entity {
             }
             case CARRYING -> {
                 if (moving) {
-                    throwEntity();
+                    throwObject();
+                }
+                else {
+                    placeObject();
                 }
             }
         }
@@ -511,7 +520,18 @@ public class Player extends Entity {
         return object;
     }
 
-    private void throwEntity() {
+    private void placeObject() {
+
+        gp.keyH.aPressed = false;
+
+        if (grabbedObject == null) {
+            action = THROWING;
+            return;
+        }
+
+        grabbedObject.place(this);
+    }
+    private void throwObject() {
 
         gp.keyH.aPressed = false;
 
@@ -1143,6 +1163,7 @@ public class Player extends Entity {
         else {
             grabNum = 1;
             grabCounter = 0;
+            grabbedObject.setInteractable(false);
             action = Action.CARRYING;
 
             gp.keyH.aPressed = false;

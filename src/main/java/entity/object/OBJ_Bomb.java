@@ -25,7 +25,7 @@ public class OBJ_Bomb extends Object {
         attack = defaultAttack;
         knockbackPower = 2;
 
-        hitbox = new Rectangle(12, 15, 24, 27);
+        hitbox = new Rectangle(6, 6, 36, 36);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
@@ -106,6 +106,7 @@ public class OBJ_Bomb extends Object {
         spriteNum = 1;
         health = maxHealth;
         opened = false;
+        interactable = true;
     }
 
     @Override

@@ -150,6 +150,8 @@ public class OBJ_Cucco extends Object {
 
     @Override
     protected void landOnGround() {
+        super.landOnGround();
+
         health -= 2;
         speed = 0;
         directionRate = 10;
@@ -187,6 +189,7 @@ public class OBJ_Cucco extends Object {
         aggressiveCounter = 0;
         stunned = false;
         invincible = false;
+        interactable = true;
     }
 
     @Override
@@ -194,20 +197,12 @@ public class OBJ_Cucco extends Object {
 
         if (!drawing) return;
 
-        drawOffset.setLocation(0, 0);
-        getSpriteImage();
-
         // Flash sprite if hurt
         if (invincible) {
             playHurtAnimation(g2);
         }
 
-        // Draw sprite
-        gp.camera.worldToScreen(worldPoint, screenPoint);
-        g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
-
-        // Reset opacity
-        changeAlpha(g2, 1f);
+        super.draw(g2);
     }
 
     @Override

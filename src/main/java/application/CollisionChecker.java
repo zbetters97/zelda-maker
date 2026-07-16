@@ -27,7 +27,23 @@ public record CollisionChecker(GamePanel gp) {
 
         switch (entity.getMoveDirection()) {
             case UP -> delta.y -= entity.getSpeed();
+            case UPLEFT -> {
+                delta.x -= entity.getSpeed();
+                delta.y -= entity.getSpeed();
+            }
+            case UPRIGHT -> {
+                delta.x = entity.getSpeed();
+                delta.y -= entity.getSpeed();
+            }
             case DOWN -> delta.y = entity.getSpeed();
+            case DOWNLEFT -> {
+                delta.x -= entity.getSpeed();
+                delta.y = entity.getSpeed();
+            }
+            case DOWNRIGHT -> {
+                delta.x = entity.getSpeed();
+                delta.y = entity.getSpeed();
+            }
             case LEFT -> {
                 delta.x -= entity.getSpeed();
 
@@ -41,22 +57,6 @@ public record CollisionChecker(GamePanel gp) {
                 if (entity instanceof Object obj && obj.getTossed()) {
                     delta.y += obj.getTWorldY();
                 }
-            }
-            case UPLEFT -> {
-                delta.x -= entity.getSpeed();
-                delta.y -= entity.getSpeed();
-            }
-            case UPRIGHT -> {
-                delta.x = entity.getSpeed();
-                delta.y -= entity.getSpeed();
-            }
-            case DOWNLEFT -> {
-                delta.x -= entity.getSpeed();
-                delta.y = entity.getSpeed();
-            }
-            case DOWNRIGHT -> {
-                delta.x = entity.getSpeed();
-                delta.y = entity.getSpeed();
             }
         }
 
@@ -76,9 +76,7 @@ public record CollisionChecker(GamePanel gp) {
             for (int col = leftCol; col <= rightCol; col++) {
 
                 Tile tile = getTileAtColRow(col, row);
-                if (tile == null) {
-                    continue;
-                }
+                if (tile == null) continue;
 
                 checkTileCollision(entity, tile);
             }
@@ -93,9 +91,7 @@ public record CollisionChecker(GamePanel gp) {
         if (tile.isPit()) {
 
             // Entity in air
-            if (entity.getElevated()) {
-                return;
-            }
+            if (entity.getElevated()) return;
 
             // NPCs and enemies
             if (entity instanceof NPC || entity instanceof Enemy) {
@@ -106,9 +102,7 @@ public record CollisionChecker(GamePanel gp) {
         else if (tile.isWater()) {
 
             // Entity in air or can swim
-            if (entity.getElevated() || entity.getCanSwim()) {
-                return;
-            }
+            if (entity.getElevated() || entity.getCanSwim()) return;
 
             // NPCs and enemies
             if (entity instanceof NPC || entity instanceof Enemy) {
@@ -166,9 +160,8 @@ public record CollisionChecker(GamePanel gp) {
         return getTileAtColRow(col, row);
     }
     private void handlePit(Entity entity) {
-        if (entity.getElevated()) {
-            return;
-        }
+
+        if (entity.getElevated()) return;
 
         if (entity == gp.player) {
             gp.player.setAction(FALLING);
@@ -179,9 +172,8 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
     private void handleWater(Entity entity) {
-        if (entity.getElevated() || entity.getCanSwim()) {
-            return;
-        }
+
+        if (entity.getElevated() || entity.getCanSwim()) return;
 
         if (entity == gp.player) {
             gp.player.setAction(DROWNING);

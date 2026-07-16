@@ -34,6 +34,42 @@ public class Object extends Entity {
         }
     }
 
+    public void place(Entity user) {
+
+        grabbed = false;
+        interactable = true;
+        direction = user.getDirection();
+
+        user.setAction(THROWING);
+
+        Point destination = new Point(user.getWorldPoint());
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> destination.y -= gp.tileSize;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> destination.y += gp.tileSize;
+            case LEFT -> destination.x -= gp.tileSize;
+            case RIGHT -> destination.x += gp.tileSize;
+        }
+
+        worldPoint.setLocation(destination);
+
+        checkCollision();
+        if (collisionOn) {
+            worldPoint.setLocation(user.getWorldPoint());
+        }
+    }
+
+    @Override
+    public void checkCollision() {
+
+        collisionOn = false;
+
+        gp.cChecker.checkTile(this);
+        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.enemy);
+        gp.cChecker.checkMovementCollision(this, gp.obj);
+    }
+
     public void toss(Entity user) {
 
         tossed = true;
@@ -147,7 +183,7 @@ public class Object extends Entity {
     }
 
     protected void landOnGround() {
-
+        interactable = true;
     }
     protected void createParticles() {
         Particle.generateParticles(gp, worldPoint, getParticleMaxHealth(), getParticleSpeed(), getParticleColor(), getParticleSize());

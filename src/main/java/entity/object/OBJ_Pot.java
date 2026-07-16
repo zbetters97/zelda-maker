@@ -55,12 +55,12 @@ public class OBJ_Pot extends Object {
     @Override
     public void interact() {
         alive = false;
-        super.landOnGround();
         dropItem(loot);
     }
 
     @Override
     protected void landOnGround() {
+        super.landOnGround();
 
         Enemy enemy = overlapEnemy(this);
         if (enemy != null) {

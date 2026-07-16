@@ -868,6 +868,10 @@ public class Entity {
                 hitbox.height);
     }
 
+    public void setInteractable(boolean interactable) {
+        this.interactable = interactable;
+    }
+
     public EntityAI getAI() {
         return ai;
     }
