@@ -483,11 +483,7 @@ public class Entity {
 
     protected void detectPlayerSwordCollision() {
 
-        // Find enemy that intersects collision box
-        Enemy enemy = overlapEnemy(this);
-        if (enemy != null) {
-            enemy.takeDamage(this);
-        }
+        damageEnemies(this);
 
         int projIndex = gp.cChecker.checkOverlapCollision(this, gp.proj);
         if (projIndex != -1) {
@@ -501,6 +497,17 @@ public class Entity {
         int objIndex = gp.cChecker.checkOverlapCollision(this, gp.obj);
         if (objIndex != -1) {
             gp.obj[objIndex].interact();
+        }
+    }
+    private void damageEnemies(Entity attacker) {
+
+        // Find enemy that intersects collision box
+        for (Enemy enemy : gp.enemy) {
+            if (enemy == null) continue;
+
+            if (gp.cChecker.hasOverlapCollision(attacker, enemy)) {
+                enemy.takeDamage(attacker);
+            }
         }
     }
     private void detectEnemySwordCollision() {

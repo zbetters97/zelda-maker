@@ -99,9 +99,6 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
     }
-    private Tile getTileAtColRow(int col, int row) {
-        return gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
-    }
     private void checkTileCollision(Entity entity, Tile tile) {
 
         // Bottomless pits
@@ -136,16 +133,6 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
 
-    public boolean checkIce(Entity entity) {
-
-        Point center = entity.getCenterPoint();
-
-        int col = center.x / gp.tileSize;
-        int row = center.y / gp.tileSize;
-
-        return gp.tileM.mapTileNum[col][row] == TileManager.iceTile;
-    }
-
     public void checkHazard(Entity entity) {
 
         if (outOfBounds(entity.getWorldHitbox())) return;
@@ -162,10 +149,6 @@ public record CollisionChecker(GamePanel gp) {
         else if (entity == gp.player && !gp.player.getElevated()) {
             setSafePoint();
         }
-    }
-    private boolean outOfBounds(Rectangle box) {
-        return (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
-                box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize);
     }
     private Tile getCurrentTile(Entity entity) {
 
@@ -208,6 +191,16 @@ public record CollisionChecker(GamePanel gp) {
         int row = center.y / gp.tileSize;
 
         gp.player.safePoint = new Point(col * gp.tileSize, row * gp.tileSize);
+    }
+
+    public boolean checkIce(Entity entity) {
+
+        Point center = entity.getCenterPoint();
+
+        int col = center.x / gp.tileSize;
+        int row = center.y / gp.tileSize;
+
+        return gp.tileM.mapTileNum[col][row] == TileManager.iceTile;
     }
 
     public int checkMovementCollision(Entity entity, Entity[] targets) {
@@ -292,6 +285,19 @@ public record CollisionChecker(GamePanel gp) {
 
         return entityIndex;
     }
+
+    public boolean hasOverlapCollision(Entity entity, Entity target) {
+
+        if (target == null || target == entity || target.isNotInteractable()) {
+            return false;
+        }
+
+        Rectangle entityRect = entity.getWorldHitbox();
+        Rectangle targetRect = target.getWorldHitbox();
+
+        return entityRect.intersects(targetRect);
+    }
+
     public void setOverlapCollision(Entity entity, Entity[] targets) {
 
         Rectangle entityRect = entity.getWorldHitbox();
@@ -404,5 +410,14 @@ public record CollisionChecker(GamePanel gp) {
                 target.takeDamage(entity);
             }
         }
+    }
+
+    private Tile getTileAtColRow(int col, int row) {
+        return gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
+    }
+
+    private boolean outOfBounds(Rectangle box) {
+        return (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
+                box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize);
     }
 }
