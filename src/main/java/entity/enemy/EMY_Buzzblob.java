@@ -94,6 +94,7 @@ public class EMY_Buzzblob extends Enemy {
 
     @Override
     protected void manageValues() {
+
         if (action == Action.ATTACKING) {
             attack = 2;
             buzzing = true;

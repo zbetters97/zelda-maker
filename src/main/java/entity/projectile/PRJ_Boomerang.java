@@ -109,21 +109,6 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     @Override
-    protected void cycleSprites() {
-
-        if (animationSpeed < ++spriteCounter) {
-            if (spriteNum == 1) {
-                spriteNum = 2;
-            }
-            else if (spriteNum == 2) {
-                spriteNum = 1;
-            }
-
-            spriteCounter = 0;
-        }
-    }
-
-    @Override
     protected void checkDeath() {
         if (!alive || (user != null && !user.isAvailable())) {
             resetValues();

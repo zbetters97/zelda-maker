@@ -82,6 +82,7 @@ public class Enemy extends Entity {
     }
 
     protected void chasePlayer() {
+        if (captured) return;
         ai.searchPath(gp.player);
     }
 
@@ -121,6 +122,9 @@ public class Enemy extends Entity {
         // Draw sprite
         gp.camera.worldToScreen(worldPoint, screenPoint);
         g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
+
+        g2.setColor(Color.RED);
+        g2.drawRect(screenPoint.x + hitbox.x, screenPoint.y + hitbox.y, hitbox.width, hitbox.height);
 
         // Reset opacity
         changeAlpha(g2, 1f);

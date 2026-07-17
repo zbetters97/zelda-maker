@@ -42,6 +42,7 @@ public class Player extends Entity {
             grabNum = 1, grabCounter = 0,
             throwNum = 1, throwCounter = 0,
             jumpNum = 1, jumpCounter = 0,
+            rodNum = 1, rodCounter = 0,
             damageNum = 1, damageCounter = 0;
 
     /** SPRITE IMAGES */
@@ -72,6 +73,9 @@ public class Player extends Entity {
 
             jumpUp1, jumpUp2, jumpUp3, jumpDown1, jumpDown2, jumpDown3,
             jumpLeft1, jumpLeft2, jumpLeft3, jumpRight1, jumpRight2, jumpRight3,
+
+            rodUp1, rodUp2, rodUp3, rodDown1, rodDown2, rodDown3,
+            rodLeft1, rodLeft2, rodLeft3, rodRight1, rodRight2, rodRight3,
 
             soarUp1, soarDown1, soarLeft1, soarRight1,
 
@@ -124,6 +128,7 @@ public class Player extends Entity {
         getDigImages();
         getAimImages();
         getJumpImages();
+        getRodImages();
         getSoarImages();
         getFallImages();
         getDrownImages();
@@ -262,6 +267,20 @@ public class Player extends Entity {
         jumpRight2 = setupImage("/player/boy_jump_right_2");
         jumpRight3 = setupImage("/player/boy_jump_right_3");
     }
+    private void getRodImages() {
+        rodUp1 = setupImage("/player/boy_rod_up_1", gp.tileSize * 2, gp.tileSize);
+        rodUp2 = setupImage("/player/boy_rod_up_2", gp.tileSize * 2, gp.tileSize * 2);
+        rodUp3 = setupImage("/player/boy_rod_up_3", gp.tileSize, gp.tileSize * 2);
+        rodDown1 = setupImage("/player/boy_rod_down_1", gp.tileSize * 2, gp.tileSize);
+        rodDown2 = setupImage("/player/boy_rod_down_2", gp.tileSize * 2, gp.tileSize * 2);
+        rodDown3 = setupImage("/player/boy_rod_down_3", gp.tileSize, gp.tileSize * 2);
+        rodLeft1 = setupImage("/player/boy_rod_left_1", gp.tileSize, gp.tileSize * 2);
+        rodLeft2 = setupImage("/player/boy_rod_left_2", gp.tileSize * 2, gp.tileSize * 2);
+        rodLeft3 = setupImage("/player/boy_rod_left_3", gp.tileSize * 2, gp.tileSize);
+        rodRight1 = setupImage("/player/boy_rod_right_1", gp.tileSize, gp.tileSize * 2);
+        rodRight2 = setupImage("/player/boy_rod_right_2", gp.tileSize * 2, gp.tileSize * 2);
+        rodRight3 = setupImage("/player/boy_rod_right_3", gp.tileSize * 2, gp.tileSize);
+    }
     private void getSoarImages() {
         soarUp1 = setupImage("/player/boy_soar_up_1");
         soarDown1 = setupImage("/player/boy_soar_down_1");
@@ -319,6 +338,7 @@ public class Player extends Entity {
         bombs = 50;
 
         items.addAll(Arrays.asList(
+                new ITM_Rod(gp, this),
                 new ITM_Bomb(gp, this),
                 new ITM_Shovel(gp, this),
                 new ITM_Boomerang(gp, this),
@@ -426,6 +446,10 @@ public class Player extends Entity {
         // Swing sword
         else if (gp.keyH.bPressed) {
             action = ATTACKING;
+
+            if (capturedTarget != null) {
+                capturedTarget.setAction(ATTACKING);
+            }
         }
         // Shield guard
         else if (gp.keyH.rPressed) {
@@ -676,7 +700,7 @@ public class Player extends Entity {
         // Item equipped
         if (item != null) {
             switch (item.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName -> {
+                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName, ITM_Rod.itmName -> {
                     gp.keyH.xPressed = false;
                     item.use();
                 }
@@ -725,6 +749,7 @@ public class Player extends Entity {
             case DIGGING -> digging();
             case AIMING -> aiming();
             case JUMPING, SOARING -> jumping();
+            case SWINGING -> swinging();
             case FALLING, DROWNING -> takingDamage();
         }
     }
@@ -806,6 +831,10 @@ public class Player extends Entity {
     protected void updateDirection() {
 
        updateFacing();
+
+        if (capturedTarget != null) {
+            capturedTarget.forceMove(getMoveDirection());
+        }
 
        if (!action.allowsTranslation()) {
            moving = false;
@@ -1343,6 +1372,24 @@ public class Player extends Entity {
         }
     }
 
+    private void swinging() {
+
+        if (++rodCounter <= 3) {
+            rodNum = 1;
+        }
+        else if (rodCounter <= 6) {
+            rodNum = 2;
+        }
+        else if (rodCounter <= 12) {
+            rodNum = 3;
+        }
+        else {
+            rodNum = 1;
+            rodCounter = 0;
+            action = Action.IDLE;
+        }
+    }
+
     private void takingDamage() {
 
         speed = 0;
@@ -1393,17 +1440,25 @@ public class Player extends Entity {
     @Override
     protected void manageValues() {
 
-        if (stunned) {
-            stunnedCounter++;
-            if (60 < stunnedCounter) {
-                stunned = false;
-                stunnedCounter = 0;
-            }
+        // Stunned counter
+        if (stunned && 60 < ++stunnedCounter) {
+            stunned = false;
+            stunnedCounter = 0;
         }
 
         // Decrease cooldown if filled
         if (0 < actionLockCounter) {
             actionLockCounter--;
+        }
+
+        // Release captured target if not currently using Rod
+        boolean rodNotEquipped = item == null || !item.getName().equals(ITM_Rod.itmName);
+        if (rodNotEquipped) {
+            if (capturedTarget != null) {
+                capturedTarget.setCaptured(false);
+            }
+
+            capturedTarget = null;
         }
     }
 
@@ -1473,6 +1528,7 @@ public class Player extends Entity {
             case DIGGING -> getDigSprite();
             case AIMING -> getAimSprite();
             case JUMPING, SOARING -> getJumpSprite();
+            case SWINGING -> getRodSprite();
             case FALLING -> getFallSprite();
             case DROWNING -> getDrownSprite();
         };
@@ -1831,6 +1887,61 @@ public class Player extends Entity {
         }
 
         return jumpSprite;        
+    }
+    private BufferedImage getRodSprite() {
+        BufferedImage rodSprite = rodUp1;
+
+        switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> {
+                if (rodNum > 1) {
+                    drawOffset.y -= gp.tileSize;
+                }
+                rodSprite = switch (rodNum) {
+                    case 1 -> rodUp1;
+                    case 2 -> rodUp2;
+                    case 3 -> rodUp3;
+                    default -> rodSprite;
+                };
+            }
+            case DOWN, DOWNLEFT, DOWNRIGHT-> {
+                if (rodNum == 1 || rodNum == 2) {
+                    drawOffset.x -= gp.tileSize;
+                }
+                rodSprite = switch (rodNum) {
+                    case 1 -> rodDown1;
+                    case 2 -> rodDown2;
+                    case 3 -> rodDown3;
+                    default -> rodSprite;
+                };
+            }
+            case LEFT -> {
+                if (rodNum == 1 || rodNum == 2) {
+                    drawOffset.y -= gp.tileSize;
+                }
+                if (rodNum == 2 || rodNum == 3) {
+                    drawOffset.x -= gp.tileSize;
+                }
+                rodSprite = switch (rodNum) {
+                    case 1 -> rodLeft1;
+                    case 2 -> rodLeft2;
+                    case 3 -> rodLeft3;
+                    default -> rodSprite;
+                };
+            }
+            case RIGHT -> {
+                if (rodNum == 1 || rodNum == 2) {
+                    drawOffset.y -= gp.tileSize;
+                }
+                rodSprite = switch (rodNum) {
+                    case 1 -> rodRight1;
+                    case 2 -> rodRight2;
+                    case 3 -> rodRight3;
+                    default -> rodSprite;
+                };
+            }
+        }
+
+        return rodSprite;
     }
     private BufferedImage getFallSprite() {
         BufferedImage fallSprite;

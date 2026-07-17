@@ -36,6 +36,7 @@ public class Entity {
         CARRYING(true, true, false),
         THROWING(false, false, false),
         JUMPING(true, true, false),
+        SWINGING(false, false, false),
         SOARING(true, true, false),
         FALLING(false, false, false),
         DROWNING(false, false, false);
@@ -117,6 +118,8 @@ public class Entity {
     protected String availableAction = "";
     protected boolean grabbed = false;
     protected Object grabbedObject;
+    protected boolean captured = false;
+    protected Entity capturedTarget;
 
     /** COMBAT VALUES */
     protected int attack;
@@ -239,6 +242,8 @@ public class Entity {
      */
     protected void updateDirection() {
 
+        if (captured) return;
+
         checkCollision();
         move(direction);
         cycleSprites();
@@ -314,7 +319,32 @@ public class Entity {
         moving = true;
         moveInDirection(direction);
     }
+    public void forceMove(Direction forcedDirection) {
+
+        collisionOn = false;
+        checkCollision();
+
+        if (collisionOn) {
+            moving = false;
+            return;
+        }
+
+        moving = true;
+        direction = fixDirection(forcedDirection);
+        moveInDirection(direction);
+
+        cycleSprites();
+    }
+    private Direction fixDirection(Direction direction) {
+        return switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> UP;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> DOWN;
+            case LEFT -> LEFT;
+            case RIGHT -> RIGHT;
+        };
+    }
     protected void moveInDirection(Direction movingDirection) {
+
         switch (movingDirection) {
             case UP -> worldPoint.y -= speed;
             case UPLEFT -> {
@@ -364,6 +394,8 @@ public class Entity {
      * @param rate Integer frequency of updates (60 = 1 sec)
      */
     protected void setDirection(int rate) {
+
+        if (captured) return;
 
         if (rate <= ++actionLockCounter) {
 
@@ -503,6 +535,7 @@ public class Entity {
 
         // Find enemy that intersects collision box
         for (Enemy enemy : gp.enemy) {
+
             if (enemy == null) continue;
 
             if (gp.cChecker.hasOverlapCollision(attacker, enemy)) {
@@ -511,6 +544,12 @@ public class Entity {
         }
     }
     private void detectEnemySwordCollision() {
+
+        if (gp.player.getCapturedTarget() == this) {
+            detectPlayerSwordCollision();
+            return;
+        }
+
         if (gp.cChecker.checkPlayer(this)) {
             gp.player.takeDamage(this);
         }
@@ -597,6 +636,9 @@ public class Entity {
         if (invincible || !isAvailable() || isNotInteractable() || !isOnSameElevation(attacker)) {
             return;
         }
+
+        // Can't take damage by own captured target
+        if (attacker == capturedTarget) return;
 
         // Target is buzzing, hurt attacker
         if (buzzing && !(attacker instanceof Projectile)) {
@@ -1050,6 +1092,27 @@ public class Entity {
     }
     public void setGrabbedObject(Object grabbedObject) {
         this.grabbedObject = grabbedObject;
+    }
+
+    public boolean getCaptured() {
+        return captured;
+    }
+    public void setCaptured(boolean captured) {
+        this.captured = captured;
+
+        if (captured && speed == 0) {
+            speed = 1;
+        }
+        else if (!captured) {
+            speed = defaultSpeed;
+        }
+    }
+
+    public Entity getCapturedTarget() {
+        return capturedTarget;
+    }
+    public void setCapturedTarget(Entity capturedTarget) {
+        this.capturedTarget = capturedTarget;
     }
 
     public String getAvailableAction(Entity user) {

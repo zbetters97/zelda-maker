@@ -177,6 +177,8 @@ public class EntityAI {
 
     public void setAttacking(int rate, int straight, int horizontal) {
 
+        if (entity.getCaptured()) return;
+
         boolean targetInRange = false;
         int xDis = getXDistance(gp.player);
         int yDis = getYDistance(gp.player);
