@@ -5,6 +5,7 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
+import entity.item.Item;
 import entity.object.Object;
 import entity.projectile.Projectile;
 
@@ -92,8 +93,6 @@ public class Entity {
     protected boolean onPath = false;
     protected boolean pathCompleted = false;
 
-    protected String availableAction = "";
-
     /** Z-TARGETING */
     protected boolean lockedOn;
     protected Entity lockedOnTarget;
@@ -110,22 +109,12 @@ public class Entity {
     protected int maxHealth = 1;
     protected int health = 1;
     protected int value = 0;
-    protected int maxRupees = 99;
-    protected int rupees = 0;
-    protected Entity item;
-    protected boolean invincible = false;
-    protected int invincibleCounter = 0;
-    protected boolean stunned = false;
-    protected int stunnedCounter = 0;
-    protected boolean dying = false;
-    private int dyingCounter = 0;
-    protected Collectable loot;
     protected boolean opened = false;
     protected boolean elevated = false;
     protected boolean canSwim = false;
     protected boolean needsWater = false;
     protected boolean shielded = false;
-
+    protected String availableAction = "";
     protected boolean grabbed = false;
     protected Object grabbedObject;
 
@@ -142,8 +131,20 @@ public class Entity {
     protected GamePanel.Direction knockbackDirection;
     protected int knockbackCounter = 0;
     protected boolean buzzing = false;
+    protected boolean invincible = false;
+    protected int invincibleCounter = 0;
+    protected boolean stunned = false;
+    protected int stunnedCounter = 0;
+    protected boolean dying = false;
+    private int dyingCounter = 0;
 
     /** INVENTORY VALUES */
+    protected Collectable loot;
+    protected Item item;
+    protected int maxRupees = 99;
+    protected int rupees = 0;
+    protected int keys = 0;
+    protected boolean hasBossKey = false;
     protected int arrows = 0;
     protected int bombs = 0;
 
@@ -157,9 +158,8 @@ public class Entity {
     protected boolean drawing = true;
     protected int spriteNum = 1;
     protected int spriteCounter = 0;
-    protected BufferedImage sprite;
     protected BufferedImage
-            image,
+            sprite, image,
             up1, up2, up3, down1, down2, left1, left2, right1, right2,
             attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
@@ -393,12 +393,6 @@ public class Entity {
             case RIGHT -> LEFT;
         };
     }
-
-    /**
-     * USE
-     * Initiates using the Entity
-     */
-    protected void use() { }
 
     protected void useProjectile(Projectile projectile, int seconds) {
 
@@ -930,15 +924,46 @@ public class Entity {
         }
     }
 
+    public Entity getItem() {
+        return item;
+    }
+
     public int getMaxRupees() {
         return maxRupees;
     }
-
     public int getRupees() {
         return rupees;
     }
     public void addRupees(int amount) {
         this.rupees += amount;
+    }
+
+    public int getKeys() {
+        return keys;
+    }
+    public void addKeys(int amount) {
+        this.keys += amount;
+    }
+
+    public boolean getHasBossKey() {
+        return hasBossKey;
+    }
+    public void setHasBossKey(boolean hasBossKey) {
+        this.hasBossKey = hasBossKey;
+    }
+
+    public int getArrows() {
+        return arrows;
+    }
+    public void addArrows(int arrows) {
+        this.arrows += arrows;
+    }
+
+    public int getBombs() {
+        return bombs;
+    }
+    public void addBombs(int bombs) {
+        this.bombs += bombs;
     }
 
     public int getSpeed() {
@@ -992,24 +1017,6 @@ public class Entity {
     }
     public boolean isOnSameElevation(Entity target) {
         return target.getElevated() == elevated;
-    }
-
-    public Entity getItem() {
-        return item;
-    }
-
-    public int getArrows() {
-        return arrows;
-    }
-    public void addArrows(int arrows) {
-        this.arrows += arrows;
-    }
-
-    public int getBombs() {
-        return bombs;
-    }
-    public void addBombs(int bombs) {
-        this.bombs += bombs;
     }
 
     public boolean isLatchable() {

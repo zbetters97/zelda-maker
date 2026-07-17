@@ -5,7 +5,7 @@ import entity.Entity;
 
 public class OBJ_Door_Oneway extends Object {
 
-    public static final String objName = "Oneway";
+    public static final String objName = "Door_Oneway";
 
     public OBJ_Door_Oneway(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
@@ -14,18 +14,16 @@ public class OBJ_Door_Oneway extends Object {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/objects/obj_oneway_open_up");
-        up2 = setupImage("/objects/obj_oneway_closed_up");
-        sprite = down1 = setupImage("/objects/obj_oneway_open_down");
-        down2 = setupImage("/objects/obj_oneway_closed_down");
+        up1 = setupImage("/objects/obj_oneway_up_1");
+        sprite = down1 = setupImage("/objects/obj_oneway_down_1");
     }
     private void getTurnImages() {
-        attackUp1 = setupImage("/objects/obj_oneway_open_up_1");
-        attackUp2 = setupImage("/objects/obj_oneway_open_up_2");
-        attackUp3 = setupImage("/objects/obj_oneway_open_up_3");
-        attackDown1 = setupImage("/objects/obj_oneway_open_down_1");
-        attackDown2 = setupImage("/objects/obj_oneway_open_down_2");
-        attackDown3 = setupImage("/objects/obj_oneway_open_down_3");
+        attackUp1 = setupImage("/objects/obj_oneway_up_2");
+        attackUp2 = setupImage("/objects/obj_oneway_up_3");
+        attackUp3 = setupImage("/objects/obj_oneway_up_4");
+        attackDown1 = setupImage("/objects/obj_oneway_down_2");
+        attackDown2 = setupImage("/objects/obj_oneway_down_3");
+        attackDown3 = setupImage("/objects/obj_oneway_down_4");
     }
 
     @Override
@@ -97,7 +95,7 @@ public class OBJ_Door_Oneway extends Object {
             getOpeningSprite();
         }
         else {
-            getIdleSprite();
+            super.getSpriteImage();
         }
     }
 
@@ -125,26 +123,6 @@ public class OBJ_Door_Oneway extends Object {
                 case DOWN, DOWNLEFT, DOWNRIGHT -> attackDown3;
                 case LEFT -> attackLeft3;
                 case RIGHT -> attackRight3;
-            };
-        }
-    }
-
-    private void getIdleSprite() {
-
-        if (spriteNum == 1) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up1;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
-                case LEFT -> left1;
-                case RIGHT -> right1;
-            };
-        }
-        else {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up2;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
-                case LEFT -> left2;
-                case RIGHT -> right2;
             };
         }
     }

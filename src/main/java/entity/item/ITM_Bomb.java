@@ -19,12 +19,12 @@ public class ITM_Bomb extends Item {
     }
 
     @Override
-    protected void use() {
+    public void use() {
 
         if (0 < user.getBombs() && user.getGrabbedObject() == null) {
 
             Object bomb = new OBJ_Bomb(gp, -gp.tileSize, -gp.tileSize);
-            addBomb(bomb);
+            if (!addBomb(bomb)) return;
 
             user.addBombs(-1);
             user.setGrabbedObject(bomb);
@@ -33,12 +33,14 @@ public class ITM_Bomb extends Item {
         }
     }
 
-    private void addBomb(Object bomb) {
+    private boolean addBomb(Object bomb) {
         for (int i = 0; i < gp.obj.length; i++) {
             if (gp.obj[i] == null) {
                 gp.obj[i] = bomb;
-                break;
+                return true;
             }
         }
+
+        return false;
     }
 }

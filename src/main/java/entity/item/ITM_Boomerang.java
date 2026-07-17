@@ -19,7 +19,7 @@ public class ITM_Boomerang extends Item {
     }
 
     @Override
-    protected void use() {
+    public void use() {
 
         if (!projectile.getAlive()) {
             projectile.set(user.getWorldPoint(), user.getDirection(), true, user);

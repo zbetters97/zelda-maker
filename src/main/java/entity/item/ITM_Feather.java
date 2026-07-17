@@ -17,7 +17,7 @@ public class ITM_Feather extends Item {
     }
 
     @Override
-    protected void use() {
+    public void use() {
         super.use();
         user.setElevated(true);
     }

@@ -8,10 +8,25 @@ import tile.Tile;
 import tile.TileManager;
 
 import java.awt.*;
+import java.util.Map;
 
+import static application.GamePanel.Direction;
 import static entity.Entity.Action.*;
 
 public record CollisionChecker(GamePanel gp) {
+
+    // Offset points for explosion radius, directions for knockback
+    private static final Map<Point, Direction> EXPLOSION_OFFSETS = Map.ofEntries(
+            Map.entry(new Point(0, 0), Direction.UP), // center
+            Map.entry(new Point(0, -1), Direction.UP), // up
+            Map.entry(new Point(-1, -1), Direction.UP), // up-left
+            Map.entry(new Point(1, -1), Direction.UP), // up-right
+            Map.entry(new Point(0, 1), Direction.DOWN), // down
+            Map.entry(new Point(-1, 1), Direction.DOWN), // down-left
+            Map.entry(new Point(1, 1), Direction.DOWN), // down-right
+            Map.entry(new Point(-1, 0), Direction.LEFT), // left
+            Map.entry(new Point(1, 0), Direction.RIGHT) // right
+    );
 
     /**
      * CHECK TILE
@@ -268,7 +283,6 @@ public record CollisionChecker(GamePanel gp) {
                 continue;
             }
 
-            //  boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
             Rectangle targetRect = target.getWorldHitbox();
             if (entityRect.intersects(targetRect)) {
                 entityIndex = i;
@@ -277,6 +291,23 @@ public record CollisionChecker(GamePanel gp) {
         }
 
         return entityIndex;
+    }
+    public void setOverlapCollision(Entity entity, Entity[] targets) {
+
+        Rectangle entityRect = entity.getWorldHitbox();
+
+        for (Entity target : targets) {
+
+            if (target == null || target == entity || target.isNotInteractable()) {
+                continue;
+            }
+
+            Rectangle targetRect = target.getWorldHitbox();
+            if (entityRect.intersects(targetRect)) {
+                entity.setCollision(true);
+                break;
+            }
+        }
     }
 
     /**
@@ -311,5 +342,67 @@ public record CollisionChecker(GamePanel gp) {
         entity.setCollision(true);
 
         return entity.isOnSameElevation(gp.player);
+    }
+
+    public void checkExplosion(Entity entity) {
+
+        // Current col, row of given entity
+        Point center = entity.getCenterPoint();
+        int startingCol = center.x / gp.tileSize;
+        int startingRow = center.y / gp.tileSize;
+
+        // Target player, enemies, and objects
+        Entity[][] allTargets = {
+                { gp.player },
+                gp.enemy,
+                gp.obj
+        };
+
+        // Iterate over each corresponding tile (surrounding square shape)
+        int col, row;
+        for (Map.Entry<Point, Direction> entry : EXPLOSION_OFFSETS.entrySet()) {
+
+            // Shift row/col based on give offset
+            Point offset = entry.getKey();
+            col = startingCol + offset.x;
+            row = startingRow + offset.y;
+
+            // Detect if out of bounds
+            if (col < 0 || row < 0) continue;
+
+            // Change direction for knockback
+            Direction direction = entry.getValue();
+            entity.setDirection(direction);
+
+            // Detect if any entity is on the current tile
+            for (Entity[] targets : allTargets) {
+                handleExplosionCollision(entity, targets, col, row);
+            }
+        }
+    }
+    private void handleExplosionCollision(Entity entity, Entity[] targets, int entityCol, int entityRow) {
+
+        Point center;
+        int targetCol, targetRow;
+
+        // For each target in given list
+        for (Entity target : targets) {
+
+            // Skip if not valid
+            if (target == null || target == entity || target.isNotInteractable()) {
+                continue;
+            }
+
+            center = target.getCenterPoint();
+
+            // Current entity's tile position
+            targetCol = center.x / gp.tileSize;
+            targetRow = center.y / gp.tileSize;
+
+            // Current tile same as detection zone, deal damage
+            if (targetCol == entityCol && targetRow == entityRow) {
+                target.takeDamage(entity);
+            }
+        }
     }
 }

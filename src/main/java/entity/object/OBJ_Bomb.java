@@ -89,7 +89,28 @@ public class OBJ_Bomb extends Object {
         }
     }
 
+    @Override
+    protected void landOnGround() {
+        super.landOnGround();
+
+        collisionOn = false;
+        checkLandCollision();
+
+        if (collisionOn) {
+            explode();
+        }
+    }
+
+    private void checkLandCollision() {
+
+        gp.cChecker.setOverlapCollision(this, gp.npc);
+        gp.cChecker.setOverlapCollision(this, gp.enemy);
+        gp.cChecker.setOverlapCollision(this, gp.obj);
+        gp.cChecker.checkPlayer(this);
+    }
+
     private void explode() {
+        gp.cChecker.checkExplosion(this);
         createParticles();
         alive = false;
     }
@@ -109,16 +130,16 @@ public class OBJ_Bomb extends Object {
     }
 
     @Override
-    protected int getParticleSize() {
-        return 7;
+    protected int getParticleMaxHealth() {
+        return 20;
     }
     @Override
     protected int getParticleSpeed() {
         return 1;
     }
     @Override
-    protected int getParticleMaxHealth() {
-        return 20;
+    protected int getParticleSize() {
+        return 7;
     }
 
     @Override

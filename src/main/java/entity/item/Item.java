@@ -12,8 +12,7 @@ public class Item extends Entity {
         this.action = action;
     }
 
-    @Override
-    protected void use() {
+    public void use() {
         user.setAction(action);
     }
 

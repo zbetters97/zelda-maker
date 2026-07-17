@@ -18,7 +18,7 @@ public class ITM_Bow extends Item {
     }
 
     @Override
-    protected void use() {
+    public void use() {
         if (user.getArrows() > 0) {
             if (120 > user.charge) {
                 user.charge++;

@@ -29,7 +29,6 @@ public class Player extends Entity {
     private final ArrayList<Item> items = new ArrayList<>();
     private int currentItemSlot = 0;
 
-
     /** ICE VALUES */
     private int slideCounter = 0;
     private Direction slideDirection;

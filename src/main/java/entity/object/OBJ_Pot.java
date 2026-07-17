@@ -15,12 +15,16 @@ public class OBJ_Pot extends Object {
         super(gp, worldX, worldY, objName);
         setLoot();
 
+        maxHealth = 1;
+        health = maxHealth;
+
+        defaultAttack = 1;
+        attack = defaultAttack;
+
         hitbox = new Rectangle(4, 16, 40, 32);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
         hitboxDefaultWidth = hitbox.width;
         hitboxDefaultHeight = hitbox.height;
-
-        attack = 1;
 
         availableAction = "GRAB";
     }
@@ -28,6 +32,13 @@ public class OBJ_Pot extends Object {
     @Override
     protected void getImages() {
         sprite = setupImage("/objects/obj_pot");
+    }
+
+    @Override
+    public void update() {
+        if (health <= 0) {
+            shatter();
+        }
     }
 
     @Override
@@ -93,19 +104,19 @@ public class OBJ_Pot extends Object {
     }
 
     @Override
-    protected Color getParticleColor() {
-        return new Color(150, 83, 23);
-    }
-    @Override
-    protected int getParticleSize() {
-        return 9;
+    protected int getParticleMaxHealth() {
+        return 16;
     }
     @Override
     protected int getParticleSpeed() {
         return 1;
     }
     @Override
-    protected int getParticleMaxHealth() {
-        return 16;
+    protected Color getParticleColor() {
+        return new Color(150, 83, 23);
+    }
+    @Override
+    protected int getParticleSize() {
+        return 9;
     }
 }
