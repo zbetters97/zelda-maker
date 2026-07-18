@@ -103,9 +103,9 @@ public class OBJ_Bomb extends Object {
 
     private void checkLandCollision() {
 
-        gp.cChecker.setOverlapCollision(this, gp.npc);
-        gp.cChecker.setOverlapCollision(this, gp.enemy);
-        gp.cChecker.setOverlapCollision(this, gp.obj);
+        gp.cChecker.setOverlapCollision(this, gp.npcs);
+        gp.cChecker.setOverlapCollision(this, gp.enemies);
+        gp.cChecker.setOverlapCollision(this, gp.objects);
         gp.cChecker.checkPlayer(this);
     }
 

@@ -66,6 +66,16 @@ public class EMY_Goblin_Boomerang extends Enemy {
     }
 
     @Override
+    protected void handleCapture() {
+
+        if (action == Action.ATTACKING) {
+            speed = defaultSpeed;
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
+    }
+
+    @Override
     protected void manageValues() {
 
         // Force 30 frame delay between throws

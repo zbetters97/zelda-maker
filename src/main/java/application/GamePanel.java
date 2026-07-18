@@ -18,8 +18,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -85,13 +87,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
+    private final ArrayList<ArrayList<? extends Entity>> entities = new ArrayList<>();
     public final Player player = new Player(this);
-    public final NPC[] npc = new NPC[10];
-    public final Enemy[] enemy = new Enemy[25];
-    public final Object[] obj = new Object[25];
-    public final Collectable[] col = new Collectable[25];
-    public final Projectile[] proj = new Projectile[50];
-    public final ArrayList<Particle> particleList = new ArrayList<>();
+    public final ArrayList<NPC> npcs = new ArrayList<>();
+    public final ArrayList<Enemy> enemies = new ArrayList<>();
+    public final ArrayList<Object> objects = new ArrayList<>();
+    public final ArrayList<Collectable> collectables = new ArrayList<>();
+    public final ArrayList<Projectile> projectiles = new ArrayList<>();
+    public final ArrayList<Particle> particles = new ArrayList<>();
 
     /**
      * CONSTRUCTOR
@@ -126,6 +129,8 @@ public class GamePanel extends JPanel implements Runnable {
         if (fullScreenOn) {
             setFullScreen();
         }
+
+        entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
     }
 
     /**
@@ -225,73 +230,29 @@ public class GamePanel extends JPanel implements Runnable {
 
     /** UPDATERS **/
     private void updateEntities() {
-        updateNPCs();
-        updateEnemies();
-        updateObjects();
-        updateCollectables();
-        updateProjectiles();
-        updateParticles();
-    }
-    private void updateNPCs() {
-        for (Entity entity : npc) {
-            if (entity != null) {
-                entity.update();
-            }
-        }
-    }
-    private void updateEnemies() {
-        for (int i = 0; i < enemy.length; i++) {
-            if (enemy[i] != null) {
-                // Only update if enemy is alive and not dying
-                if (enemy[i].getAlive() && !enemy[i].getDying()) {
-                    enemy[i].update();
-                }
-                // Delete enemy if dead
-                else if (!enemy[i].getAlive()) {
-                    enemy[i] = null;
-                }
-            }
-        }
-    }
-    private void updateObjects() {
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                obj[i].update();
-                if (!obj[i].getAlive()) {
-                    obj[i] = null;
-                }
-            }
-        }
-    }
-    private void updateCollectables() {
-        for (int i = 0; i < col.length; i++) {
-            if (col[i] != null) {
-                col[i].update();
-                if (!col[i].getAlive()) {
-                    col[i] = null;
-                }
-            }
-        }
-    }
-    private void updateProjectiles() {
-        for (int i = 0; i < proj.length; i++) {
-            if (proj[i] != null) {
-                proj[i].update();
-                if (!proj[i].getAlive()) {
-                    proj[i] = null;
-                }
-            }
-        }
-    }
-    private void updateParticles() {
-        Iterator<Particle> iterator = particleList.iterator();
 
-        while (iterator.hasNext()) {
+        for (ArrayList<? extends Entity> entityList : entities) {
 
-            Particle particle = iterator.next();
-            if (particle != null) {
-                particle.update();
-                if (!particle.getAlive()) {
+            Iterator<? extends Entity> iterator = entityList.iterator();
+            while (iterator.hasNext()) {
+
+                Entity e = iterator.next();
+
+                // Release captured spell before removing
+                if (!e.getAlive()) {
+                    e.breakCapture();
+                    iterator.remove();
+                    continue;
+                }
+
+                // Don't update dying enemies
+                if ((e instanceof Enemy) && e.getDying()) continue;
+
+                e.update();
+
+                // Entity died during update
+                if (!e.getAlive()) {
+                    e.breakCapture();
                     iterator.remove();
                 }
             }
@@ -321,70 +282,30 @@ public class GamePanel extends JPanel implements Runnable {
     }
     private void drawEntities() {
 
-        entityList.add(player);
-
-        // NPCs
-        for (NPC n : npc) {
-            if (n != null) {
-                entityList.add(n);
-            }
-        }
-
-        // Enemies
-        for (Enemy n : enemy) {
-            if (n != null) {
-                entityList.add(n);
-            }
-        }
-
-        // Objects
-        for (Object o : obj) {
-            if (o != null) {
-                entityList.add(o);
-            }
-        }
-
-        // Projectiles
-        for (Projectile p : proj) {
-            if (p != null) {
-                entityList.add(p);
-            }
-        }
-
-        // Collectables
-        for (Collectable c : col) {
-            if (c != null) {
-                entityList.add(c);
-            }
-        }
-
-        // Particles
-        for (Particle pa : particleList) {
-            if (pa != null) {
-                entityList.add(pa);
-            }
-        }
-
-        for (Entity e : entityList) {
-            if (e.getDrawLayer() == Entity.DrawLayer.GROUND) {
-                e.draw(g2);
-            }
-        }
-
-        entityList.stream()
-                .filter(e -> e.getDrawLayer() == Entity.DrawLayer.ENTITY)
-                .sorted(Comparator.comparing(Entity::getIsGrabbed)
-                .thenComparingInt(Entity::getWorldPointY))
-                .forEach(e -> e.draw(g2));
-
-        for (Entity e : entityList) {
-            if (e.getDrawLayer() == Entity.DrawLayer.ABOVE) {
-                e.draw(g2);
-            }
-        }
-
-        // Empty list
         entityList.clear();
+
+        entityList.add(player);
+        for (ArrayList<? extends Entity> list : entities) {
+            entityList.addAll(list);
+        }
+
+        drawLayer(Entity.DrawLayer.GROUND, false);
+        drawLayer(Entity.DrawLayer.ENTITY, true);
+        drawLayer(Entity.DrawLayer.ABOVE, false);
+    }
+    private void drawLayer(Entity.DrawLayer layer, boolean sort) {
+
+        Stream<Entity> stream = entityList.stream()
+                .filter(e -> e.getDrawLayer() == layer);
+
+        if (sort) {
+            stream = stream.sorted(
+                    Comparator.comparing(Entity::getIsGrabbed)
+                            .thenComparingInt(Entity::getWorldPointY)
+            );
+        }
+
+        stream.forEach(e -> e.draw(g2));
     }
 
     /**
@@ -417,37 +338,20 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public Entity[][] getAllEntities() {
-        return new Entity[][] {
-                npc,
-                enemy,
-                obj,
-                col,
-                proj
-        };
-    }
-    public Entity[] getEntityList(Entity entity) {
-
-        return switch (entity) {
-            case NPC _ -> npc;
-            case Enemy _ -> enemy;
-            case Object _ -> obj;
-            case Collectable _ -> col;
-            case null, default -> null;
-        };
+    public ArrayList<ArrayList<? extends Entity>> getAllEntities() {
+        return entities;
     }
 
-    public int findOpenSlot(Entity[] list) {
+    public void addEntity(Entity entity) {
 
-        if (list == null) {
-            return -1;
+        switch (entity) {
+            case NPC npc -> npcs.add(npc);
+            case Enemy enemy -> enemies.add(enemy);
+            case Particle particle -> particles.add(particle);
+            case Object object -> objects.add(object);
+            case Collectable collectable -> collectables.add(collectable);
+            case Projectile projectile -> projectiles.add(projectile);
+            default -> throw new IllegalArgumentException();
         }
-
-        for (int i = 0; i < list.length; i++) {
-            if (list[i] == null) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

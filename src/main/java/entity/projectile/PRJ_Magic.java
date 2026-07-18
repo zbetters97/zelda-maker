@@ -9,7 +9,7 @@ public class PRJ_Magic extends Projectile {
     public PRJ_Magic(GamePanel gp) {
         super(gp, prjName);
 
-        maxHealth = 120;
+        maxHealth = 90;
         health = maxHealth;
 
         defaultSpeed = 8;

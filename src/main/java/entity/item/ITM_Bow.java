@@ -36,7 +36,7 @@ public class ITM_Bow extends Item {
         setPower();
 
         projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
-        addProjectile(projectile);
+        gp.projectiles.add(projectile);
 
         user.addArrows(-1);
         user.charge = 0;

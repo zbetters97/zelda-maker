@@ -22,8 +22,7 @@ public class ITM_Rod extends Item {
     public void use() {
 
         if (user.getCapturedTarget() != null) {
-            user.getCapturedTarget().setCaptured(false);
-            user.setCapturedTarget(null);
+            user.capture(null);
             super.use();
 
             return;
@@ -31,7 +30,7 @@ public class ITM_Rod extends Item {
 
         if (!projectile.getAlive()) {
             projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
-            addProjectile(projectile);
+            gp.projectiles.add(projectile);
 
             super.use();
         }

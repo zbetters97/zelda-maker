@@ -39,7 +39,7 @@ public class Particle extends Object {
         Particle p3 = new Particle(gp, worldPoint, maxHealth, speed, color, size, 2, -1);
         Particle p4 = new Particle(gp, worldPoint, maxHealth, speed, color, size, 2, 1);
 
-        gp.particleList.addAll(Arrays.asList(p1, p2, p3, p4));
+        gp.particles.addAll(Arrays.asList(p1, p2, p3, p4));
     }
 
     @Override

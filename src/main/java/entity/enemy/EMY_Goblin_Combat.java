@@ -72,4 +72,16 @@ public class EMY_Goblin_Combat extends Enemy {
         setDirection(60);
         super.searchForPlayer();
     }
+
+    @Override
+    protected void handleCapture() {
+
+        if (action == Action.ATTACKING) {
+            attacking();
+            speed = 0;
+        }
+        else {
+            speed = defaultSpeed;
+        }
+    }
 }

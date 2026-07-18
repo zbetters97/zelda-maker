@@ -41,7 +41,11 @@ public class EMY_Beetle extends Enemy {
     @Override
     public void update() {
 
-        if (isStuck()) {
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
             return;
         }
 

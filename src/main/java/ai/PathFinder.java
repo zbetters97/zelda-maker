@@ -1,6 +1,8 @@
 package ai;
 
 import application.GamePanel;
+import entity.npc.NPC;
+import entity.object.Object;
 import tile.Tile;
 
 import java.util.ArrayList;
@@ -90,11 +92,11 @@ public class PathFinder {
             }
 
             // Check NPCs
-            for (int i = 0; i < gp.npc.length; i++) {
+            for (NPC npc : gp.npcs) {
 
-                if (gp.npc[i] != null && gp.npc[i].getSpeed() == 0) {
-                    int iCol = gp.npc[i].getWorldPoint().x / gp.tileSize;
-                    int iRow = gp.npc[i].getWorldPoint().y / gp.tileSize;
+                if (npc != null && npc.getSpeed() == 0) {
+                    int iCol = npc.getWorldPoint().x / gp.tileSize;
+                    int iRow = npc.getWorldPoint().y / gp.tileSize;
                     if (iCol < 0 || iRow < 0) continue;
 
                     node[iCol][iRow].solid = true;
@@ -102,11 +104,11 @@ public class PathFinder {
             }
 
             // Check objects
-            for (int i = 0; i < gp.obj.length; i++) {
+            for (Object object : gp.objects) {
 
-                if (gp.obj[i] != null && gp.obj[i].getCollision()) {
-                    int iCol = gp.obj[i].getWorldPoint().x / gp.tileSize;
-                    int iRow = gp.obj[i].getWorldPoint().y / gp.tileSize;
+                if (object != null && object.getCollision()) {
+                    int iCol = object.getWorldPoint().x / gp.tileSize;
+                    int iRow = object.getWorldPoint().y / gp.tileSize;
                     if (iCol < 0 || iRow < 0) continue;
 
                     node[iCol][iRow].solid = true;

@@ -45,7 +45,11 @@ public class Enemy extends Entity {
     @Override
     public void update() {
 
-        if (isStuck()) {
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
             return;
         }
 
@@ -82,7 +86,7 @@ public class Enemy extends Entity {
     }
 
     protected void chasePlayer() {
-        if (captured) return;
+        if (isCaptured()) return;
         ai.searchPath(gp.player);
     }
 

@@ -23,7 +23,7 @@ public class ITM_Boomerang extends Item {
 
         if (!projectile.getAlive()) {
             projectile.set(user.getWorldPoint(), user.getDirection(), true, user);
-            addProjectile(projectile);
+            gp.projectiles.add(projectile);
 
             super.use();
         }

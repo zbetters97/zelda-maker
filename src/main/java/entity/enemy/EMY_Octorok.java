@@ -52,7 +52,11 @@ public class EMY_Octorok extends Enemy {
 
     public void update() {
 
-        if (isStuck()) {
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
             return;
         }
 
@@ -106,6 +110,17 @@ public class EMY_Octorok extends Enemy {
     @Override
     protected void attack() {
         useProjectile(projectile, 2);
+    }
+
+    @Override
+    protected void handleCapture() {
+
+        if (action == Action.ATTACKING) {
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
+
+        manageValues();
     }
 
     @Override

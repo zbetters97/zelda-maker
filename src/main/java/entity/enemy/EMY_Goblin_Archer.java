@@ -68,6 +68,18 @@ public class EMY_Goblin_Archer extends Enemy {
     }
 
     @Override
+    protected void handleCapture() {
+
+        if (action == Action.ATTACKING) {
+            speed = defaultSpeed;
+            projectile.setSpeed(6);
+            projectile.setAttack(2);
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
+    }
+
+    @Override
     protected void manageValues() {
         if (actionLockCounter > 0) {
             actionLockCounter--;

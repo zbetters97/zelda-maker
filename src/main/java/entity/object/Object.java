@@ -187,9 +187,9 @@ public class Object extends Entity {
 
         gp.cChecker.checkTile(this);
 
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.enemy);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.npcs);
+        gp.cChecker.checkMovementCollision(this, gp.enemies);
+        gp.cChecker.checkMovementCollision(this, gp.objects);
 
         // Check hazard at end of toss
         if (!tossed) {

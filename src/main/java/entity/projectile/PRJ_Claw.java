@@ -3,6 +3,7 @@ package entity.projectile;
 import application.GamePanel;
 import entity.Entity;
 import entity.object.OBJ_Cucco;
+import entity.object.Object;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -98,13 +99,9 @@ public class PRJ_Claw extends Projectile {
     }
     private Entity checkGrabbableEntity() {
 
-        Entity target = overlapEnemy(this);
-
+        Entity target = gp.cChecker.checkOverlapCollision(this, gp.enemies);
         if (target == null) {
-            int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
-            if (colIndex != -1) {
-                target = gp.col[colIndex];
-            }
+            target = gp.cChecker.checkOverlapCollision(this, gp.collectables);
         }
 
         return target;
@@ -112,21 +109,19 @@ public class PRJ_Claw extends Projectile {
 
     private void checkLatchableCollision() {
 
-        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (objIndex != -1 && gp.obj[objIndex].isLatchable()) {
-            grabbedEntity = gp.obj[objIndex];
+        Object object = gp.cChecker.checkMovementCollision(this, gp.objects);
+        if (object != null && object.isLatchable()) {
+            grabbedEntity = object;
             returning = true;
 
             // Pull Cucco towards self, otherwise pull towards object
-            boolean isCucco = gp.obj[objIndex].getName().equals(OBJ_Cucco.objName);
-            if (!isCucco) {
-                latched = true;
-            }
+            boolean isCucco = object.getName().equals(OBJ_Cucco.objName);
+            if (!isCucco) latched = true;
         }
     }
     private void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
+        gp.cChecker.checkMovementCollision(this, gp.npcs);
         checkObjectCollision();
     }
 

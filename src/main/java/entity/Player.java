@@ -3,11 +3,13 @@ package entity;
 import ai.EntityAI;
 import application.GamePanel;
 import application.GamePanel.Direction;
+import entity.collectable.Collectable;
 import entity.enemy.Enemy;
 import entity.item.*;
 import entity.npc.NPC;
 import entity.object.OBJ_Bomb;
 import entity.object.Object;
+import entity.projectile.Projectile;
 
 import static entity.Entity.Action.*;
 
@@ -398,13 +400,17 @@ public class Player extends Entity {
                 return;
             }
 
-            NPC npc = getInteractableNPCs();
+            NPC npc = gp.cChecker.checkMovementCollision(this, gp.npcs);
             if (npc != null) {
                 availableAction = npc.getAvailableAction(this);
                 return;
             }
 
-            Object object = getInteractableObject();
+            Object object = gp.cChecker.checkMovementCollision(this, gp.objects);
+            if (object == null) {
+                object = gp.cChecker.checkOverlapCollision(this, gp.objects);
+            }
+
             if (object != null) {
                 availableAction = object.getAvailableAction(this);
             }
@@ -511,41 +517,18 @@ public class Player extends Entity {
 
     private void findInteraction() {
 
-        NPC npc = getInteractableNPCs();
+        NPC npc = gp.cChecker.checkMovementCollision(this, gp.npcs);
         if (npc != null) {
             npc.interact(this);
         }
         else {
-            Object object = getInteractableObject();
-            if (object != null) {
-                object.interact(this);
+            Object object = gp.cChecker.checkMovementCollision(this, gp.objects);
+            if (object == null) {
+                object = gp.cChecker.checkOverlapCollision(this, gp.objects);
             }
+
+            if (object != null) object.interact(this);
         }
-    }
-    private NPC getInteractableNPCs() {
-
-        NPC npc = null;
-
-        int npcIndex = gp.cChecker.checkMovementCollision(this, gp.npc);
-        if (npcIndex != -1) {
-            npc = gp.npc[npcIndex];
-        }
-
-        return npc;
-    }
-    private Object getInteractableObject() {
-
-        Object object = null;
-
-        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (objIndex == -1) {
-            objIndex = gp.cChecker.checkOverlapCollision(this, gp.obj);
-        }
-        if (objIndex != -1) {
-            object = gp.obj[objIndex];
-        }
-
-        return object;
     }
 
     private void placeObject() {
@@ -610,7 +593,7 @@ public class Player extends Entity {
         Entity target = null;
         int currentDistance = maxZTargetDistance;
 
-        for (Entity e : gp.enemy) {
+        for (Entity e : gp.enemies) {
 
             if (e != null && e != lockedOnTarget && e.isAvailable()) {
 
@@ -913,46 +896,30 @@ public class Player extends Entity {
     }
     private void checkObstacleCollision() {
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.npcs);
+        gp.cChecker.checkMovementCollision(this, gp.objects);
     }
     private void checkHarmfulCollision() {
 
         gp.cChecker.checkHazard(this);
 
-        Enemy enemy = moveIntoEnemy(this);
+        Enemy enemy = gp.cChecker.checkMovementCollision(this, gp.enemies);
         if (enemy != null && !enemy.invincible) {
             takeDamage(enemy);
         }
     }
     private void checkInteractiveCollision() {
 
-        int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
-        if (colIndex != -1) {
-            gp.col[colIndex].use(this);
+        Collectable collectable = gp.cChecker.checkOverlapCollision(this, gp.collectables);
+        if (collectable != null) collectable.use(this);
+
+        Projectile projectile = gp.cChecker.checkOverlapCollision(this, gp.projectiles);
+        if (projectile != null && projectile.getCanPickup()){
+            projectile.pickup(this);
         }
 
-        int projIndex = gp.cChecker.checkOverlapCollision(this, gp.proj);
-        if (projIndex != -1 && gp.proj[projIndex].getCanPickup()){
-            gp.proj[projIndex].pickup(this);
-        }
-
-        int objIndex = gp.cChecker.checkMovementCollision(this, gp.obj);
-        if (objIndex != -1) {
-            gp.obj[objIndex].interact(this);
-        }
-    }
-
-    private Enemy moveIntoEnemy(Entity entity) {
-
-        Enemy enemy = null;
-
-        int enemyIndex = gp.cChecker.checkMovementCollision(entity, gp.enemy);
-        if (enemyIndex != -1) {
-            enemy = gp.enemy[enemyIndex];
-        }
-
-        return enemy;
+        Object object = gp.cChecker.checkMovementCollision(this, gp.objects);
+        if (object != null) object.interact(this);
     }
 
     /**
@@ -1454,11 +1421,7 @@ public class Player extends Entity {
         // Release captured target if not currently using Rod
         boolean rodNotEquipped = item == null || !item.getName().equals(ITM_Rod.itmName);
         if (rodNotEquipped) {
-            if (capturedTarget != null) {
-                capturedTarget.setCaptured(false);
-            }
-
-            capturedTarget = null;
+            releaseCapture();
         }
     }
 

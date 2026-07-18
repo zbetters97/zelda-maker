@@ -2,6 +2,8 @@ package entity.object;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.enemy.Enemy;
+import entity.npc.NPC;
 
 import java.awt.*;
 
@@ -31,13 +33,14 @@ public class OBJ_Block_Red extends Object {
      */
     private void detectSwitch() {
 
-        for (int i = 0; i < gp.obj.length; i++) {
+        for (Object object : gp.objects) {
 
             // Find switch in objects list
-            if (gp.obj[i] != null && gp.obj[i].getName().equals(OBJ_Switch.objName)) {
+            boolean isSwitch = object != null && object.getName().equals(OBJ_Switch.objName);
+            if (isSwitch) {
 
                 // Turn switch on if off
-                if (!gp.obj[i].getOpened()) {
+                if (!object.getOpened()) {
                     opened = false;
                     collisionOn = false;
                     return;
@@ -53,11 +56,11 @@ public class OBJ_Block_Red extends Object {
     }
 
     private boolean noOverlap() {
-        int npc = gp.cChecker.checkOverlapCollision(this, gp.npc);
-        int enemy = gp.cChecker.checkOverlapCollision(this, gp.enemy);
+        NPC npc = gp.cChecker.checkOverlapCollision(this, gp.npcs);
+        Enemy enemy = gp.cChecker.checkOverlapCollision(this, gp.enemies);
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
 
-        return npc == -1 && enemy == -1 && !contactPlayer;
+        return npc == null && enemy == null && !contactPlayer;
     }
 
     /**

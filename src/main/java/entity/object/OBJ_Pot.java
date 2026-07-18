@@ -36,6 +36,8 @@ public class OBJ_Pot extends Object {
 
     @Override
     public void update() {
+        super.update();
+
         if (health <= 0) {
             shatter();
         }
@@ -78,16 +80,12 @@ public class OBJ_Pot extends Object {
         super.landOnGround();
 
         // Damage enemy if landed
-        Enemy enemy = overlapEnemy(this);
-        if (enemy != null) {
-            enemy.takeDamage(this);
-        }
+        Enemy enemy = gp.cChecker.checkOverlapCollision(this, gp.enemies);
+        if (enemy != null) enemy.takeDamage(this);
 
         // Damage player if landed
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
-        if (contactPlayer) {
-            gp.player.takeDamage(this);
-        }
+        if (contactPlayer) gp.player.takeDamage(this);
 
         shatter();
     }

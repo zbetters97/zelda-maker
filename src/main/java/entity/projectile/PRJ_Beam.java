@@ -9,7 +9,7 @@ public class PRJ_Beam extends Projectile {
     public PRJ_Beam(GamePanel gp) {
         super(gp, prjName);
 
-        maxHealth = 120;
+        maxHealth = 90;
         health = maxHealth;
 
         defaultSpeed = 12;

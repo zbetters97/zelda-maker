@@ -36,10 +36,12 @@ public class OBJ_Switch extends Object {
     private void flipSwitches() {
 
         // Find other switches in object list
-        for (int i = 0; i < gp.obj.length; i++) {
-            if (gp.obj[i] != null && gp.obj[i].getName().equals(name)) {
-                gp.obj[i].setOpened(opened);
-                gp.obj[i].setInvincible(true);
+        for (Object object : gp.objects) {
+
+            boolean isSwitch = object != null && object.getName().equals(name);
+            if (isSwitch) {
+                object.setOpened(opened);
+                object.setInvincible(true);
             }
         }
     }

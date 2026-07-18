@@ -118,7 +118,7 @@ public class Entity {
     protected String availableAction = "";
     protected boolean grabbed = false;
     protected Object grabbedObject;
-    protected boolean captured = false;
+    protected Entity capturedBy;
     protected Entity capturedTarget;
 
     /** COMBAT VALUES */
@@ -228,6 +228,11 @@ public class Entity {
      * Called every frame by GamePanel
      */
     public void update() {
+
+        if (isCaptured()) {
+            handleCapture();
+        }
+
         manageValues();
     }
 
@@ -242,7 +247,7 @@ public class Entity {
      */
     protected void updateDirection() {
 
-        if (captured) return;
+        if (isCaptured()) return;
 
         checkCollision();
         move(direction);
@@ -284,9 +289,9 @@ public class Entity {
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.enemy);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.npcs);
+        gp.cChecker.checkMovementCollision(this, gp.enemies);
+        gp.cChecker.checkMovementCollision(this, gp.objects);
 
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         boolean canHurtPlayer = this instanceof Enemy;
@@ -332,6 +337,8 @@ public class Entity {
         moving = true;
         direction = fixDirection(forcedDirection);
         moveInDirection(direction);
+
+        System.out.println("called");
 
         cycleSprites();
     }
@@ -395,7 +402,7 @@ public class Entity {
      */
     protected void setDirection(int rate) {
 
-        if (captured) return;
+        if (isCaptured()) return;
 
         if (rate <= ++actionLockCounter) {
 
@@ -426,25 +433,26 @@ public class Entity {
         };
     }
 
+    protected void useProjectile(Projectile projectile) {
+
+        if (projectile.getAlive()) return;
+
+        projectile.set(worldPoint, direction, true, this);
+        gp.projectiles.add(projectile);
+    }
+
     protected void useProjectile(Projectile projectile, int seconds) {
 
         int i = new Random().nextInt(60 * seconds);
         if (i == 0 && !projectile.alive && actionLockCounter == 0) {
             projectile.set(worldPoint, direction, true, this);
-            addProjectile(projectile);
+            gp.projectiles.add(projectile);
 
             // Force 30 frame delay in between shots
             actionLockCounter = 30;
         }
     }
-    protected void addProjectile(Projectile projectile) {
-        for (int i = 0; i < gp.proj.length; i++) {
-            if (gp.proj[i] == null) {
-                gp.proj[i] = projectile;
-                break;
-            }
-        }
-    }
+
 
     protected void attack() {
 
@@ -517,25 +525,18 @@ public class Entity {
 
         damageEnemies(this);
 
-        int projIndex = gp.cChecker.checkOverlapCollision(this, gp.proj);
-        if (projIndex != -1) {
-            Projectile projectile = gp.proj[projIndex];
-
-            if (projectile.canBeDeflected(false)) {
-                projectile.deflect(this);
-            }
+        Projectile projectile = gp.cChecker.checkOverlapCollision(this, gp.projectiles);
+        if (projectile != null && projectile.canBeDeflected(false)) {
+            projectile.deflect(this);
         }
 
-        int objIndex = gp.cChecker.checkOverlapCollision(this, gp.obj);
-        if (objIndex != -1) {
-            gp.obj[objIndex].interact();
-        }
+        Object object = gp.cChecker.checkOverlapCollision(this, gp.objects);
+        if (object != null) object.interact();
     }
     private void damageEnemies(Entity attacker) {
 
         // Find enemy that intersects collision box
-        for (Enemy enemy : gp.enemy) {
-
+        for (Enemy enemy : gp.enemies) {
             if (enemy == null) continue;
 
             if (gp.cChecker.hasOverlapCollision(attacker, enemy)) {
@@ -553,18 +554,6 @@ public class Entity {
         if (gp.cChecker.checkPlayer(this)) {
             gp.player.takeDamage(this);
         }
-    }
-
-    protected Enemy overlapEnemy(Entity entity) {
-
-        Enemy enemy = null;
-
-        int enemyIndex = gp.cChecker.checkOverlapCollision(entity, gp.enemy);
-        if (enemyIndex != -1) {
-            enemy = gp.enemy[enemyIndex];
-        }
-
-        return enemy;
     }
 
     /**
@@ -716,13 +705,12 @@ public class Entity {
     protected void checkDeath() { }
 
     protected void dropItem(Collectable droppedItem) {
-        for (int i = 0; i < gp.col.length; i++) {
-            if (gp.col[i] == null) {
-                gp.col[i] = droppedItem;
-                gp.col[i].setWorldPoint(worldPoint);
-                break;
-            }
-        }
+        droppedItem.setWorldPoint(new Point(worldPoint));
+        gp.collectables.add(droppedItem);
+    }
+
+    protected void handleCapture() {
+
     }
 
     /**
@@ -1094,25 +1082,33 @@ public class Entity {
         this.grabbedObject = grabbedObject;
     }
 
-    public boolean getCaptured() {
-        return captured;
-    }
-    public void setCaptured(boolean captured) {
-        this.captured = captured;
+    public void capture(Entity target) {
 
-        if (captured && speed == 0) {
-            speed = 1;
+        // Release current target first
+        if (capturedTarget != null) {
+            capturedTarget.capturedBy = null;
         }
-        else if (!captured) {
-            speed = defaultSpeed;
+
+        capturedTarget = target;
+
+        if (target != null) {
+            target.capturedBy = this;
         }
     }
+    public void releaseCapture() {
+        capture(null);
+    }
+    public void breakCapture() {
 
+        if (capturedBy != null) {
+            capturedBy.releaseCapture();
+        }
+    }
+    public boolean isCaptured() {
+        return capturedBy != null;
+    }
     public Entity getCapturedTarget() {
         return capturedTarget;
-    }
-    public void setCapturedTarget(Entity capturedTarget) {
-        this.capturedTarget = capturedTarget;
     }
 
     public String getAvailableAction(Entity user) {

@@ -8,6 +8,7 @@ import tile.Tile;
 import tile.TileManager;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Map;
 
 import static application.GamePanel.Direction;
@@ -203,9 +204,7 @@ public record CollisionChecker(GamePanel gp) {
         return gp.tileM.mapTileNum[col][row] == TileManager.iceTile;
     }
 
-    public int checkMovementCollision(Entity entity, Entity[] targets) {
-
-        int entityIndex = -1;
+    public <T extends Entity> T checkMovementCollision(Entity entity, ArrayList<T> targets) {
 
         Rectangle futureRect = entity.getWorldHitbox();
 
@@ -234,9 +233,7 @@ public record CollisionChecker(GamePanel gp) {
 
         Rectangle currentRect = entity.getWorldHitbox();
 
-        for (int i = 0; i < targets.length; i++) {
-
-            Entity target = targets[i];
+        for (T target : targets) {
 
             if (target == null || target == entity || target.isNotInteractable()) {
                 continue;
@@ -249,28 +246,22 @@ public record CollisionChecker(GamePanel gp) {
 
             if (!alreadyIntersecting && willIntersect) {
 
-                entityIndex = i;
-
                 boolean canCollide = entity.canCollideWith(target) && target.canCollideWith(entity);
                 if (canCollide) {
                     entity.setCollision(true);
                 }
 
-                break;
+                return target;
             }
         }
 
-        return entityIndex;
+        return null;
     }
-    public int checkOverlapCollision(Entity entity, Entity[] targets) {
-
-        int entityIndex = -1;
+    public <T extends Entity> T checkOverlapCollision(Entity entity, ArrayList<T> targets) {
 
         Rectangle entityRect = entity.getWorldHitbox();
 
-        for (int i = 0; i < targets.length; i++) {
-
-            Entity target = targets[i];
+        for (T target : targets) {
 
             if (target == null || target == entity || target.isNotInteractable()) {
                 continue;
@@ -278,12 +269,11 @@ public record CollisionChecker(GamePanel gp) {
 
             Rectangle targetRect = target.getWorldHitbox();
             if (entityRect.intersects(targetRect)) {
-                entityIndex = i;
-                break;
+                return target;
             }
         }
 
-        return entityIndex;
+        return null;
     }
 
     public boolean hasOverlapCollision(Entity entity, Entity target) {
@@ -298,7 +288,7 @@ public record CollisionChecker(GamePanel gp) {
         return entityRect.intersects(targetRect);
     }
 
-    public void setOverlapCollision(Entity entity, Entity[] targets) {
+    public void setOverlapCollision(Entity entity, ArrayList<? extends Entity> targets) {
 
         Rectangle entityRect = entity.getWorldHitbox();
 
@@ -358,18 +348,17 @@ public record CollisionChecker(GamePanel gp) {
         int startingRow = center.y / gp.tileSize;
 
         // Target player, enemies, and objects
-        Entity[][] allTargets = {
-                { gp.player },
-                gp.enemy,
-                gp.obj
-        };
+        ArrayList<ArrayList<? extends Entity>> allTargets = new ArrayList<>();
+        allTargets.add(gp.enemies);
+        allTargets.add(gp.objects);
 
         // Iterate over each corresponding tile (surrounding square shape)
+        Point offset;
         int col, row;
         for (Map.Entry<Point, Direction> entry : EXPLOSION_OFFSETS.entrySet()) {
 
             // Shift row/col based on give offset
-            Point offset = entry.getKey();
+            offset = entry.getKey();
             col = startingCol + offset.x;
             row = startingRow + offset.y;
 
@@ -380,35 +369,32 @@ public record CollisionChecker(GamePanel gp) {
             Direction direction = entry.getValue();
             entity.setDirection(direction);
 
-            // Detect if any entity is on the current tile
-            for (Entity[] targets : allTargets) {
-                handleExplosionCollision(entity, targets, col, row);
+            // For each target in given list
+            for (ArrayList<? extends Entity> targets : allTargets) {
+                for (Entity target : targets) {
+                    handleExplosionCollision(entity, target, col, row);
+                }
             }
+
+            handleExplosionCollision(entity, gp.player, col, row);
         }
     }
-    private void handleExplosionCollision(Entity entity, Entity[] targets, int entityCol, int entityRow) {
+    private void handleExplosionCollision(Entity entity, Entity target, int entityCol, int entityRow) {
 
-        Point center;
-        int targetCol, targetRow;
+        // Skip if not valid
+        if (target == null || target == entity || target.isNotInteractable()) {
+            return;
+        }
 
-        // For each target in given list
-        for (Entity target : targets) {
+        Point center = target.getCenterPoint();
 
-            // Skip if not valid
-            if (target == null || target == entity || target.isNotInteractable()) {
-                continue;
-            }
+        // Current entity's tile position
+        int targetCol = center.x / gp.tileSize;
+        int targetRow = center.y / gp.tileSize;
 
-            center = target.getCenterPoint();
-
-            // Current entity's tile position
-            targetCol = center.x / gp.tileSize;
-            targetRow = center.y / gp.tileSize;
-
-            // Current tile same as detection zone, deal damage
-            if (targetCol == entityCol && targetRow == entityRow) {
-                target.takeDamage(entity);
-            }
+        // Current tile same as detection zone, deal damage
+        if (targetCol == entityCol && targetRow == entityRow) {
+            target.takeDamage(entity);
         }
     }
 

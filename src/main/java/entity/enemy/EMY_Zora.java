@@ -48,7 +48,11 @@ public class EMY_Zora extends Enemy {
 
     public void update() {
 
-        if (isStuck()) {
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
             return;
         }
 
@@ -81,9 +85,7 @@ public class EMY_Zora extends Enemy {
     protected void attack() {
 
         if (++spriteCounter == 30) {
-            projectile.set(worldPoint, direction, true, this);
-            addProjectile(projectile);
-
+            useProjectile(projectile);
             actionLockCounter = 30;
         }
         else if (60 < spriteCounter) {
@@ -101,6 +103,19 @@ public class EMY_Zora extends Enemy {
         action = Action.IDLE;
         interactable = false;
         actionLockCounter = 0;
+    }
+
+    @Override
+    protected void handleCapture() {
+
+        // Stay above water if captured
+        spriteNum = 2;
+        interactable = true;
+
+        if (action == Action.ATTACKING) {
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
     }
 
     @Override

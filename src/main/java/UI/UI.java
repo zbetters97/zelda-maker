@@ -3,7 +3,6 @@ package UI;
 import application.GamePanel;
 import application.UtilityTool;
 import entity.Entity;
-import entity.Player;
 import entity.item.ITM_Bomb;
 import entity.item.ITM_Bow;
 import tile.Tile;
@@ -16,10 +15,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class UI {
@@ -457,7 +453,7 @@ public class UI {
         Entity newTarget = null;
         int currentDistance = Entity.maxZTargetDistance;
 
-        for (Entity enemy : gp.enemy) {
+        for (Entity enemy : gp.enemies) {
 
             if (enemy != null && enemy.isAvailable()) {
 
@@ -722,22 +718,25 @@ public class UI {
             return true;
         }
 
-        for (Entity[] list : gp.getAllEntities()) {
-            for (int i = 0; i < list.length; i++) {
+        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
 
-                Entity e = list[i];
-                if (e == null) continue;
+            Iterator<? extends Entity> it = list.iterator();
 
-                // Entity found at same X/Y
-                if (e.getCol() == cursorCol && e.getRow() == cursorRow) {
+            while (it.hasNext()) {
+
+                Entity entity = it.next();
+
+                if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
 
                     // Trying to place selected entity on top of existing, not allowed
-                    if (selectedEntity != null) return true;
+                    if (selectedEntity != null) {
+                        return true;
+                    }
 
                     // Grab new entity, remove from level
-                    selectedEntity = e;
+                    selectedEntity = entity;
+                    it.remove();
 
-                    list[i] = null;
                     return true;
                 }
             }
@@ -782,18 +781,13 @@ public class UI {
     }
     private void editing_PlaceEntity(Entity entity) {
 
-        if (entity.getName().equals(Player.playerName)) {
+        if (entity == gp.player) {
             gp.player.setWorldPoint(cursor.getWorldPoint());
             return;
         }
 
-        Entity[] entityList = gp.getEntityList(entity);
-        int entityIndex = gp.findOpenSlot(entityList);
-
-        if (entityIndex != -1) {
-            entity.setWorldPoint(cursor.getWorldPoint());
-            entityList[entityIndex] = entity;
-        }
+        entity.setWorldPoint(cursor.getWorldPoint());
+        gp.addEntity(entity);
     }
     private boolean cannotPlaceEntity(Entity entity) {
 
@@ -807,31 +801,36 @@ public class UI {
     }
 
     private void editing_Map_Input_B() {
-        if (gp.keyH.bPressed) {
-            gp.keyH.bPressed = false;
 
-            // Can't delete player
-            if (gp.player.getWorldPoint().equals(cursor.getWorldPoint())) {
-                return;
-            }
+        if (!gp.keyH.bPressed) return;
 
-            // Find entity at X/Y
-            for (Entity[] list : gp.getAllEntities()) {
-                for (int i = 0; i < list.length; i++) {
+        gp.keyH.bPressed = false;
 
-                    Entity e = list[i];
-                    if (e == null) continue;
+        int cursorCol = cursor.getWorldX() / gp.tileSize;
+        int cursorRow = cursor.getWorldY() / gp.tileSize;
 
-                    // Entity found, delete from list
-                    if (e.getWorldPoint().equals(cursor.getWorldPoint())) {
-                        list[i] = null;
-                        return;
-                    }
+        // Can't delete player
+        if (gp.player.getCol() == cursorCol && gp.player.getRow() == cursorRow) {
+            return;
+        }
+
+        // Find entity at X/Y
+        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
+
+            Iterator<? extends Entity> it = list.iterator();
+
+            while (it.hasNext()) {
+
+                Entity entity = it.next();
+
+                // Entity found, delete from list
+                if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
+                    it.remove();
+                    return;
                 }
             }
         }
     }
-
     private void editing_Map_Input_Dir() {
 
         if (gp.keyH.upPressed) {

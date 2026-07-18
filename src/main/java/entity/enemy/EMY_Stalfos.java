@@ -42,18 +42,24 @@ public class EMY_Stalfos extends Enemy {
     @Override
     protected void setAction() {
 
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
+            return;
+        }
+
         // Jumping out of the way
         if (action == Action.JUMPING) {
             speed = 3;
             interactable = false;
         }
+        else if (decideToJump()) {
+            jumpAway();
+        }
         else {
-            if (decideToJump()) {
-                jumpAway();
-            }
-            else {
-                super.setAction();
-            }
+            super.setAction();
         }
     }
 
@@ -81,6 +87,15 @@ public class EMY_Stalfos extends Enemy {
     @Override
     protected void attack() {
         useProjectile(projectile, 2);
+    }
+
+    @Override
+    protected void handleCapture() {
+
+        if (action == Action.ATTACKING) {
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
     }
 
     @Override

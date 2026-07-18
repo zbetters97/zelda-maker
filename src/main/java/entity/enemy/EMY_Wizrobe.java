@@ -38,7 +38,11 @@ public class EMY_Wizrobe extends Enemy {
     @Override
     public void update() {
 
-        if (isStuck()) {
+        if (isStuck()) return;
+
+        if (isCaptured()) {
+            handleCapture();
+            manageValues();
             return;
         }
 
@@ -121,8 +125,7 @@ public class EMY_Wizrobe extends Enemy {
 
     @Override
     protected void attack() {
-        projectile.set(worldPoint, direction, true, this);
-        addProjectile(projectile);
+       useProjectile(projectile);
     }
 
     private boolean checkTeleportTimer() {
@@ -143,6 +146,21 @@ public class EMY_Wizrobe extends Enemy {
         attackCounter = 0;
         teleporting = true;
         interactable = false;
+    }
+
+    @Override
+    protected void handleCapture() {
+
+        spriteNum = 1;
+        teleporting = false;
+        interactable = true;
+
+        if (action == Action.ATTACKING) {
+            useProjectile(projectile);
+            action = Action.IDLE;
+        }
+
+        manageValues();
     }
 
     @Override

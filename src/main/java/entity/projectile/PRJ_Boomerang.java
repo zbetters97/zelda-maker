@@ -57,16 +57,14 @@ public class PRJ_Boomerang extends Projectile {
     public void checkCollision() {
         super.checkCollision();
 
-        int colIndex = gp.cChecker.checkOverlapCollision(this, gp.col);
-        if (colIndex != -1) {
-            grabbedEntity = gp.col[colIndex];
-        }
+        Collectable collectable = gp.cChecker.checkOverlapCollision(this, gp.collectables);
+        if (collectable != null) grabbedEntity = collectable;
     }
 
     @Override
     protected boolean checkEnemyCollision() {
 
-        Enemy enemy = overlapEnemy(this);
+        Enemy enemy = gp.cChecker.checkOverlapCollision(this, gp.enemies);
         if (enemy != null) {
             enemy.setStunned(true);
             enemy.takeDamage(this);

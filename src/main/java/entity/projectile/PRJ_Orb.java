@@ -9,14 +9,14 @@ import java.util.Arrays;
 public class PRJ_Orb extends Projectile {
 
     public static final String prjName = "Orb Projectile";
-    private final ArrayList<Entity[]> capturableEntities = new ArrayList<>(Arrays.asList(gp.enemy, gp.obj, gp.col));
+    private final ArrayList<ArrayList<? extends Entity>> capturableEntities = new ArrayList<>(Arrays.asList(gp.enemies, gp.objects, gp.collectables));
 
     public PRJ_Orb(GamePanel gp, Entity user) {
         super(gp, prjName);
 
         animationSpeed = 4;
 
-        maxHealth = 60;
+        maxHealth = 40;
         health = maxHealth;
 
         defaultSpeed = 5;
@@ -53,19 +53,14 @@ public class PRJ_Orb extends Projectile {
 
     private void checkCapturableCollision() {
 
-        int trgIndex;
         Entity target;
 
-        for (Entity[] targets : capturableEntities) {
+        for (ArrayList<? extends Entity> targets : capturableEntities) {
 
-            trgIndex = gp.cChecker.checkOverlapCollision(this, targets);
-            if (trgIndex == -1) continue;
-
-            target = targets[trgIndex];
+            target = gp.cChecker.checkOverlapCollision(this, targets);
             if (target != null && target.getAlive()) {
 
-                target.setCaptured(true);
-                user.setCapturedTarget(target);
+                user.capture(target);
 
                 collisionOn = true;
                 return;

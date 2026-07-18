@@ -3,6 +3,7 @@ package entity.projectile;
 import application.GamePanel;
 import entity.Entity;
 import entity.enemy.Enemy;
+import entity.object.Object;
 
 import static application.GamePanel.Direction.DOWN;
 import static application.GamePanel.Direction.UP;
@@ -75,8 +76,8 @@ public class Projectile extends Entity {
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
-        gp.cChecker.checkMovementCollision(this, gp.npc);
-        gp.cChecker.checkMovementCollision(this, gp.obj);
+        gp.cChecker.checkMovementCollision(this, gp.npcs);
+        gp.cChecker.checkMovementCollision(this, gp.objects);
         checkObjectCollision();
 
         if (user == gp.player) {
@@ -88,7 +89,7 @@ public class Projectile extends Entity {
     }
     protected boolean checkEnemyCollision() {
 
-        Enemy enemy = overlapEnemy(this);
+        Enemy enemy = gp.cChecker.checkOverlapCollision(this, gp.enemies);
         if (enemy != null) {
             enemy.takeDamage(this);
             collisionOn = true;
@@ -107,19 +108,15 @@ public class Projectile extends Entity {
     }
     protected void checkObjectCollision() {
 
-        int object = gp.cChecker.checkOverlapCollision(this, gp.obj);
-        if (object != -1 ) {
-            gp.obj[object].interact();
+        Object object = gp.cChecker.checkOverlapCollision(this, gp.objects);
+        if (object == null) {
+            object = gp.cChecker.checkMovementCollision(this, gp.objects);
+        }
+
+        if (object != null) {
+            object.interact();
             health = 0;
             collisionOn = true;
-        }
-        else {
-            object = gp.cChecker.checkMovementCollision(this, gp.obj);
-            if (object != -1 ) {
-                gp.obj[object].interact();
-                health = 0;
-                collisionOn = true;
-            }
         }
     }
 
