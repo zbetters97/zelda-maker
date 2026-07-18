@@ -263,7 +263,7 @@ public record CollisionChecker(GamePanel gp) {
 
         for (T target : targets) {
 
-            if (target == null || target == entity || target.isNotInteractable()) {
+            if (target == entity.getUser() || target == null || target == entity || target.isNotInteractable()) {
                 continue;
             }
 

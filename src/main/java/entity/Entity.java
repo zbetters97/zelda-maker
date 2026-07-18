@@ -153,7 +153,7 @@ public class Entity {
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
-    public Entity user;
+    protected Entity user;
     public int charge = 0;
     protected boolean latchable = false;
 
@@ -337,8 +337,6 @@ public class Entity {
         moving = true;
         direction = fixDirection(forcedDirection);
         moveInDirection(direction);
-
-        System.out.println("called");
 
         cycleSprites();
     }
@@ -1082,6 +1080,10 @@ public class Entity {
         this.grabbedObject = grabbedObject;
     }
 
+    public Entity getUser() {
+        return user;
+    }
+
     public void capture(Entity target) {
 
         // Release current target first
@@ -1109,6 +1111,9 @@ public class Entity {
     }
     public Entity getCapturedTarget() {
         return capturedTarget;
+    }
+    public Entity getCapturedBy() {
+        return capturedBy;
     }
 
     public String getAvailableAction(Entity user) {

@@ -80,7 +80,7 @@ public class Projectile extends Entity {
         gp.cChecker.checkMovementCollision(this, gp.objects);
         checkObjectCollision();
 
-        if (user == gp.player) {
+        if (user == gp.player || user.getCapturedBy() == gp.player) {
             checkEnemyCollision();
         }
         else {

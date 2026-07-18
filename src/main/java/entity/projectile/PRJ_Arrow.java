@@ -85,6 +85,12 @@ public class PRJ_Arrow extends Projectile {
     }
 
     @Override
+    public void resetValues() {
+        super.resetValues();
+        canPickup = false;
+    }
+
+    @Override
     public void pickup(Entity user) {
         user.addArrows(1);
         resetValues();
