@@ -123,11 +123,6 @@ public class PRJ_Boomerang extends Projectile {
 
     @Override
     protected void getSpriteImage() {
-        if (spriteNum == 1) {
-            image = up1;
-        }
-        else {
-            image = up2;
-        }
+        image = spriteNum == 1 ? up1 : up2;
     }
 }

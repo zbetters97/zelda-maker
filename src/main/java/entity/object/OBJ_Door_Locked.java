@@ -36,12 +36,12 @@ public class OBJ_Door_Locked extends Object {
 
         if (opened) return;
 
-        boolean userHasKeys = user.getKeys() > 0;
         boolean userFacing = user.getDirection() == getOppositeDirection(direction);
+        boolean userHasKey = user.getKeys() > 0;
 
-        if (userHasKeys && userFacing) {
-            opened = true;
+        if (userFacing && userHasKey) {
             user.addKeys(-1);
+            opened = true;
         }
     }
 

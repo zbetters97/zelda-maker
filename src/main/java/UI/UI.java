@@ -898,6 +898,8 @@ public class UI {
 
                 Entity entity = it.next();
 
+                if (entity == null) continue;
+
                 if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
 
                     // Trying to place selected entity on top of existing, not allowed

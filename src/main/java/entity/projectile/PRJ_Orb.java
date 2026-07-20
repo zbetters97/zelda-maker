@@ -32,8 +32,8 @@ public class PRJ_Orb extends Projectile {
 
     @Override
     public void getImages() {
-        sprite = down1 = setupImage("/projectiles/orb_down_1");
-        down2 = setupImage("/projectiles/orb_down_2");
+        sprite = up1 = setupImage("/projectiles/orb_down_1");
+        up2 = setupImage("/projectiles/orb_down_2");
     }
 
     @Override
@@ -70,6 +70,6 @@ public class PRJ_Orb extends Projectile {
 
     @Override
     protected void getSpriteImage() {
-        image = spriteNum == 1 ? down1 : down2;
+        image = spriteNum == 1 ? up1 : up2;
     }
 }

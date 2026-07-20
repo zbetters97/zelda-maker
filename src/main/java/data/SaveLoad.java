@@ -2,6 +2,7 @@ package data;
 
 import application.GamePanel;
 import entity.enemy.Enemy;
+import entity.npc.NPC;
 import entity.object.Object;
 
 import java.awt.*;
@@ -36,6 +37,12 @@ public class SaveLoad {
             ds.direction = gp.player.getDirection().toString();
             ds.health = gp.player.getHealth();
 
+            // NPCs
+            ds.npcNames = new String[gp.npcs.size()];
+            ds.npcWorldX = new int[gp.npcs.size()];
+            ds.npcWorldY = new int[gp.npcs.size()];
+            ds.npcDirections = new String[gp.npcs.size()];
+
             // ENEMIES
             ds.enemyNames = new String[gp.enemies.size()];
             ds.enemyWorldX = new int[gp.enemies.size()];
@@ -51,6 +58,19 @@ public class SaveLoad {
 
             // TILES
             ds.tileNums = new int[gp.maxWorldCol * gp.maxWorldRow];
+
+            // NPCs
+            for (int i = 0; i < gp.npcs.size(); i++) {
+
+                NPC npc = gp.npcs.get(i);
+
+                if (npc == null) continue;
+
+                ds.npcNames[i] = npc.getName();
+                ds.npcWorldX[i] = npc.getWorldPoint().x;
+                ds.npcWorldY[i] = npc.getWorldPoint().y;
+                ds.npcDirections[i] = npc.getDirection().toString();
+            }
 
             // ENEMIES
             for (int i = 0; i < gp.enemies.size(); i++) {
@@ -111,6 +131,32 @@ public class SaveLoad {
             gp.player.setDirection(GamePanel.Direction.valueOf(ds.direction));
             gp.player.setHealth(ds.health);
 
+            // TILES
+            int c = 0;
+            for (int row = 0; row < gp.maxWorldRow; row++) {
+                for (int col = 0; col < gp.maxWorldCol; col++) {
+
+                    int tileNum = ds.tileNums[c];
+
+                    gp.tileM.mapTileNum[col][row] = tileNum;
+
+                    c++;
+                }
+            }
+
+            // NPCs
+            for (int i = 0; i < ds.npcNames.length; i++) {
+
+                NPC npc = (NPC) gp.eGenerator.getEntity(ds.npcNames[i]);
+
+                if (npc == null) continue;
+
+                npc.setWorldPoint(new Point(ds.npcWorldX[i], ds.npcWorldY[i]));
+                npc.setDirection(GamePanel.Direction.valueOf(ds.npcDirections[i]));
+
+                gp.npcs.add(npc);
+            }
+
             // ENEMIES
             for (int i = 0; i < ds.enemyNames.length; i++) {
 
@@ -136,19 +182,6 @@ public class SaveLoad {
                 object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
 
                 gp.objects.add(object);
-            }
-
-            // TILES
-            int i = 0;
-            for (int row = 0; row < gp.maxWorldRow; row++) {
-                for (int col = 0; col < gp.maxWorldCol; col++) {
-
-                    int tileNum = ds.tileNums[i];
-
-                    gp.tileM.mapTileNum[col][row] = tileNum;
-
-                    i++;
-                }
             }
 
             ois.close();

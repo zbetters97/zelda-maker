@@ -100,7 +100,6 @@ public class EMY_Beamos extends Enemy {
             case LEFT -> UP;
             case RIGHT -> DOWN;
         };
-        System.out.println(direction);
     }
 
     @Override

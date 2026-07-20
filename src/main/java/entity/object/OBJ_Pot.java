@@ -83,6 +83,9 @@ public class OBJ_Pot extends Object {
         Enemy enemy = gp.cChecker.checkOverlapCollision(this, gp.enemies);
         if (enemy != null) enemy.takeDamage(this);
 
+        Object object = gp.cChecker.checkOverlapCollision(this, gp.objects);
+        if (object != null) object.takeDamage(this);
+
         // Damage player if landed
         boolean contactPlayer = gp.cChecker.checkPlayer(this);
         if (contactPlayer) gp.player.takeDamage(this);

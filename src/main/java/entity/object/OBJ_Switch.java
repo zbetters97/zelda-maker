@@ -13,8 +13,13 @@ public class OBJ_Switch extends Object {
 
     @Override
     protected void getImages() {
-        up1 = setupImage("/objects/obj_switch_off");
+        sprite = up1 = setupImage("/objects/obj_switch_off");
         up2 = setupImage("/objects/obj_switch_on");
+    }
+
+    @Override
+    public void update() {
+        manageValues();
     }
 
     @Override
@@ -56,11 +61,6 @@ public class OBJ_Switch extends Object {
 
     @Override
     protected void getSpriteImage() {
-        if (opened) {
-            image = up2;
-        }
-        else {
-            image = up1;
-        }
+        image = opened ? up2 : up1;
     }
 }

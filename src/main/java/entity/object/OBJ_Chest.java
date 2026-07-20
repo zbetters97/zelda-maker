@@ -50,12 +50,7 @@ public class OBJ_Chest extends Object {
 
     @Override
     protected void getSpriteImage() {
-        if (opened) {
-            image = up2;
-        }
-        else {
-            image = up1;
-        }
+        image = opened ? up2 : up1;
     }
 
     @Override

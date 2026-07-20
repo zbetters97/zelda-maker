@@ -116,23 +116,11 @@ public class EMY_Buzzblob extends Enemy {
     protected void getSpriteImage() {
 
         if (action == Action.ATTACKING) {
-            if (attackNum == 1) {
-                image = attackUp1;
-            }
-            else {
-                image = attackUp2;
-            }
+            image = attackNum == 1 ? attackUp1 : attackUp2;
         }
         else {
-            if (spriteNum == 1) {
-                image = up1;
-            }
-            else if (spriteNum == 2) {
-                image = up2;
-            }
-            else {
-                image = up3;
-            }
+            image = spriteNum == 1 ? up1 :
+                    spriteNum == 2 ? up2 : up3;
         }
     }
 }

@@ -31,10 +31,11 @@ public class OBJ_Door_Boss extends Object {
         if (opened) return;
 
         boolean userFacing = user.getDirection() == getOppositeDirection(direction);
+        boolean userHasKey = user.getHasBossKey();
 
-        if (user.getHasBossKey() && userFacing) {
-            opened = true;
+        if (userFacing && userHasKey) {
             user.setHasBossKey(false);
+            opened = true;
         }
     }
 
@@ -52,5 +53,10 @@ public class OBJ_Door_Boss extends Object {
 
             spriteCounter = 0;
         }
+    }
+
+    @Override
+    public void rotate() {
+
     }
 }

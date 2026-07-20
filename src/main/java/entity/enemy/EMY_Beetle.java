@@ -96,22 +96,8 @@ public class EMY_Beetle extends Enemy {
 
     @Override
     protected void getSpriteImage() {
-
-        if (shielded) {
-            if (spriteNum == 1) {
-                image = up1;
-            }
-            else if (spriteNum == 2) {
-                image = up2;
-            }
-        }
-        else {
-            if (attackNum == 1) {
-                image = attackUp1;
-            }
-            else {
-                image = attackUp2;
-            }
-        }
+        image = shielded ?
+                spriteNum == 1 ? up1 : up2 :
+                attackNum == 1 ? attackUp1 : attackUp2;
     }
 }

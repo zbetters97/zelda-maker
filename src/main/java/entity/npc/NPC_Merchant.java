@@ -39,4 +39,9 @@ public class NPC_Merchant extends NPC {
         super.interact(user);
         System.out.println("Buy somethin', will ya?");
     }
+
+    @Override
+    protected void getSpriteImage() {
+        image = spriteNum == 1 ? down1 : down2;
+    }
 }

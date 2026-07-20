@@ -1508,7 +1508,8 @@ public class Player extends Entity {
                 case LEFT -> left1;
                 case RIGHT -> right1;
             };
-        } else {
+        }
+        else {
             idleSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
@@ -1565,7 +1566,8 @@ public class Player extends Entity {
                 case LEFT -> guardLeft1;
                 case RIGHT -> guardRight1;
             };
-        } else {
+        }
+        else {
             guardSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> guardUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> guardDown2;
@@ -1588,14 +1590,7 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackUp1;
                     case 2 -> attackUp2;
-                    case 3 -> {
-                        if (spriteNum == 1) {
-                            yield attackUp3;
-                        }
-                        else {
-                            yield attackUp4;
-                        }
-                    }
+                    case 3 -> spriteNum == 1 ? attackUp3 : attackUp4;
                     default -> attackSprite;
                 };
             }
@@ -1606,14 +1601,7 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackDown1;
                     case 2 -> attackDown2;
-                    case 3 -> {
-                        if (spriteNum == 1) {
-                            yield attackDown3;
-                        }
-                        else {
-                            yield attackDown4;
-                        }
-                    }
+                    case 3 -> spriteNum == 1 ? attackDown3 : attackDown4;
                     default -> attackSprite;
                 };
             }
@@ -1627,14 +1615,7 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackLeft1;
                     case 2 -> attackLeft2;
-                    case 3 -> {
-                        if (spriteNum == 1) {
-                           yield attackLeft3;
-                        }
-                        else {
-                            yield attackLeft4;
-                        }
-                    }
+                    case 3 -> spriteNum == 1 ? attackLeft3 : attackLeft4;
                     default -> attackSprite;
                 };
             }
@@ -1645,14 +1626,7 @@ public class Player extends Entity {
                 attackSprite = switch (attackNum) {
                     case 1 -> attackRight1;
                     case 2 -> attackRight2;
-                    case 3 -> {
-                        if (spriteNum == 1) {
-                            yield attackRight3;
-                        }
-                        else {
-                            yield attackRight4;
-                        }
-                    }
+                    case 3 -> spriteNum == 1 ? attackRight3 : attackRight4;
                     default -> attackSprite;
                 };
             }
@@ -1713,14 +1687,16 @@ public class Player extends Entity {
                 case LEFT -> grabLeft1;
                 case RIGHT -> grabRight1;
             };
-        } else if (grabNum == 2){
+        }
+        else if (grabNum == 2){
             grabSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> grabUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown2;
                 case LEFT -> grabLeft2;
                 case RIGHT -> grabRight2;
             };
-        } else {
+        }
+        else {
             grabSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> grabUp3;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> grabDown3;
@@ -1741,7 +1717,8 @@ public class Player extends Entity {
                 case LEFT -> carryLeft1;
                 case RIGHT -> carryRight1;
             };
-        } else {
+        }
+        else {
             carrySprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> carryUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> carryDown2;
@@ -1762,7 +1739,8 @@ public class Player extends Entity {
                 case LEFT -> throwLeft1;
                 case RIGHT -> throwRight1;
             };
-        } else {
+        }
+        else {
             throwSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> throwUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> throwDown2;
@@ -1783,7 +1761,8 @@ public class Player extends Entity {
                 case LEFT -> digLeft1;
                 case RIGHT -> digRight1;
             };
-        } else {
+        }
+        else {
             digSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> digUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> digDown2;
@@ -1804,7 +1783,8 @@ public class Player extends Entity {
                 case LEFT -> aimLeft1;
                 case RIGHT -> aimRight1;
             };
-        } else {
+        }
+        else {
             aimSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> aimUp2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> aimDown2;
@@ -1835,14 +1815,16 @@ public class Player extends Entity {
                 case LEFT -> jumpLeft2;
                 case RIGHT -> jumpRight2;
             };
-        } else if (jumpNum == 3) {
+        }
+        else if (jumpNum == 3) {
             jumpSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> jumpUp3;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> jumpDown3;
                 case LEFT -> jumpLeft3;
                 case RIGHT -> jumpRight3;
             };
-        } else {
+        }
+        else {
             jumpSprite = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> soarUp1;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> soarDown1;

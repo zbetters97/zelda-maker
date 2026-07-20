@@ -81,4 +81,9 @@ public class OBJ_Grass extends Object {
     protected int getParticleSize() {
         return 9;
     }
+
+    @Override
+    public DrawLayer getDrawLayer() {
+        return DrawLayer.GROUND;
+    }
 }

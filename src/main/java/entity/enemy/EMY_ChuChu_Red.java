@@ -69,14 +69,7 @@ public class EMY_ChuChu_Red extends Enemy {
 
     @Override
     protected void getSpriteImage() {
-        if (spriteNum == 1) {
-            image = up1;
-        }
-        else if (spriteNum == 2) {
-            image = up2;
-        }
-        else {
-            image = up3;
-        }
+        image = spriteNum == 1 ? up1 :
+                spriteNum == 2 ? up2 : up3;
     }
 }

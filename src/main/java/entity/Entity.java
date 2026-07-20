@@ -769,6 +769,7 @@ public class Entity {
     }
 
     protected void getSpriteImage() {
+
         if (spriteNum == 1) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up1;
@@ -776,7 +777,8 @@ public class Entity {
                 case LEFT -> left1;
                 case RIGHT -> right1;
             };
-        } else if (spriteNum == 2) {
+        }
+        else if (spriteNum == 2) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> down2;

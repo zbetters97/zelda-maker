@@ -3,6 +3,9 @@ package entity.object;
 import application.GamePanel;
 import entity.Entity;
 
+import static application.GamePanel.Direction.DOWN;
+import static application.GamePanel.Direction.UP;
+
 public class OBJ_Door_Oneway extends Object {
 
     public static final String objName = "Door_Oneway";
@@ -78,6 +81,11 @@ public class OBJ_Door_Oneway extends Object {
         }
 
         resetValues();
+    }
+
+    @Override
+    public void rotate() {
+        direction = direction == UP ? DOWN : UP;
     }
 
     @Override
