@@ -119,6 +119,11 @@ public class EMY_Zora extends Enemy {
     }
 
     @Override
+    public boolean canTakeLoot() {
+        return false;
+    }
+
+    @Override
     protected void manageValues() {
         if (action == Action.IDLE && actionLockCounter > 0) {
             actionLockCounter--;
@@ -127,6 +132,7 @@ public class EMY_Zora extends Enemy {
         super.manageValues();
     }
 
+    @Override
     protected void getSpriteImage() {
 
         if (action == Action.ATTACKING) {

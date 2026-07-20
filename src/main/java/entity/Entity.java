@@ -691,9 +691,12 @@ public class Entity {
      */
     protected void checkDeath() { }
 
-    protected void dropItem(Collectable droppedItem) {
-        droppedItem.setWorldPoint(new Point(worldPoint));
-        gp.collectables.add(droppedItem);
+    protected void dropItem() {
+
+        if (loot == null) return;
+
+        loot.setWorldPoint(new Point(worldPoint));
+        gp.collectables.add(loot);
     }
 
     protected void handleCapture() {
@@ -766,6 +769,9 @@ public class Entity {
 
         // Reset opacity
         changeAlpha(g2, 1f);
+
+        // Draw held loot
+        drawLoot(g2);
     }
 
     protected void getSpriteImage() {
@@ -786,6 +792,13 @@ public class Entity {
                 case RIGHT -> right2;
             };
         }
+    }
+
+    protected void drawLoot(Graphics2D g2) {
+
+        if (gp.gameState != gp.editState || loot == null) return;
+
+        g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
     }
 
     /**
@@ -820,6 +833,7 @@ public class Entity {
         if (40 < dyingCounter) {
             dyingCounter = 0;
             alive = false;
+            dropItem();
         }
     }
 
@@ -947,6 +961,23 @@ public class Entity {
 
         if (health > maxHealth) {
             health = maxHealth;
+        }
+    }
+
+    public boolean canTakeLoot() {
+        return false;
+    }
+
+    public Collectable getLoot() {
+        return loot;
+    }
+    public void setLoot(String lootName) {
+
+        Entity newLoot = gp.eGenerator.getEntity(lootName);
+
+        // Loot must be a collectable
+        if (newLoot instanceof Collectable) {
+            loot = (Collectable) newLoot;
         }
     }
 

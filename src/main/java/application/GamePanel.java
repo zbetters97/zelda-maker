@@ -358,6 +358,18 @@ public class GamePanel extends JPanel implements Runnable {
             default -> throw new IllegalArgumentException();
         }
     }
+    public void removeEntity(Entity entity) {
+
+        switch (entity) {
+            case NPC npc -> npcs.remove(npc);
+            case Enemy enemy -> enemies.remove(enemy);
+            case Particle particle -> particles.remove(particle);
+            case Object object -> objects.remove(object);
+            case Collectable collectable -> collectables.remove(collectable);
+            case Projectile projectile -> projectiles.remove(projectile);
+            default -> throw new IllegalArgumentException();
+        }
+    }
 
     private void resetGame() {
 

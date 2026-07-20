@@ -13,7 +13,7 @@ public class COL_Key_Boss extends Collectable {
 
     @Override
     protected void getImages() {
-        sprite = setupImage("/collectables/col_key_boss");
+        sprite = setupImage("/collectables/col_key_boss", 38, 38);
     }
 
     @Override

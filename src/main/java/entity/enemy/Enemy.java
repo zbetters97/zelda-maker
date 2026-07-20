@@ -100,6 +100,11 @@ public class Enemy extends Entity {
     }
 
     @Override
+    public boolean canTakeLoot() {
+        return true;
+    }
+
+    @Override
     public void resetValues() {
         super.resetValues();
         stunned = false;
@@ -132,6 +137,9 @@ public class Enemy extends Entity {
 
         // Reset opacity
         changeAlpha(g2, 1f);
+
+        // Draw held loot
+        drawLoot(g2);
     }
 
     protected void getSpriteImage() {

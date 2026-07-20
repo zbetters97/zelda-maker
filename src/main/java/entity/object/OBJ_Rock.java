@@ -80,8 +80,13 @@ public class OBJ_Rock extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem(loot);
+        dropItem();
         createParticles();
+    }
+
+    @Override
+    public boolean canTakeLoot() {
+        return true;
     }
 
     @Override

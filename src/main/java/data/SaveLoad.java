@@ -49,12 +49,14 @@ public class SaveLoad {
             ds.enemyWorldY = new int[gp.enemies.size()];
             ds.enemyDirections = new String[gp.enemies.size()];
             ds.enemyHealth = new int[gp.enemies.size()];
+            ds.enemyLoot = new String[gp.enemies.size()];
 
             // OBJECTS
             ds.objectWorldX = new int[gp.objects.size()];
             ds.objectWorldY = new int[gp.objects.size()];
             ds.objectNames = new String[gp.objects.size()];
             ds.objectDirections = new String[gp.objects.size()];
+            ds.objectLoot = new String[gp.objects.size()];
 
             // TILES
             ds.tileNums = new int[gp.maxWorldCol * gp.maxWorldRow];
@@ -84,6 +86,7 @@ public class SaveLoad {
                 ds.enemyWorldY[i] = enemy.getWorldPoint().y;
                 ds.enemyDirections[i] = enemy.getDirection().toString();
                 ds.enemyHealth[i] = enemy.getHealth();
+                ds.enemyLoot[i] = enemy.getLoot() == null ? "NULL" : enemy.getLoot().getName();
             }
 
             // OBJECTS
@@ -97,6 +100,7 @@ public class SaveLoad {
                 ds.objectWorldX[i] = object.getWorldPoint().x;
                 ds.objectWorldY[i] = object.getWorldPoint().y;
                 ds.objectDirections[i] = object.getDirection().toString();
+                ds.objectLoot[i] = object.getLoot() == null ? "NULL" : object.getLoot().getName();
             }
 
             // TILES
@@ -167,6 +171,7 @@ public class SaveLoad {
                 enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
                 enemy.setDirection(GamePanel.Direction.valueOf(ds.enemyDirections[i]));
                 enemy.setHealth(ds.enemyHealth[i]);
+                enemy.setLoot(ds.enemyLoot[i]);
 
                 gp.enemies.add(enemy);
             }
@@ -180,6 +185,7 @@ public class SaveLoad {
 
                 object.setWorldPoint(new Point(ds.objectWorldX[i], ds.objectWorldY[i]));
                 object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
+                object.setLoot(ds.objectLoot[i]);
 
                 gp.objects.add(object);
             }

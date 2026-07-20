@@ -15,7 +15,7 @@ public class OBJ_Grass extends Object {
 
     public OBJ_Grass(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
-        setLoot();
+        if (loot == null) setLoot();
 
         defaultAttack = 1;
         attack = defaultAttack;
@@ -56,8 +56,13 @@ public class OBJ_Grass extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem(loot);
+        dropItem();
         createParticles();
+    }
+
+    @Override
+    public boolean canTakeLoot() {
+        return true;
     }
 
     @Override

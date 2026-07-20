@@ -21,11 +21,11 @@ public class DataStorage implements Serializable {
     int[] npcWorldX, npcWorldY;
 
     // ENEMIES
-    String[] enemyNames, enemyDirections;
+    String[] enemyNames, enemyDirections, enemyLoot;
     int[] enemyWorldX, enemyWorldY, enemyHealth;
 
     // OBJECTS
-    String[] objectNames, objectDirections;
+    String[] objectNames, objectDirections, objectLoot;
     int[] objectWorldX, objectWorldY;
 
     // TILES

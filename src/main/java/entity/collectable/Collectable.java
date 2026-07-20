@@ -25,6 +25,13 @@ public class Collectable extends Entity {
         image = sprite;
     }
 
+    @Override
+    public void setWorldPoint(Point worldPoint) {
+        super.setWorldPoint(worldPoint);
+        this.worldPoint.x += 5;
+        this.worldPoint.y += 5;
+    }
+
     public DrawLayer getDrawLayer() {
         return DrawLayer.GROUND;
     }

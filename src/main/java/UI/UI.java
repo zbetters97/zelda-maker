@@ -3,6 +3,7 @@ package UI;
 import application.GamePanel;
 import application.UtilityTool;
 import entity.Entity;
+import entity.collectable.Collectable;
 import entity.item.ITM_Bomb;
 import entity.item.ITM_Bow;
 import tile.Tile;
@@ -848,34 +849,55 @@ public class UI {
     }
 
     private void editing_Map_Entity_Input_A() {
-        if (gp.keyH.aPressed) {
-            gp.keyH.aPressed = false;
 
-            // Cursor on existing entity and grabbed, return
-            if (editing_GrabEntity()) return;
+        if (!gp.keyH.aPressed) return;
 
-            // Entity currently grabbed, place down
-            if (selectedEntity != null) {
+        gp.keyH.aPressed = false;
 
-                // Tile at selected X/Y is not traversable
-                if (cannotPlaceEntity(selectedEntity)) return;
+        editing_GetEntity();
 
-                editing_PlaceEntity(selectedEntity);
+        // Find entity on map where cursor is
+        Entity mapEntity = editing_GetEntityAtTile();
+
+        // Find cursor entity
+        editing_GetEntity();
+
+        // Hovering over existing entity on map
+        if (mapEntity != null) {
+
+            // Attempt to give loot
+            if (editing_GiveLoot(mapEntity)) {
                 selectedEntity = null;
+                return;
             }
-            // Not currently holding entity, place down new one
-            else {
-                editing_GetEntity();
 
-                // Tile at selected X/Y is not traversable
-                if (cannotPlaceEntity(currentEntity)) return;
-
-                editing_PlaceEntity(currentEntity);
-                currentEntity = null;
+            // Grab map entity if not currently holding an entity
+            if (selectedEntity == null) {
+                selectedEntity = mapEntity;
+                gp.removeEntity(mapEntity);
             }
         }
+        // Currently holding an entity over an empty spot
+        else if (selectedEntity != null) {
+
+            // Cannot place on current tile
+            if (cannotPlaceEntity(selectedEntity)) return;
+
+            // Place on map
+            editing_PlaceEntity(selectedEntity);
+            selectedEntity = null;
+        }
+        // Not currently holding an entity over an empty spot
+        else {
+            // Cannot place on current tile
+            if (cannotPlaceEntity(currentEntity)) return;
+
+            // Place on map
+            editing_PlaceEntity(currentEntity);
+        }
     }
-    private boolean editing_GrabEntity() {
+
+    private Entity editing_GetEntityAtTile() {
 
         int cursorCol = cursor.getWorldX() / gp.tileSize;
         int cursorRow = cursor.getWorldY() / gp.tileSize;
@@ -887,33 +909,35 @@ public class UI {
             gp.player.setWorldPoint(new Point(-48, -48));
             selectedEntity = gp.player;
 
-            return true;
+            return null;
         }
 
         for (ArrayList<? extends Entity> list : gp.entities) {
 
-            Iterator<? extends Entity> it = list.iterator();
-
-            while (it.hasNext()) {
-
-                Entity entity = it.next();
-
+            for (Entity entity : list) {
                 if (entity == null) continue;
 
                 if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
-
-                    // Trying to place selected entity on top of existing, not allowed
-                    if (selectedEntity != null) {
-                        return true;
-                    }
-
-                    // Grab new entity, remove from level
-                    selectedEntity = entity;
-                    it.remove();
-
-                    return true;
+                    return entity;
                 }
             }
+        }
+
+        return null;
+    }
+
+    private boolean editing_GiveLoot(Entity entity) {
+
+        // Not valid
+        if (entity == null || !entity.canTakeLoot()) return false;
+
+        if (selectedEntity != null && selectedEntity instanceof Collectable) {
+            entity.setLoot(selectedEntity.getName());
+            return true;
+        }
+        else if (currentEntity != null && currentEntity instanceof Collectable) {
+            entity.setLoot(currentEntity.getName());
+            return true;
         }
 
         return false;
@@ -929,6 +953,8 @@ public class UI {
         currentEntity.setWorldPoint(cursor.getWorldPoint());
     }
     private boolean cannotPlaceEntity(Entity entity) {
+
+        if (entity == null) return true;
 
         int col = cursor.getWorldPoint().x / gp.tileSize;
         int row = cursor.getWorldPoint().y / gp.tileSize;

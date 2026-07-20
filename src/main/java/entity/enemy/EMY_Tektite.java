@@ -65,6 +65,11 @@ public class EMY_Tektite extends Enemy {
     }
 
     @Override
+    public boolean canTakeLoot() {
+        return false;
+    }
+
+    @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
     }

@@ -108,6 +108,11 @@ public class EMY_Beamos extends Enemy {
     }
 
     @Override
+    public boolean canTakeLoot() {
+        return false;
+    }
+
+    @Override
     protected void manageValues() {
         if (actionLockCounter > 0) {
             actionLockCounter--;

@@ -3,6 +3,8 @@ package entity.collectable;
 import application.GamePanel;
 import entity.Entity;
 
+import java.awt.*;
+
 public class COL_Rupee_Red extends Collectable {
 
     public static final String colName = "Rupee_Red";
@@ -14,7 +16,7 @@ public class COL_Rupee_Red extends Collectable {
 
     @Override
     protected void getImages() {
-        sprite = setupImage("/collectables/col_rupee_red");
+        sprite = setupImage("/collectables/col_rupee_red", 38, 38);
     }
 
     @Override

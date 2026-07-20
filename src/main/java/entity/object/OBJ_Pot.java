@@ -13,7 +13,7 @@ public class OBJ_Pot extends Object {
 
     public OBJ_Pot(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
-        setLoot();
+        if (loot == null) setLoot();
 
         maxHealth = 1;
         health = maxHealth;
@@ -95,8 +95,13 @@ public class OBJ_Pot extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem(loot);
+        dropItem();
         createParticles();
+    }
+
+    @Override
+    public boolean canTakeLoot() {
+        return true;
     }
 
     @Override

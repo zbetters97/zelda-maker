@@ -13,7 +13,7 @@ public class COL_Fairy extends Collectable {
 
     @Override
     protected void getImages() {
-        sprite = setupImage("/collectables/col_fairy");
+        sprite = setupImage("/collectables/col_fairy", 38, 38);
     }
 
     @Override
