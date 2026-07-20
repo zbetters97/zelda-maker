@@ -4,6 +4,7 @@ import UI.UI;
 import UI.Camera;
 import ai.PathFinder;
 import data.EntityGenerator;
+import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
@@ -80,8 +81,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int editState = 2;
 
     /** HANDLERS */
+    public final SaveLoad saveLoad = new SaveLoad(this);
     public TileManager tileM = new TileManager(this);
-    public AssetSetter aSetter = new AssetSetter(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
 
@@ -122,7 +123,6 @@ public class GamePanel extends JPanel implements Runnable {
         g2 = (Graphics2D) tempScreen.getGraphics();
 
         tileM.loadMap();
-        aSetter.setup();
 
         player.setDefaultValues();
 
@@ -208,21 +208,26 @@ public class GamePanel extends JPanel implements Runnable {
     private void update() {
 
         if (gameState == playState) {
+
             camera.follow(player.getWorldPoint());
+
             player.update();
             updateEntities();
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
+                // saveLoad.load();
                 ui.cursor.setWorldPoint(player.getWorldPoint());
                 gameState = editState;
             }
         }
         else if (gameState == editState) {
+
             camera.follow(ui.cursor.getWorldPoint());
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
+                // saveLoad.save();
                 gameState = playState;
             }
         }

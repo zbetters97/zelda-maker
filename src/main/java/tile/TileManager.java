@@ -166,12 +166,9 @@ public class TileManager {
                 worldPoint.setLocation(col * gp.tileSize, row * gp.tileSize);
 
                 // Skip tiles outside the camera view
-                if (!gp.camera.isVisible(worldPoint, gp.tileSize)) {
-                    continue;
-                }
+                if (!gp.camera.isVisible(worldPoint, gp.tileSize)) continue;
 
                 gp.camera.worldToScreen(worldPoint, screenPoint);
-
                 g2.drawImage(tiles[tileNum].image, screenPoint.x, screenPoint.y, null);
             }
         }

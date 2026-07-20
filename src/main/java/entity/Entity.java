@@ -87,8 +87,7 @@ public class Entity {
     protected EntityAI ai;
     protected Direction direction = DOWN;
     protected Action action = IDLE;
-    protected int speed = 1;
-    protected int defaultSpeed;
+    protected int defaultSpeed = 1, speed = defaultSpeed;
     protected boolean canMove = true;
     protected boolean moving = false;
     protected boolean onPath = false;
@@ -107,8 +106,7 @@ public class Entity {
     /** RPG VALUES */
     protected String name;
     protected boolean alive = true;
-    protected int maxHealth = 1;
-    protected int health = 1;
+    protected int maxHealth = 1, health = 1;
     protected int value = 0;
     protected boolean opened = false;
     protected boolean elevated = false;
@@ -118,18 +116,14 @@ public class Entity {
     protected String availableAction = "";
     protected boolean grabbed = false;
     protected Object grabbedObject;
-    protected Entity capturedBy;
-    protected Entity capturedTarget;
+    protected Entity capturedBy, capturedTarget;
 
     /** COMBAT VALUES */
-    protected int attack;
-    protected int defaultAttack;
-    protected int knockbackPower;
+    protected int defaultAttack, attack;
     protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
     protected int attackNum = 1, attackCounter = 0;
-    protected int swingSpeed1;
-    protected int swingSpeed2;
-    protected int swingSpeed3;
+    protected int swingSpeed1, swingSpeed2, swingSpeed3;
+    protected int knockbackPower;
     protected boolean knockback;
     protected GamePanel.Direction knockbackDirection;
     protected int knockbackCounter = 0;
@@ -144,12 +138,11 @@ public class Entity {
     /** INVENTORY VALUES */
     protected Collectable loot;
     protected Item item;
-    protected int maxRupees = 99;
-    protected int rupees = 0;
     protected int keys = 0;
     protected boolean hasBossKey = false;
-    protected int arrows = 0;
-    protected int bombs = 0;
+    protected int maxRupees = 99, rupees = 0;
+    protected int maxArrows = 99, arrows = 0;
+    protected int maxBombs = 99, bombs = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -159,8 +152,7 @@ public class Entity {
 
     /** SPRITE ATTRIBUTES */
     protected boolean drawing = true;
-    protected int spriteNum = 1;
-    protected int spriteCounter = 0;
+    protected int spriteNum = 1, spriteCounter = 0;
     protected BufferedImage
             sprite, image,
             up1, up2, up3, down1, down2, left1, left2, right1, right2,

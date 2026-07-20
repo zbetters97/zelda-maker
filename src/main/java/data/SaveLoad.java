@@ -1,6 +1,7 @@
 package data;
 
 import application.GamePanel;
+import entity.enemy.Enemy;
 import entity.object.Object;
 
 import java.awt.*;
@@ -12,19 +13,18 @@ public class SaveLoad {
 
     private final GamePanel gp;
 
-    public File saveDir = new File(System.getProperty("user.home") + "/loz-conf/save_1.dat");
+    public File saveDir = new File(System.getProperty("user.home") + "/zmaker-conf/save_1.dat");
 
     public SaveLoad(GamePanel gp) {
         this.gp = gp;
     }
 
-    /*
     public void save()  {
 
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveDir));
 
             // SAVE DATA TO DS
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveDir));
             DataStorage ds = new DataStorage();
 
             // CURRENT DATE/TIME
@@ -33,52 +33,61 @@ public class SaveLoad {
             // PLAYER DATA
             ds.pWorldX = gp.player.getWorldPoint().x;
             ds.pWorldY = gp.player.getWorldPoint().y;
-
             ds.direction = gp.player.getDirection().toString();
-            ds.maxHealth = gp.player.getMaxHealth();
             ds.health = gp.player.getHealth();
-            ds.attack = gp.player.getAttack();
 
             // ENEMIES
-            ds.enemyWorldX = new int[gp.enemy.length];
-            ds.enemyWorldY = new int[gp.enemy.length];
-            ds.enemyHealth = new int[gp.enemy.length];
-            ds.enemyAlive = new boolean[gp.enemy.length];
+            ds.enemyNames = new String[gp.enemies.size()];
+            ds.enemyWorldX = new int[gp.enemies.size()];
+            ds.enemyWorldY = new int[gp.enemies.size()];
+            ds.enemyHealth = new int[gp.enemies.size()];
 
-            // MAP OBJECTS
-            ds.mapObjectNames = new String[gp.obj.length];
-            ds.mapObjectWorldX = new int[gp.obj.length];
-            ds.mapObjectWorldY = new int[gp.obj.length];
-            ds.mapObjectDirections = new String[gp.obj.length];
+            // OBJECTS
+            ds.objectWorldX = new int[gp.objects.size()];
+            ds.objectWorldY = new int[gp.objects.size()];
+            ds.objectNames = new String[gp.objects.size()];
+            ds.objectDirections = new String[gp.objects.size()];
 
-           
+            // TILES
+            ds.tileNums = new int[gp.maxWorldCol * gp.maxWorldRow];
+
             // ENEMIES
-            for (int i = 0; i < gp.enemy.length; i++) {
-                if (gp.enemy[i] == null) {
-                    ds.enemyAlive[i] = false;
-                }
-                else {
-                    ds.enemyWorldX[i] = gp.enemy[i].getWorldPoint().x;
-                    ds.enemyWorldY[i] = gp.enemy[i].getWorldPoint().y;
-                    ds.enemyHealth[i] = gp.enemy[i].getHealth();
-                    ds.enemyAlive[i] = true;
-                }
+            for (int i = 0; i < gp.enemies.size(); i++) {
+
+                Enemy enemy = gp.enemies.get(i);
+
+                if (enemy == null) continue;
+
+                ds.enemyNames[i] = enemy.getName();
+                ds.enemyWorldX[i] = enemy.getWorldPoint().x;
+                ds.enemyWorldY[i] = enemy.getWorldPoint().y;
+                ds.enemyHealth[i] = enemy.getHealth();
             }
 
-            // MAP OBJECTS
-            for (int i = 0; i < gp.obj.length; i++) {
+            // OBJECTS
+            for (int i = 0; i < gp.objects.size(); i++) {
 
-                if (gp.obj[i] == null) {
-                    ds.mapObjectNames[i] = "NULL";
-                }
-                else {
-                    ds.mapObjectNames[i] = gp.obj[i].getName();
-                    ds.mapObjectWorldX[i] = gp.obj[i].getWorldPoint().x;
-                    ds.mapObjectWorldY[i] = gp.obj[i].getWorldPoint().y;
-                    ds.mapObjectDirections[i] = gp.obj[i].getDirection().toString();
+                Object object = gp.objects.get(i);
+
+                if (object == null) continue;
+
+                ds.objectNames[i] = object.getName();
+                ds.objectWorldX[i] = object.getWorldPoint().x;
+                ds.objectWorldY[i] = object.getWorldPoint().y;
+                ds.objectDirections[i] = object.getDirection().toString();
+            }
+
+            // TILES
+            int i = 0;
+            for (int row = 0; row < gp.maxWorldRow; row++) {
+                for (int col = 0; col < gp.maxWorldCol; col++) {
+
+                    int tileNum = gp.tileM.mapTileNum[col][row];
+
+                    ds.tileNums[i] = tileNum;
+                    i++;
                 }
             }
-            
 
             oos.writeObject(ds);
             oos.close();
@@ -90,51 +99,54 @@ public class SaveLoad {
 
     public void load() {
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveDir));
 
             // LOAD DATA FROM DS
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveDir));
             DataStorage ds = (DataStorage) ois.readObject();
 
             // PLAYER DATA
             gp.player.setWorldPoint(new Point(ds.pWorldX, ds.pWorldY));
-
-
             gp.player.setDirection(GamePanel.Direction.valueOf(ds.direction));
             gp.player.setHealth(ds.health);
-            gp.player.setAttack(ds.attack);
-
 
             // ENEMIES
-            for (int i = 0; i < gp.enemy.length; i++) {
-                if (!ds.enemyAlive[i]) {
-                    gp.enemy[i] = null;
-                }
-                else if (gp.enemy[i] != null) {
-                    gp.enemy[i].setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
-                    gp.enemy[i].setHealth(ds.enemyHealth[i]);
-                }
+            for (int i = 0; i < ds.enemyNames.length; i++) {
+
+                Enemy enemy = (Enemy) gp.eGenerator.getEntity(ds.enemyNames[i]);
+
+                if (enemy == null) continue;
+
+                enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
+                enemy.setHealth(ds.enemyHealth[i]);
+
+                gp.enemies.add(enemy);
             }
 
-            // MAP OBJECTS
-            for (int i = 0; i < gp.obj.length; i++) {
+            // OBJECTS
+            for (int i = 0; i < ds.objectNames.length; i++) {
 
-                if (ds.mapObjectNames[i].equals("NULL")) {
-                    gp.obj[i] = null;
-                }
-                else if (gp.obj[i] != null) {
-                    gp.obj[i] = (Object) gp.eGenerator.getEntity(
-                            ds.mapObjectNames[i]
-                    );
+                Object object = (Object) gp.eGenerator.getEntity(ds.objectNames[i]);
 
-                    gp.obj[i].setWorldPoint(new Point(
-                            ds.mapObjectWorldX[i],
-                            ds.mapObjectWorldY[i])
-                    );
+                if (object == null) continue;
 
-                    gp.obj[i].setDirection(GamePanel.Direction.valueOf(ds.mapObjectDirections[i]));
-                }
+                object.setWorldPoint(new Point(ds.objectWorldX[i], ds.objectWorldY[i]));
+                object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
+
+                gp.objects.add(object);
             }
 
+            // TILES
+            int i = 0;
+            for (int row = 0; row < gp.maxWorldRow; row++) {
+                for (int col = 0; col < gp.maxWorldCol; col++) {
+
+                    int tileNum = ds.tileNums[i];
+
+                    gp.tileM.mapTileNum[col][row] = tileNum;
+
+                    i++;
+                }
+            }
 
             ois.close();
         }
@@ -142,6 +154,4 @@ public class SaveLoad {
             System.out.println(e);
         }
     }
-
-     */
 }
