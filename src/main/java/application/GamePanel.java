@@ -125,10 +125,13 @@ public class GamePanel extends JPanel implements Runnable {
         tileM.loadMap();
 
         player.setDefaultValues();
+        entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
+
+        ui.cursor.setWorldPoint(player.getWorldPoint());
+
+        saveLoad.load();
 
         if (fullScreenOn) setFullScreen();
-
-        entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
     }
 
     /**
@@ -214,7 +217,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
-                // saveLoad.load();
+                saveLoad.load();
                 ui.cursor.setWorldPoint(player.getWorldPoint());
                 gameState = editState;
             }
@@ -225,7 +228,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
-                // saveLoad.save();
+                saveLoad.save();
                 gameState = playState;
             }
         }

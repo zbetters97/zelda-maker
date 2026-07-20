@@ -50,7 +50,9 @@ public class EntityGenerator {
         objectFactory.put(OBJ_Door_Closed.objName, () -> new OBJ_Door_Closed(gp, 0, 0));
         objectFactory.put(OBJ_Door_Locked.objName, () -> new OBJ_Door_Locked(gp, 0, 0));
         objectFactory.put(OBJ_Door_Oneway.objName, () -> new OBJ_Door_Oneway(gp, 0, 0));
+        objectFactory.put(OBJ_Grass.objName, () -> new OBJ_Grass(gp, 0, 0));
         objectFactory.put(OBJ_Pot.objName, () -> new OBJ_Pot(gp, 0, 0));
+        objectFactory.put(OBJ_Rock.objName, () -> new OBJ_Rock(gp, 0, 0));
         objectFactory.put(OBJ_Switch.objName, () -> new OBJ_Switch(gp, 0, 0));
 
         // Collectables

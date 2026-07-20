@@ -629,8 +629,8 @@ public class Entity {
         boolean facingEnemy = getDirection() == getOppositeDirection(attacker.getDirection());
         if (action == GUARDING && facingEnemy) {
 
-            if (canBeDeflected(true)) {
-                deflect(this);
+            if (attacker.canBeDeflected(true)) {
+                attacker.deflect(this);
             }
             else {
                 setKnockback(attacker.getDirection(), attacker.getKnockbackPower());

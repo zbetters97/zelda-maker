@@ -40,6 +40,11 @@ public class OBJ_Bomb extends Object {
     public void update() {
         super.update();
 
+        if (isCaptured()) {
+            handleCapture();
+            return;
+        }
+
         lightFuse();
     }
 
@@ -118,6 +123,16 @@ public class OBJ_Bomb extends Object {
     @Override
     public boolean canCollideWith(Entity target) {
         return false;
+    }
+
+    @Override
+    protected void handleCapture() {
+
+        spriteNum = 1;
+
+        if (action == Action.ATTACKING) {
+            explode();
+        }
     }
 
     @Override

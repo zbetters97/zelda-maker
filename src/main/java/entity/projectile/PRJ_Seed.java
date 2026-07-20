@@ -9,6 +9,9 @@ public class PRJ_Seed extends Projectile {
     public PRJ_Seed(GamePanel gp) {
         super(gp, prjName);
 
+        defaultSpeed = 6;
+        speed = defaultSpeed;
+
         defaultAttack = 2;
         attack = defaultAttack;
     }
