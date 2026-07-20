@@ -88,7 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
-    private final ArrayList<ArrayList<? extends Entity>> entities = new ArrayList<>();
+    public final ArrayList<ArrayList<? extends Entity>> entities = new ArrayList<>();
     public final Player player = new Player(this);
     public final ArrayList<NPC> npcs = new ArrayList<>();
     public final ArrayList<Enemy> enemies = new ArrayList<>();
@@ -127,9 +127,8 @@ public class GamePanel extends JPanel implements Runnable {
         player.setDefaultValues();
         entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
 
-        ui.cursor.setWorldPoint(player.getWorldPoint());
-
         saveLoad.load();
+        ui.cursor.setWorldPoint(player.getWorldPoint());
 
         if (fullScreenOn) setFullScreen();
     }
@@ -218,9 +217,7 @@ public class GamePanel extends JPanel implements Runnable {
             if (keyH.startPressed) {
                 keyH.startPressed = false;
 
-                for (ArrayList<? extends Entity> list : entities) {
-                    list.clear();
-                }
+                resetGame();
 
                 saveLoad.load();
                 ui.cursor.setWorldPoint(player.getWorldPoint());
@@ -349,10 +346,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public ArrayList<ArrayList<? extends Entity>> getAllEntities() {
-        return entities;
-    }
-
     public void addEntity(Entity entity) {
 
         switch (entity) {
@@ -363,6 +356,15 @@ public class GamePanel extends JPanel implements Runnable {
             case Collectable collectable -> collectables.add(collectable);
             case Projectile projectile -> projectiles.add(projectile);
             default -> throw new IllegalArgumentException();
+        }
+    }
+
+    private void resetGame() {
+
+        player.resetValues();
+
+        for (ArrayList<? extends Entity> list : entities) {
+            list.clear();
         }
     }
 }

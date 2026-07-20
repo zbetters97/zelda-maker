@@ -57,7 +57,10 @@ public class EntityGenerator {
 
         // Collectables
         collectableFactory.put(COL_Arrow.colName, () -> new COL_Arrow(gp));
+        collectableFactory.put(COL_Fairy.colName, () -> new COL_Fairy(gp));
         collectableFactory.put(COL_Heart.colName, () -> new COL_Heart(gp));
+        collectableFactory.put(COL_Key.colName, () -> new COL_Key(gp));
+        collectableFactory.put(COL_Key_Boss.colName, () -> new COL_Key_Boss(gp));
         collectableFactory.put(COL_Rupee_Blue.colName, () -> new COL_Rupee_Blue(gp));
         collectableFactory.put(COL_Rupee_Green.colName, () -> new COL_Rupee_Green(gp));
         collectableFactory.put(COL_Rupee_Red.colName, () -> new COL_Rupee_Red(gp));

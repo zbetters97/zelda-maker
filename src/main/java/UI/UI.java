@@ -632,20 +632,20 @@ public class UI {
         else {
             if (editingTiles) {
                 UITile uiTile = tileLibrary.get(tileIndex);
-                drawCurrentSprite(screenPoint, uiTile.sprite());
+                drawCurrentSprite(screenPoint, 0.9f, uiTile.sprite());
             }
             else {
                 UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
-                drawCurrentSprite(screenPoint, uiEntity.getSprite());
+                drawCurrentSprite(screenPoint, 0.4f, uiEntity.getSprite());
             }
 
             g2.drawImage(cursor.getCursor(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
         }
     }
 
-    private void drawCurrentSprite(Point screenPoint, BufferedImage sprite) {
+    private void drawCurrentSprite(Point screenPoint, float alpha, BufferedImage sprite) {
 
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
         g2.drawImage(sprite, screenPoint.x + 7, screenPoint.y + 7, gp.tileSize - 14, gp.tileSize - 14, null);
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
@@ -890,7 +890,7 @@ public class UI {
             return true;
         }
 
-        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
+        for (ArrayList<? extends Entity> list : gp.entities) {
 
             Iterator<? extends Entity> it = list.iterator();
 
@@ -968,7 +968,7 @@ public class UI {
         }
 
         // Find entity at X/Y
-        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
+        for (ArrayList<? extends Entity> list : gp.entities) {
 
             Iterator<? extends Entity> it = list.iterator();
 
@@ -1003,7 +1003,7 @@ public class UI {
             return;
         }
 
-        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
+        for (ArrayList<? extends Entity> list : gp.entities) {
 
             for (Entity entity : list) {
                 if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {

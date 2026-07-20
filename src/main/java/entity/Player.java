@@ -1255,12 +1255,7 @@ public class Player extends Entity {
             }
         }
         else {
-            if (charge <= 6) {
-                aimNum = 1;
-            }
-            else {
-                aimNum = 2;
-            }
+            aimNum = charge <= 6 ? 1 : 2;
         }
 
         if (gp.keyH.xPressed) {

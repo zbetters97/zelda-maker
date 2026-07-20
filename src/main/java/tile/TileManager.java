@@ -17,14 +17,17 @@ public class TileManager {
     private final GamePanel gp;
     public Tile[] tiles;
 
-    public static final int iceTile = 21;
-    public static final int spikeTile = 38;
+    private int waterNum = 1;
+    private int waterFrames = 60;
 
     /* [ROW][COL] */
     public final int[][] mapTileNum;
 
     private final Point worldPoint = new Point();
     private final Point screenPoint = new Point();
+
+    public static final int iceTile = 21;
+    public static final int spikeTile = 38;
 
     /**
      * CONSTRUCTOR
@@ -159,10 +162,20 @@ public class TileManager {
      */
     public void draw(Graphics2D g2) {
 
+        if (gp.gameState == gp.playState && --waterFrames <= 0) {
+            waterFrames = 60;
+            waterNum = waterNum == 1 ? 2 : 1;
+        }
+
         for (int row = 0; row < gp.maxWorldRow; row++) {
             for (int col = 0; col < gp.maxWorldCol; col++) {
 
                 int tileNum = mapTileNum[col][row];
+
+                // Animate ocean
+                if (tileNum == 1 & waterNum == 2) {
+                    tileNum = 2;
+                }
 
                 worldPoint.setLocation(col * gp.tileSize, row * gp.tileSize);
 
