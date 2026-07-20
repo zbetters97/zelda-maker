@@ -139,12 +139,16 @@ public record CollisionChecker(GamePanel gp) {
         if (outOfBounds(entity.getWorldHitbox())) return;
 
         Tile tile = getCurrentTile(entity);
+        int tileNum = getCurrentTileNum(entity);
 
         if (tile.isPit()) {
             handlePit(entity);
         }
         else if (tile.isWater()) {
             handleWater(entity);
+        }
+        else if (tileNum == TileManager.spikeTile) {
+            handleSpike(entity);
         }
         // Player is on ground, set safe X/Y
         else if (entity == gp.player && !gp.player.getElevated()) {
@@ -159,6 +163,15 @@ public record CollisionChecker(GamePanel gp) {
         int row = center.y / gp.tileSize;
 
         return getTileAtColRow(col, row);
+    }
+    private int getCurrentTileNum(Entity entity) {
+
+        Point center = entity.getCenterPoint();
+
+        int col = center.x / gp.tileSize;
+        int row = center.y / gp.tileSize;
+
+        return gp.tileM.mapTileNum[col][row];
     }
     private void handlePit(Entity entity) {
 
@@ -183,6 +196,11 @@ public record CollisionChecker(GamePanel gp) {
         else {
             entity.setAlive(false);
         }
+    }
+    private void handleSpike(Entity entity) {
+
+        // Damage enemy and push back
+        entity.dealDamage(1, entity.getOppositeDirection(entity.getDirection()), 1);
     }
     private void setSafePoint() {
 

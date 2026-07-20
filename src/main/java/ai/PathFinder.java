@@ -86,8 +86,9 @@ public class PathFinder {
         while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
 
             // Check tiles
-            Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
-            if (tile.isNotTraversable()) {
+            int tileNum = gp.tileM.mapTileNum[col][row];
+            Tile tile = gp.tileM.tiles[tileNum];
+            if (tile.isNotTraversable(tileNum)) {
                 node[col][row].solid = true;
             }
 

@@ -13,8 +13,10 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -43,11 +45,18 @@ public class UI {
 
     /** EDITING HANDLERS */
     private boolean wasYPressed = false;
+    private boolean editingTiles = false;
+
+    /** ENTITY EDITING */
     private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
     private int entityListIndex = 0;
     private int entityIndex = 0;
     private Entity currentEntity;
     private Entity selectedEntity;
+
+    /** TILE EDITING */
+    private final ArrayList<UITile> tileLibrary = new ArrayList<>();
+    private int tileIndex = 0;
 
     /** SPRITES */
     private BufferedImage
@@ -68,6 +77,7 @@ public class UI {
         importFont();
         getAllImages();
         fillEntityLibrary();
+        fillTileLibrary();
     }
 
     /**
@@ -100,6 +110,31 @@ public class UI {
         heart_2 = setupImage("/ui/ui_heart_2", 23, 23);
         heart_3 = setupImage("/ui/ui_heart_3", 23, 23);
         heart_4 = setupImage("/ui/ui_heart_4", 23, 23);
+    }
+
+    private void fillTileLibrary() {
+
+        // Import tile data
+        InputStream is = getClass().getResourceAsStream("/maps/map_tile_data.txt");
+        BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)));
+
+        try {
+            String line;
+            int tileNumber;
+
+            while ((line = br.readLine()) != null) {
+
+                if (!line.contains(".png")) continue;
+
+                tileNumber = Integer.parseInt(line.replace(".png", ""));
+                tileLibrary.add(new UITile(tileNumber));
+            }
+
+            br.close();
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void fillEntityLibrary() {
@@ -560,8 +595,8 @@ public class UI {
         if (gp.keyH.yPressed) {
             drawEditing_Menu();
         }
-        // User let go of Y, run once
-        else if (wasYPressed) {
+        // User let go of Y when editing entities, run once
+        else if (wasYPressed && !editingTiles) {
             editing_GetEntity();
         }
         else {
@@ -572,8 +607,15 @@ public class UI {
         // Detect if Y is pressed
         wasYPressed = gp.keyH.yPressed;
 
-        if (gp.keyH.startPressed) {
-            gp.keyH.startPressed = false;
+        // Switch tile editing on/off
+        if (gp.keyH.xPressed) {
+            gp.keyH.xPressed = false;
+
+            editingTiles = !editingTiles;
+
+            tileIndex = 0;
+            entityListIndex = 0;
+            entityIndex = 0;
         }
     }
 
@@ -583,29 +625,102 @@ public class UI {
         gp.camera.worldToScreen(cursor.getWorldPoint(), screenPoint);
 
         // Entity currently selected, draw sprite under cursor
-        if (selectedEntity != null) {
+        if (!editingTiles && selectedEntity != null) {
             g2.drawImage(selectedEntity.getSprite(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize, null);
             g2.drawImage(cursor.getSelect(), screenPoint.x - 6, screenPoint.y - 6, gp.tileSize + 13, gp.tileSize + 13,null);
         }
         else {
-            drawCurrentEntity(screenPoint);
+            if (editingTiles) {
+                UITile uiTile = tileLibrary.get(tileIndex);
+                drawCurrentSprite(screenPoint, uiTile.sprite());
+            }
+            else {
+                UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+                drawCurrentSprite(screenPoint, uiEntity.getSprite());
+            }
+
             g2.drawImage(cursor.getCursor(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
         }
     }
 
-    private void drawCurrentEntity(Point screenPoint) {
-        UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+    private void drawCurrentSprite(Point screenPoint, BufferedImage sprite) {
 
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
-        g2.drawImage(uiEntity.getSpirte(), screenPoint.x + 7, screenPoint.y + 7, gp.tileSize - 14, gp.tileSize - 14, null);
+        g2.drawImage(sprite, screenPoint.x + 7, screenPoint.y + 7, gp.tileSize - 14, gp.tileSize - 14, null);
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
 
     private void drawEditing_Menu() {
-        editing_menu();
-        editing_menu_Input_Dir();
+
+        if (editingTiles) {
+            editing_Tile_Menu();
+            editing_Tile_Menu_Input_Dir();
+        }
+        else {
+            editing_Entity_Menu();
+            editing_Entity_Menu_Input_Dir();
+        }
     }
-    private void editing_menu() {
+
+    private void editing_Tile_Menu() {
+
+        int baseX = (int) (gp.screenWidth / 2.25);
+        int baseY = (int) (gp.screenHeight / 2.75);
+        int width = gp.tileSize * 2;
+        int height = gp.tileSize * 2;
+        g2.setColor(new Color(0, 0, 0, 235));
+        g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
+
+        int offset = 25;
+
+        int cursorX = baseX + offset;
+        int cursorY = baseY + offset;
+        int spacingY = (int) (gp.tileSize * 1.75);
+        int x = baseX + offset;
+        int y = cursorY - tileIndex * spacingY;
+
+        for (int i = 0; i < tileLibrary.size(); i++) {
+
+            if (Math.abs(i - tileIndex) > 2) {
+                y += spacingY;
+                continue;
+            }
+
+            if (i == tileIndex) {
+                g2.drawImage(cursor.getCursor(),cursorX - 10, cursorY - 10,gp.tileSize + 20, gp.tileSize + 20, null);
+            }
+            else {
+                g2.setColor(new Color(28, 28, 28, 200));
+                g2.fillRoundRect(x - 10, y - 10, gp.tileSize + 20, gp.tileSize + 20, 0, 0);
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
+            }
+
+            g2.drawImage(tileLibrary.get(i).sprite(), x, y,gp.tileSize, gp.tileSize, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+            y += spacingY;
+        }
+    }
+    private void editing_Tile_Menu_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            tileIndex--;
+            if (tileIndex < 0) {
+                tileIndex = tileLibrary.size() - 1;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            tileIndex++;
+            if (tileIndex > tileLibrary.size() - 1) {
+                tileIndex = 0;
+            }
+        }
+    }
+
+    private void editing_Entity_Menu() {
 
         int baseX = (int) (gp.tileSize * 5.5);
         int baseY = gp.tileSize * 5;
@@ -651,14 +766,14 @@ public class UI {
                 if (i != entityListIndex || c != entityIndex) {
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
                 }
-                g2.drawImage(entityLibrary.get(i).get(c).getSpirte(), x, y, gp.tileSize, gp.tileSize,null);
+                g2.drawImage(entityLibrary.get(i).get(c).getSprite(), x, y, gp.tileSize, gp.tileSize,null);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
                 y += entitySpacingY;
             }
         }
     }
-    private void editing_menu_Input_Dir() {
+    private void editing_Entity_Menu_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
@@ -695,13 +810,69 @@ public class UI {
         }
     }
 
-    private void editing_GetEntity() {
-        UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+    private void drawEditing_Map() {
 
-        currentEntity = gp.eGenerator.getEntity(uiEntity.getName());
-        if (currentEntity == null) return;
+        if (editingTiles) {
+            editing_Map_Tile_Input_A();
+            editing_Map_Tile_Input_B();
+        }
+        else {
+            editing_Map_Entity_Input_A();
+            editing_Map_Entity_Input_B();
+        }
 
-        currentEntity.setWorldPoint(cursor.getWorldPoint());
+        editing_Map_Input_Dir();
+    }
+
+    private void editing_Map_Tile_Input_A() {
+        if (gp.keyH.aPressed) {
+            gp.keyH.aPressed = false;
+
+            editing_PlaceTile(tileIndex);
+        }
+    }
+    private void editing_Map_Tile_Input_B() {
+        if (gp.keyH.bPressed) {
+            gp.keyH.bPressed = false;
+
+            editing_PlaceTile(0);
+        }
+    }
+    private void editing_PlaceTile(int tileNum) {
+
+        int col = cursor.getWorldX() / gp.tileSize;
+        int row = cursor.getWorldY() / gp.tileSize;
+
+        gp.tileM.mapTileNum[col][row] = tileNum;
+    }
+
+    private void editing_Map_Entity_Input_A() {
+        if (gp.keyH.aPressed) {
+            gp.keyH.aPressed = false;
+
+            // Cursor on existing entity and grabbed, return
+            if (editing_GrabEntity()) return;
+
+            // Entity currently grabbed, place down
+            if (selectedEntity != null) {
+
+                // Tile at selected X/Y is not traversable
+                if (cannotPlaceEntity(selectedEntity)) return;
+
+                editing_PlaceEntity(selectedEntity);
+                selectedEntity = null;
+            }
+            // Not currently holding entity, place down new one
+            else {
+                editing_GetEntity();
+
+                // Tile at selected X/Y is not traversable
+                if (cannotPlaceEntity(currentEntity)) return;
+
+                editing_PlaceEntity(currentEntity);
+                currentEntity = null;
+            }
+        }
     }
     private boolean editing_GrabEntity() {
 
@@ -744,40 +915,24 @@ public class UI {
 
         return false;
     }
+    private void editing_GetEntity() {
 
-    private void drawEditing_Map() {
-        editing_Map_Input_A();
-        editing_Map_Input_B();
-        editing_Map_Input_Dir();
+        UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
+
+        currentEntity = gp.eGenerator.getEntity(uiEntity.getName());
+        if (currentEntity == null) return;
+
+        currentEntity.setWorldPoint(cursor.getWorldPoint());
     }
+    private boolean cannotPlaceEntity(Entity entity) {
 
-    private void editing_Map_Input_A() {
-        if (gp.keyH.aPressed) {
-            gp.keyH.aPressed = false;
+        int col = cursor.getWorldPoint().x / gp.tileSize;
+        int row = cursor.getWorldPoint().y / gp.tileSize;
+        int tileNum = gp.tileM.mapTileNum[col][row];
 
-            // Cursor on existing entity and grabbed, return
-            if (editing_GrabEntity()) return;
+        Tile tile = gp.tileM.tiles[tileNum];
 
-            // Entity currently grabbed, place down
-            if (selectedEntity != null) {
-
-                // Tile at selected X/Y is not traversable
-                if (cannotPlaceEntity(selectedEntity)) return;
-
-                editing_PlaceEntity(selectedEntity);
-                selectedEntity = null;
-            }
-            // Not currently holding entity, place down new one
-            else {
-                editing_GetEntity();
-
-                // Tile at selected X/Y is not traversable
-                if (cannotPlaceEntity(currentEntity)) return;
-
-                editing_PlaceEntity(currentEntity);
-                currentEntity = null;
-            }
-        }
+        return tile.isNotTraversable(entity, tileNum);
     }
     private void editing_PlaceEntity(Entity entity) {
 
@@ -789,22 +944,16 @@ public class UI {
         entity.setWorldPoint(cursor.getWorldPoint());
         gp.addEntity(entity);
     }
-    private boolean cannotPlaceEntity(Entity entity) {
 
-        int col = cursor.getWorldPoint().x / gp.tileSize;
-        int row = cursor.getWorldPoint().y / gp.tileSize;
-        int tileNum = gp.tileM.mapTileNum[col][row];
-
-        Tile tile = gp.tileM.tiles[tileNum];
-
-        return tileNum == 0 || tile.isNotTraversable(entity);
-    }
-
-    private void editing_Map_Input_B() {
+    private void editing_Map_Entity_Input_B() {
 
         if (!gp.keyH.bPressed) return;
 
         gp.keyH.bPressed = false;
+
+        editing_RemoveEntity();
+    }
+    private void editing_RemoveEntity() {
 
         int cursorCol = cursor.getWorldX() / gp.tileSize;
         int cursorRow = cursor.getWorldY() / gp.tileSize;
@@ -831,6 +980,7 @@ public class UI {
             }
         }
     }
+
     private void editing_Map_Input_Dir() {
 
         if (gp.keyH.upPressed) {

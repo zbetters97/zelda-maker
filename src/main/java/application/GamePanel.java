@@ -116,7 +116,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     protected void setupGame() {
 
-        gameState = playState;
+        gameState = editState;
 
         // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
@@ -126,9 +126,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         player.setDefaultValues();
 
-        if (fullScreenOn) {
-            setFullScreen();
-        }
+        if (fullScreenOn) setFullScreen();
 
         entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
     }

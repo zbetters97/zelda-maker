@@ -17,7 +17,8 @@ public class TileManager {
     private final GamePanel gp;
     public Tile[] tiles;
 
-    public static final int iceTile = 78;
+    public static final int iceTile = 21;
+    public static final int spikeTile = 38;
 
     /* [ROW][COL] */
     public final int[][] mapTileNum;

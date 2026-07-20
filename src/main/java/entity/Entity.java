@@ -140,9 +140,7 @@ public class Entity {
     protected Item item;
     protected int keys = 0;
     protected boolean hasBossKey = false;
-    protected int maxRupees = 99, rupees = 0;
-    protected int maxArrows = 99, arrows = 0;
-    protected int maxBombs = 99, bombs = 0;
+    protected int rupees = 0, arrows = 0, bombs = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -414,7 +412,7 @@ public class Entity {
         }
     }
 
-    protected Direction getOppositeDirection(Direction direction) {
+    public Direction getOppositeDirection(Direction direction) {
         return switch (direction) {
             case UP, UPLEFT, UPRIGHT -> DOWN;
             case DOWN, DOWNLEFT, DOWNRIGHT -> UP;
@@ -430,7 +428,6 @@ public class Entity {
         projectile.set(worldPoint, direction, true, this);
         gp.projectiles.add(projectile);
     }
-
     protected void useProjectile(Projectile projectile, int seconds) {
 
         int i = new Random().nextInt(60 * seconds);
@@ -442,7 +439,6 @@ public class Entity {
             actionLockCounter = 30;
         }
     }
-
 
     protected void attack() {
 
@@ -569,16 +565,15 @@ public class Entity {
     /**
      * SET KNOCKBACK
      * Starts the knockback animation on the target
-     * @param attacker Entity that provided the knockback
      */
-    protected void setKnockback(Entity attacker) {
+    protected void setKnockback(Direction direction, int knockbackPower) {
 
         knockback = true;
 
         // Direction attacker was facing when hit
-        knockbackDirection = attacker.getDirection();
+        knockbackDirection = direction;
 
-        speed += attacker.getKnockbackPower();
+        speed += knockbackPower;
     }
 
     /**
@@ -638,13 +633,15 @@ public class Entity {
                 deflect(this);
             }
             else {
-                setKnockback(attacker);
+                setKnockback(attacker.getDirection(), attacker.getKnockbackPower());
             }
 
             return;
         }
 
-        int damage = attacker.getAttack();
+        dealDamage(attacker.getAttack(), attacker.getDirection(), attacker.getKnockbackPower());
+    }
+    public void dealDamage(int damage, Direction direction, int knockbackPower) {
 
         health -= damage;
         if (health <= 0) {
@@ -655,7 +652,7 @@ public class Entity {
             reactToDamage();
         }
 
-        setKnockback(attacker);
+        setKnockback(direction, knockbackPower);
     }
 
     protected void reactToDamage() {
@@ -955,9 +952,6 @@ public class Entity {
         return item;
     }
 
-    public int getMaxRupees() {
-        return maxRupees;
-    }
     public int getRupees() {
         return rupees;
     }

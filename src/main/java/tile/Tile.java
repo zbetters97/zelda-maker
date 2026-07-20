@@ -40,17 +40,17 @@ public class Tile {
         this.pit = pit;
     }
 
-    public boolean isNotTraversable() {
-        return collision || water || pit;
+    public boolean isNotTraversable(int tileNum) {
+        return collision || water || pit || tileNum == TileManager.spikeTile;
     }
 
-    public boolean isNotTraversable(Entity entity) {
+    public boolean isNotTraversable(Entity entity, int tileNum) {
 
         // Entity needs water, false if water
         if (entity.getNeedsWater()) {
             return !water;
         }
 
-        return collision || water || pit;
+        return collision || water || pit || tileNum == TileManager.spikeTile;
     }
 }

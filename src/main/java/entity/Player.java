@@ -28,8 +28,10 @@ public class Player extends Entity {
     /** X/Y VALUES */
     public Point safePoint;
 
+    /** INVENTORY VALUES */
     private final ArrayList<Item> items = new ArrayList<>();
     private int currentItemSlot = 0;
+    protected int maxRupees = 99, maxArrows = 99, maxBombs = 99;
 
     /** ICE VALUES */
     private int slideCounter = 0;
@@ -323,7 +325,7 @@ public class Player extends Entity {
      * SET DEFAULT POSITON
      */
     private void setDefaultPosition() {
-        worldPoint = new Point(0, 0);
+        worldPoint = new Point(20 * gp.tileSize, 20 * gp.tileSize);
         safePoint = new Point(worldPoint.x, worldPoint.y);
     }
 
@@ -1931,5 +1933,9 @@ public class Player extends Entity {
     /** GETTERS */
     public Entity getLockedOnTarget() {
         return lockedOnTarget;
+    }
+
+    public int getMaxRupees() {
+        return maxRupees;
     }
 }
