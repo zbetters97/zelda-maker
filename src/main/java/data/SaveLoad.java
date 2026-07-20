@@ -40,6 +40,7 @@ public class SaveLoad {
             ds.enemyNames = new String[gp.enemies.size()];
             ds.enemyWorldX = new int[gp.enemies.size()];
             ds.enemyWorldY = new int[gp.enemies.size()];
+            ds.enemyDirections = new String[gp.enemies.size()];
             ds.enemyHealth = new int[gp.enemies.size()];
 
             // OBJECTS
@@ -61,6 +62,7 @@ public class SaveLoad {
                 ds.enemyNames[i] = enemy.getName();
                 ds.enemyWorldX[i] = enemy.getWorldPoint().x;
                 ds.enemyWorldY[i] = enemy.getWorldPoint().y;
+                ds.enemyDirections[i] = enemy.getDirection().toString();
                 ds.enemyHealth[i] = enemy.getHealth();
             }
 
@@ -117,6 +119,7 @@ public class SaveLoad {
                 if (enemy == null) continue;
 
                 enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
+                enemy.setDirection(GamePanel.Direction.valueOf(ds.enemyDirections[i]));
                 enemy.setHealth(ds.enemyHealth[i]);
 
                 gp.enemies.add(enemy);

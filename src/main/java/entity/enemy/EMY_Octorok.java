@@ -131,4 +131,10 @@ public class EMY_Octorok extends Enemy {
 
         super.manageValues();
     }
+
+    @Override
+    public void setDirection(GamePanel.Direction direction) {
+        super.setDirection(direction);
+        lockonDirection = direction;
+    }
 }

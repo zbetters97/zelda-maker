@@ -244,15 +244,6 @@ public class Entity {
         cycleSprites();
     }
 
-    protected void updateSpinDirection() {
-        direction = switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> LEFT;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
-            case LEFT -> DOWN;
-            case RIGHT -> UP;
-        };
-    }
-
     /**
      * GET MOVE DIRECTION
      * Called by CollisionDetector
@@ -410,6 +401,15 @@ public class Entity {
 
             actionLockCounter = 0;
         }
+    }
+
+    public void rotate() {
+        direction = switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> LEFT;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> RIGHT;
+            case LEFT -> DOWN;
+            case RIGHT -> UP;
+        };
     }
 
     public Direction getOppositeDirection(Direction direction) {

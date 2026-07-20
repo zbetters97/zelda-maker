@@ -84,7 +84,7 @@ public class EMY_Beamos extends Enemy {
             }
             // Find next direction when turned all the way
             else {
-                updateSpinDirection();
+                rotate();
                 spriteNum = 1;
             }
 
@@ -93,13 +93,14 @@ public class EMY_Beamos extends Enemy {
     }
 
     @Override
-    protected void updateSpinDirection() {
+    public void rotate() {
         direction = switch (direction) {
             case UP, UPLEFT, UPRIGHT -> RIGHT;
             case DOWN, DOWNLEFT, DOWNRIGHT -> LEFT;
             case LEFT -> UP;
             case RIGHT -> DOWN;
         };
+        System.out.println(direction);
     }
 
     @Override

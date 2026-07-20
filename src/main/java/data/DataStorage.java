@@ -17,7 +17,7 @@ public class DataStorage implements Serializable {
     int health;
 
     // ENEMIES
-    String[] enemyNames;
+    String[] enemyNames, enemyDirections;
     int[] enemyWorldX, enemyWorldY, enemyHealth;
 
     // OBJECTS

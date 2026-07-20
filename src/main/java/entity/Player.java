@@ -1038,7 +1038,7 @@ public class Player extends Entity {
         }
         // Charge is ready, start spin and reset values
         else if (120 <= charge) {
-            updateSpinDirection();
+            rotate();
 
             charge = 0;
             attackNum = 1;
@@ -1077,7 +1077,7 @@ public class Player extends Entity {
 
             // Full rotation
             if (spriteNum < 3) {
-               updateSpinDirection();
+               rotate();
             }
 
             // Run 4 times for 4 directions, then stop spin

@@ -819,6 +819,7 @@ public class UI {
         else {
             editing_Map_Entity_Input_A();
             editing_Map_Entity_Input_B();
+            editing_Map_Entity_Input_LR();
         }
 
         editing_Map_Input_Dir();
@@ -915,6 +916,7 @@ public class UI {
 
         return false;
     }
+
     private void editing_GetEntity() {
 
         UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
@@ -975,6 +977,35 @@ public class UI {
                 // Entity found, delete from list
                 if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
                     it.remove();
+                    return;
+                }
+            }
+        }
+    }
+
+    private void editing_Map_Entity_Input_LR() {
+        if (!gp.keyH.lPressed && !gp.keyH.rPressed) return;
+        gp.keyH.lPressed = false;
+        gp.keyH.rPressed = false;
+
+        editing_RotateEntity();
+    }
+    private void editing_RotateEntity() {
+
+        int cursorCol = cursor.getWorldX() / gp.tileSize;
+        int cursorRow = cursor.getWorldY() / gp.tileSize;
+
+        // If player is selected
+        if (gp.player.getCol() == cursorCol && gp.player.getRow() == cursorRow) {
+            gp.player.rotate();
+            return;
+        }
+
+        for (ArrayList<? extends Entity> list : gp.getAllEntities()) {
+
+            for (Entity entity : list) {
+                if (entity.getCol() == cursorCol && entity.getRow() == cursorRow) {
+                    entity.rotate();
                     return;
                 }
             }
