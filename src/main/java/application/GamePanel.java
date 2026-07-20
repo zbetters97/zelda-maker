@@ -217,6 +217,11 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (keyH.startPressed) {
                 keyH.startPressed = false;
+
+                for (ArrayList<? extends Entity> list : entities) {
+                    list.clear();
+                }
+
                 saveLoad.load();
                 ui.cursor.setWorldPoint(player.getWorldPoint());
                 gameState = editState;
