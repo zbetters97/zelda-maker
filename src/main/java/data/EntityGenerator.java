@@ -4,6 +4,7 @@ import application.GamePanel;
 import entity.Entity;
 import entity.collectable.*;
 import entity.enemy.*;
+import entity.item.*;
 import entity.npc.*;
 import entity.object.*;
 
@@ -17,6 +18,7 @@ public class EntityGenerator {
     public final Map<String, Supplier<Entity>> enemyFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> objectFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> collectableFactory = new LinkedHashMap<>();
+    public final Map<String, Supplier<Entity>> itemFactory = new LinkedHashMap<>();
 
     public EntityGenerator(GamePanel gp) {
 
@@ -64,6 +66,16 @@ public class EntityGenerator {
         collectableFactory.put(COL_Rupee_Blue.colName, () -> new COL_Rupee_Blue(gp));
         collectableFactory.put(COL_Rupee_Green.colName, () -> new COL_Rupee_Green(gp));
         collectableFactory.put(COL_Rupee_Red.colName, () -> new COL_Rupee_Red(gp));
+
+        // Items
+        itemFactory.put(ITM_Bomb.itmName, () -> new ITM_Bomb(gp, null));
+        itemFactory.put(ITM_Boomerang.itmName, () -> new ITM_Boomerang(gp, null));
+        itemFactory.put(ITM_Bow.itmName, () -> new ITM_Bow(gp, null));
+        itemFactory.put(ITM_Cape.itmName, () -> new ITM_Cape(gp, null));
+        itemFactory.put(ITM_Feather.itmName, () -> new ITM_Feather(gp, null));
+        itemFactory.put(ITM_Hookshot.itmName, () -> new ITM_Hookshot(gp, null));
+        itemFactory.put(ITM_Rod.itmName, () -> new ITM_Rod(gp, null));
+        itemFactory.put(ITM_Shovel.itmName, () -> new ITM_Shovel(gp, null));
     }
 
     public Entity getEntity(String eName) {
@@ -78,6 +90,9 @@ public class EntityGenerator {
         if (entity != null) return entity;
 
         entity = getFromFactory(collectableFactory, eName);
+        if (entity != null) return entity;
+
+        entity = getFromFactory(itemFactory, eName);
         return entity;
     }
 

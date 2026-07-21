@@ -7,7 +7,7 @@ import entity.object.Object;
 
 public class ITM_Bomb extends Item {
 
-    public static final String itmName = "Item Bomb";
+    public static final String itmName = "Bomb";
 
     public ITM_Bomb(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.GRABBING);

@@ -6,7 +6,7 @@ import entity.projectile.PRJ_Boomerang;
 
 public class ITM_Boomerang extends Item {
 
-    public static final String itmName = "Hylian Boomerang";
+    public static final String itmName = "Boomerang";
 
     public ITM_Boomerang(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.THROWING);

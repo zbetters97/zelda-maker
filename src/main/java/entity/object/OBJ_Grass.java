@@ -56,7 +56,7 @@ public class OBJ_Grass extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem();
+        dropLoot();
         createParticles();
     }
 

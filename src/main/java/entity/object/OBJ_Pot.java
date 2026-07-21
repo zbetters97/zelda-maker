@@ -95,7 +95,7 @@ public class OBJ_Pot extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem();
+        dropLoot();
         createParticles();
     }
 

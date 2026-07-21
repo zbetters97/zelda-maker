@@ -68,6 +68,11 @@ public class EMY_ChuChu_Red extends Enemy {
     }
 
     @Override
+    protected void handleCapture() {
+        onPath = true;
+    }
+
+    @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 :
                 spriteNum == 2 ? up2 : up3;

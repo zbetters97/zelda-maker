@@ -6,7 +6,7 @@ import entity.projectile.PRJ_Orb;
 
 public class ITM_Rod extends Item {
 
-    public static final String itmName = "Item Rod";
+    public static final String itmName = "Rod";
 
     public ITM_Rod(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.SWINGING);

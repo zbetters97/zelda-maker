@@ -1,6 +1,7 @@
 package data;
 
 import application.GamePanel;
+import entity.Entity;
 import entity.enemy.Enemy;
 import entity.npc.NPC;
 import entity.object.Object;
@@ -171,7 +172,11 @@ public class SaveLoad {
                 enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
                 enemy.setDirection(GamePanel.Direction.valueOf(ds.enemyDirections[i]));
                 enemy.setHealth(ds.enemyHealth[i]);
-                enemy.setLoot(ds.enemyLoot[i]);
+
+                Entity loot = gp.eGenerator.getEntity(ds.enemyLoot[i]);
+                if (loot != null) {
+                    enemy.setLoot(loot);
+                }
 
                 gp.enemies.add(enemy);
             }
@@ -185,7 +190,11 @@ public class SaveLoad {
 
                 object.setWorldPoint(new Point(ds.objectWorldX[i], ds.objectWorldY[i]));
                 object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
-                object.setLoot(ds.objectLoot[i]);
+
+                Entity loot = gp.eGenerator.getEntity(ds.objectLoot[i]);
+                if (loot != null) {
+                    object.setLoot(loot);
+                }
 
                 gp.objects.add(object);
             }

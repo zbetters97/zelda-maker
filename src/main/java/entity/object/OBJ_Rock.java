@@ -80,7 +80,7 @@ public class OBJ_Rock extends Object {
 
     private void shatter() {
         alive = false;
-        dropItem();
+        dropLoot();
         createParticles();
     }
 

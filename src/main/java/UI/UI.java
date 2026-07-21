@@ -6,6 +6,7 @@ import entity.Entity;
 import entity.collectable.Collectable;
 import entity.item.ITM_Bomb;
 import entity.item.ITM_Bow;
+import entity.item.Item;
 import tile.Tile;
 
 import javax.imageio.ImageIO;
@@ -143,7 +144,8 @@ public class UI {
                 buildFromFactory("npc", gp.eGenerator.npcFactory),
                 buildFromFactory("enemy", gp.eGenerator.enemyFactory),
                 buildFromFactory("object", gp.eGenerator.objectFactory),
-                buildFromFactory("collectable", gp.eGenerator.collectableFactory)
+                buildFromFactory("collectable", gp.eGenerator.collectableFactory),
+                buildFromFactory("item", gp.eGenerator.itemFactory)
         ));
     }
     private ArrayList<UIEntity> buildFromFactory(String path, Map<String, ? extends Supplier<Entity>> factory) {
@@ -723,9 +725,9 @@ public class UI {
 
     private void editing_Entity_Menu() {
 
-        int baseX = (int) (gp.tileSize * 5.5);
+        int baseX = (int) (gp.tileSize * 4.5);
         int baseY = gp.tileSize * 5;
-        int width = (int) (gp.tileSize * 6.5);
+        int width = gp.tileSize * 8;
         int height = gp.tileSize * 2;
         g2.setColor(new Color(0, 0, 0, 235));
         g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
@@ -879,13 +881,14 @@ public class UI {
     private void editing_HandleMapEntityAPress(Entity mapEntity) {
 
         // Attempt to give loot
-        if (editing_GiveLoot(mapEntity)) {
+        if (editing_GiveLoot(mapEntity, selectedEntity) || editing_GiveLoot(mapEntity, currentEntity)) {
             selectedEntity = null;
             return;
         }
 
         // Grab map entity if not currently holding an entity
         if (selectedEntity == null) {
+
             selectedEntity = mapEntity;
 
             // Move player offscreen when selected
@@ -931,17 +934,13 @@ public class UI {
         return null;
     }
 
-    private boolean editing_GiveLoot(Entity entity) {
+    private boolean editing_GiveLoot(Entity target, Entity loot) {
 
         // Not valid
-        if (entity == null || !entity.canTakeLoot() || entity == gp.player) return false;
+        if (target == null || !target.canTakeLoot() || loot == null || target == gp.player) return false;
 
-        if (selectedEntity != null && selectedEntity instanceof Collectable) {
-            entity.setLoot(selectedEntity.getName());
-            return true;
-        }
-        else if (currentEntity != null && currentEntity instanceof Collectable) {
-            entity.setLoot(currentEntity.getName());
+        if (loot instanceof Collectable || loot instanceof Item) {
+            target.setLoot(loot);
             return true;
         }
 

@@ -6,7 +6,7 @@ import entity.projectile.PRJ_Arrow;
 
 public class ITM_Bow extends Item {
 
-    public static final String itmName = "Hylian Bow";
+    public static final String itmName = "Bow";
 
     public ITM_Bow(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.AIMING);

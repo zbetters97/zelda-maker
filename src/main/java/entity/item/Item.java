@@ -7,6 +7,10 @@ import java.awt.*;
 
 public class Item extends Entity {
 
+    public Item(GamePanel gp, String itmName, Action action) {
+        super(gp, itmName);
+        this.action = action;
+    }
     public Item(GamePanel gp, String itmName, Entity user, Action action) {
         super(gp, itmName, user);
         this.action = action;

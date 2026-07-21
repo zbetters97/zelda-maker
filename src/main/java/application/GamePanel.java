@@ -355,7 +355,7 @@ public class GamePanel extends JPanel implements Runnable {
             case Object object -> objects.add(object);
             case Collectable collectable -> collectables.add(collectable);
             case Projectile projectile -> projectiles.add(projectile);
-            default -> throw new IllegalArgumentException();
+            default -> { }
         }
     }
     public void removeEntity(Entity entity) {
@@ -367,7 +367,7 @@ public class GamePanel extends JPanel implements Runnable {
             case Object object -> objects.remove(object);
             case Collectable collectable -> collectables.remove(collectable);
             case Projectile projectile -> projectiles.remove(projectile);
-            default -> throw new IllegalArgumentException();
+            default -> { }
         }
     }
 

@@ -15,7 +15,6 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -29,9 +28,8 @@ public class Player extends Entity {
     public Point safePoint;
 
     /** INVENTORY VALUES */
-    private final ArrayList<Item> items = new ArrayList<>();
     private int currentItemSlot = 0;
-    protected int maxRupees = 99, maxArrows = 99, maxBombs = 99;
+    protected int maxRupees = 99;
 
     /** ICE VALUES */
     private int slideCounter = 0;
@@ -342,14 +340,14 @@ public class Player extends Entity {
         bombs = 50;
 
         items.addAll(Arrays.asList(
-                new ITM_Rod(gp, this),
-                new ITM_Bomb(gp, this),
-                new ITM_Shovel(gp, this),
                 new ITM_Boomerang(gp, this),
-                new ITM_Feather(gp, this),
+                new ITM_Bomb(gp, this),
                 new ITM_Bow(gp, this),
+                new ITM_Cape(gp, this),
+                new ITM_Feather(gp, this),
                 new ITM_Hookshot(gp, this),
-                new ITM_Cape(gp, this)
+                new ITM_Rod(gp, this),
+                new ITM_Shovel(gp, this)
         ));
 
         item = items.getFirst();

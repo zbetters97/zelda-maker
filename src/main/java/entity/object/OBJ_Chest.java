@@ -2,6 +2,7 @@ package entity.object;
 
 import application.GamePanel;
 import entity.Entity;
+import entity.item.ITM_Bow;
 
 import java.awt.*;
 
@@ -14,6 +15,8 @@ public class OBJ_Chest extends Object {
     public OBJ_Chest(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
         latchable = true;
+
+        item = new ITM_Bow(gp, this);
 
         hitbox = new Rectangle(4, 16, 40, 32);
         hitboxDefaultPoint.setLocation(hitbox.x, hitbox.y);
@@ -45,7 +48,13 @@ public class OBJ_Chest extends Object {
         if (user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT) {
             opened = true;
             availableAction = "";
+            user.receiveLoot(loot);
         }
+    }
+
+    @Override
+    public boolean canTakeLoot() {
+        return true;
     }
 
     @Override

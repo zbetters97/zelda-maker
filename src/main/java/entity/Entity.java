@@ -13,6 +13,7 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 
 import static application.GamePanel.Direction.*;
@@ -136,11 +137,12 @@ public class Entity {
     private int dyingCounter = 0;
 
     /** INVENTORY VALUES */
-    protected Collectable loot;
+    protected Entity loot;
+    protected final ArrayList<Item> items = new ArrayList<>();
     protected Item item;
     protected int keys = 0;
     protected boolean hasBossKey = false;
-    protected int rupees = 0, arrows = 0, bombs = 0;
+    protected int rupees = 0, maxArrows = 99, arrows = 0, maxBombs = 99, bombs = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -691,12 +693,24 @@ public class Entity {
      */
     protected void checkDeath() { }
 
-    protected void dropItem() {
+    protected void dropLoot() {
 
-        if (loot == null) return;
+        // Loot must be a collectable
+        if (loot == null || !(loot instanceof Collectable)) return;
 
         loot.setWorldPoint(new Point(worldPoint));
-        gp.collectables.add(loot);
+        gp.collectables.add((Collectable) loot);
+    }
+
+    public void receiveLoot(Entity loot) {
+
+        if (loot instanceof Collectable) {
+            ((Collectable) loot).use(this);
+        }
+        else if (loot instanceof Item) {
+            loot.setUser(this);
+            items.add((Item) loot);
+        }
     }
 
     protected void handleCapture() {
@@ -833,7 +847,7 @@ public class Entity {
         if (40 < dyingCounter) {
             dyingCounter = 0;
             alive = false;
-            dropItem();
+            dropLoot();
         }
     }
 
@@ -968,17 +982,11 @@ public class Entity {
         return false;
     }
 
-    public Collectable getLoot() {
+    public Entity getLoot() {
         return loot;
     }
-    public void setLoot(String lootName) {
-
-        Entity newLoot = gp.eGenerator.getEntity(lootName);
-
-        // Loot must be a collectable
-        if (newLoot instanceof Collectable) {
-            loot = (Collectable) newLoot;
-        }
+    public void setLoot(Entity loot) {
+        this.loot = loot;
     }
 
     public Entity getItem() {
@@ -1010,14 +1018,23 @@ public class Entity {
         return arrows;
     }
     public void addArrows(int arrows) {
+
         this.arrows += arrows;
+
+        if (this.arrows > maxArrows) {
+            this.arrows = maxArrows;
+        }
     }
 
     public int getBombs() {
         return bombs;
     }
     public void addBombs(int bombs) {
+
         this.bombs += bombs;
+        if (this.bombs > maxBombs) {
+            this.bombs = bombs;
+        }
     }
 
     public int getSpeed() {
@@ -1101,6 +1118,9 @@ public class Entity {
 
     public Entity getUser() {
         return user;
+    }
+    public void setUser(Entity user) {
+        this.user = user;
     }
 
     public void capture(Entity target) {
