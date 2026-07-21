@@ -15,10 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -57,8 +55,14 @@ public class UI {
     private Entity selectedEntity;
 
     /** TILE EDITING */
-    private final ArrayList<UITile> tileLibrary = new ArrayList<>();
-    private int tileIndex = 0;
+    private final ArrayList<ArrayList<UIEntity>> tileLibrary = new ArrayList<>();
+    private static final int[][] TILE_GROUPS = {
+            {0, 1, 2, 3, 9, 38, 21}, // Hazard
+            {4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18}, // Land 1
+            {20, 19}, // House 1
+            {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}, // Dungeon 1
+            {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63} // Dungeon 2
+    };
 
     /** SPRITES */
     private BufferedImage
@@ -116,26 +120,15 @@ public class UI {
 
     private void fillTileLibrary() {
 
-        // Import tile data
-        InputStream is = getClass().getResourceAsStream("/maps/map_tile_data.txt");
-        BufferedReader br = new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)));
+        for (int[] group : TILE_GROUPS) {
 
-        try {
-            String line;
-            int tileNumber;
+            ArrayList<UIEntity> category = new ArrayList<>();
 
-            while ((line = br.readLine()) != null) {
-
-                if (!line.contains(".png")) continue;
-
-                tileNumber = Integer.parseInt(line.replace(".png", ""));
-                tileLibrary.add(new UITile(tileNumber));
+            for (int tileNum : group) {
+                category.add(new UIEntity(tileNum));
             }
 
-            br.close();
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
+            tileLibrary.add(category);
         }
     }
 
@@ -616,7 +609,6 @@ public class UI {
 
             editingTiles = !editingTiles;
 
-            tileIndex = 0;
             entityListIndex = 0;
             entityIndex = 0;
         }
@@ -633,15 +625,13 @@ public class UI {
             g2.drawImage(cursor.getSelect(), screenPoint.x - 6, screenPoint.y - 6, gp.tileSize + 13, gp.tileSize + 13,null);
         }
         else {
-            if (editingTiles) {
-                UITile uiTile = tileLibrary.get(tileIndex);
-                drawCurrentSprite(screenPoint, 0.9f, uiTile.sprite());
-            }
-            else {
-                UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
-                drawCurrentSprite(screenPoint, 0.4f, uiEntity.getSprite());
-            }
+            UIEntity uiEntity = editingTiles ?
+                    tileLibrary.get(entityListIndex).get(entityIndex) :
+                    entityLibrary.get(entityListIndex).get(entityIndex);
 
+            float alpha = editingTiles ? 0.9f : 0.4f;
+
+            drawCurrentSprite(screenPoint, alpha, uiEntity.getSprite());
             g2.drawImage(cursor.getCursor(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
         }
     }
@@ -656,96 +646,38 @@ public class UI {
     private void drawEditing_Menu() {
 
         if (editingTiles) {
-            editing_Tile_Menu();
-            editing_Tile_Menu_Input_Dir();
+            editing_Entity_Menu(tileLibrary);
+            editing_Menu_Input_Dir(tileLibrary);
         }
         else {
-            editing_Entity_Menu();
-            editing_Entity_Menu_Input_Dir();
+            editing_Entity_Menu(entityLibrary);
+            editing_Menu_Input_Dir(entityLibrary);
         }
     }
+    private void editing_Entity_Menu(ArrayList<ArrayList<UIEntity>> library) {
 
-    private void editing_Tile_Menu() {
-
-        int baseX = (int) (gp.screenWidth / 2.25);
-        int baseY = (int) (gp.screenHeight / 2.75);
-        int width = gp.tileSize * 2;
-        int height = gp.tileSize * 2;
-        g2.setColor(new Color(0, 0, 0, 235));
-        g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
-
-        int offset = 25;
-
-        int cursorX = baseX + offset;
-        int cursorY = baseY + offset;
-        int spacingY = (int) (gp.tileSize * 1.75);
-        int x = baseX + offset;
-        int y = cursorY - tileIndex * spacingY;
-
-        for (int i = 0; i < tileLibrary.size(); i++) {
-
-            if (Math.abs(i - tileIndex) > 2) {
-                y += spacingY;
-                continue;
-            }
-
-            if (i == tileIndex) {
-                g2.drawImage(cursor.getCursor(),cursorX - 10, cursorY - 10,gp.tileSize + 20, gp.tileSize + 20, null);
-            }
-            else {
-                g2.setColor(new Color(28, 28, 28, 200));
-                g2.fillRoundRect(x - 10, y - 10, gp.tileSize + 20, gp.tileSize + 20, 0, 0);
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
-            }
-
-            g2.drawImage(tileLibrary.get(i).sprite(), x, y,gp.tileSize, gp.tileSize, null);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
-
-            y += spacingY;
-        }
-    }
-    private void editing_Tile_Menu_Input_Dir() {
-        if (gp.keyH.upPressed) {
-            gp.keyH.upPressed = false;
-
-            tileIndex--;
-            if (tileIndex < 0) {
-                tileIndex = tileLibrary.size() - 1;
-            }
-        }
-        else if (gp.keyH.downPressed) {
-            gp.keyH.downPressed = false;
-
-            tileIndex++;
-            if (tileIndex > tileLibrary.size() - 1) {
-                tileIndex = 0;
-            }
-        }
-    }
-
-    private void editing_Entity_Menu() {
+        int listSpacingX = (int) (gp.tileSize * 1.50);
+        int padding = 25;
 
         int baseX = (int) (gp.tileSize * 4.5);
         int baseY = gp.tileSize * 5;
-        int width = gp.tileSize * 8;
+        int width = (library.size() - 1) * listSpacingX + gp.tileSize + padding * 2;
         int height = gp.tileSize * 2;
         g2.setColor(new Color(0, 0, 0, 235));
         g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
 
-        int listSpacingX = (int) (gp.tileSize * 1.50);
-        int entitySpacingY = (int) (gp.tileSize * 1.75);
-
-        int cursorX = baseX + (entityListIndex * listSpacingX + 25);
+        int cursorX = baseX + (entityListIndex * listSpacingX + padding);
         int cursorY = (gp.screenHeight / 2) - gp.tileSize;
 
+        int entitySpacingY = (int) (gp.tileSize * 1.75);
         int scrollOffsetY = cursorY - (entityIndex * entitySpacingY);
 
-        for (int i = 0; i < entityLibrary.size(); i++) {
+        for (int i = 0; i < library.size(); i++) {
 
-            int x = baseX + (i * listSpacingX + 25);
+            int x = baseX + (i * listSpacingX + padding);
             int y = (i == entityListIndex) ? scrollOffsetY : cursorY;
 
-            for (int c = 0; c < entityLibrary.get(i).size(); c++) {
+            for (int c = 0; c < library.get(i).size(); c++) {
 
                 if (i == entityListIndex) {
                     if (Math.abs(c - entityIndex) > 2) {
@@ -769,27 +701,27 @@ public class UI {
                 if (i != entityListIndex || c != entityIndex) {
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
                 }
-                g2.drawImage(entityLibrary.get(i).get(c).getSprite(), x, y, gp.tileSize, gp.tileSize,null);
+                g2.drawImage(library.get(i).get(c).getSprite(), x, y, gp.tileSize, gp.tileSize,null);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
                 y += entitySpacingY;
             }
         }
     }
-    private void editing_Entity_Menu_Input_Dir() {
+    private void editing_Menu_Input_Dir(ArrayList<ArrayList<UIEntity>> library) {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
             entityIndex--;
             if (entityIndex < 0) {
-                entityIndex = entityLibrary.get(entityListIndex).size() - 1;
+                entityIndex = library.get(entityListIndex).size() - 1;
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
             entityIndex++;
-            if (entityIndex > entityLibrary.get(entityListIndex).size() - 1) {
+            if (entityIndex > library.get(entityListIndex).size() - 1) {
                 entityIndex = 0;
             }
         }
@@ -799,7 +731,7 @@ public class UI {
             entityListIndex--;
             entityIndex = 0;
             if (entityListIndex < 0) {
-                entityListIndex = entityLibrary.size() - 1;
+                entityListIndex = library.size() - 1;
             }
         }
         else if (gp.keyH.rightPressed) {
@@ -807,7 +739,7 @@ public class UI {
 
             entityListIndex++;
             entityIndex = 0;
-            if (entityListIndex > entityLibrary.size() - 1) {
+            if (entityListIndex > library.size() - 1) {
                 entityListIndex = 0;
             }
         }
@@ -832,7 +764,9 @@ public class UI {
         if (gp.keyH.aPressed) {
             gp.keyH.aPressed = false;
 
-            editing_PlaceTile(tileIndex);
+            UIEntity currentTile = tileLibrary.get(entityListIndex).get(entityIndex);
+
+            editing_PlaceTile(Integer.parseInt(currentTile.getName()));
         }
     }
     private void editing_Map_Tile_Input_B() {
