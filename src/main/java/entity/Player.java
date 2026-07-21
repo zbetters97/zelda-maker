@@ -340,14 +340,15 @@ public class Player extends Entity {
         bombs = 50;
 
         items.addAll(Arrays.asList(
+                new ITM_Shovel(gp, this),
                 new ITM_Boomerang(gp, this),
+                new ITM_Boots(gp, this),
+                new ITM_Feather(gp, this),
                 new ITM_Bomb(gp, this),
                 new ITM_Bow(gp, this),
-                new ITM_Cape(gp, this),
-                new ITM_Feather(gp, this),
                 new ITM_Hookshot(gp, this),
-                new ITM_Rod(gp, this),
-                new ITM_Shovel(gp, this)
+                new ITM_Cape(gp, this),
+                new ITM_Rod(gp, this)
         ));
 
         item = items.getFirst();
@@ -453,8 +454,8 @@ public class Player extends Entity {
         else if (gp.keyH.bPressed) {
             action = ATTACKING;
 
-            if (capturedTarget != null) {
-                capturedTarget.setAction(ATTACKING);
+            if (capturedEntity != null) {
+                capturedEntity.setAction(ATTACKING);
             }
         }
         // Shield guard
@@ -612,8 +613,8 @@ public class Player extends Entity {
         // Locked target within 8 tiles
         if (lockedOnTarget != null && ai.getTileDistance(lockedOnTarget) < maxZTargetDistance) {
 
-            // Target alive
-            if (lockedOnTarget.isAvailable()) {
+            // Target alive and not captured
+            if (lockedOnTarget.isAvailable() && !lockedOnTarget.isCaptured()) {
                 direction = getZTargetDirection(lockedOnTarget);
                 lockonDirection = direction;
             }
@@ -683,15 +684,16 @@ public class Player extends Entity {
         // Item equipped
         if (item != null) {
             switch (item.name) {
-                case ITM_Shovel.itmName, ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName, ITM_Rod.itmName -> {
+                case ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName, ITM_Rod.itmName, ITM_Shovel.itmName -> {
                     gp.keyH.xPressed = false;
                     item.use();
                 }
+                case ITM_Boots.itmName -> item.use();
                 case ITM_Bow.itmName -> {
                     lockonDirection = direction;
                     item.use();
                 }
-                case ITM_Feather.itmName, ITM_Cape.itmName -> {
+                case ITM_Cape.itmName, ITM_Feather.itmName -> {
                     gp.keyH.xPressed = false;
                     lockonDirection = direction;
                     item.use();
@@ -730,6 +732,7 @@ public class Player extends Entity {
             case CARRYING -> carrying();
             case THROWING -> throwing();
             case DIGGING -> digging();
+            case RUNNING -> running();
             case AIMING -> aiming();
             case JUMPING, SOARING -> jumping();
             case SWINGING -> swinging();
@@ -769,7 +772,8 @@ public class Player extends Entity {
 
     private void handleIceSliding() {
 
-        boolean onIce = gp.cChecker.checkIce(this);
+        // Player can slip if on ice, running, or actively slipping
+        boolean onIce = gp.cChecker.checkIce(this) || action == RUNNING || slideCounter > 0;
         if (!onIce || action == ROLLING) {
             slideCounter = 0;
             animationSpeed = 10;
@@ -815,8 +819,8 @@ public class Player extends Entity {
 
        updateFacing();
 
-        if (capturedTarget != null) {
-            capturedTarget.forceMove(getMoveDirection());
+       if (capturedEntity != null) {
+            capturedEntity.forceMove(getMoveDirection());
         }
 
        if (!action.allowsTranslation()) {
@@ -824,8 +828,8 @@ public class Player extends Entity {
            return;
        }
 
-       // Don't move extra while on ice
-       if (gp.cChecker.checkIce(this)) {
+       // Don't move extra while sliding
+       if (slideCounter > 0) {
            cycleSprites();
            return;
        }
@@ -1235,6 +1239,25 @@ public class Player extends Entity {
     }
 
     /**
+     * RUNNING
+     * Runs running logic
+     * Called by startAction() when player action is RUNNING
+     */
+    private void running() {
+
+        // Must be holding the Item button to accelerate
+        if (gp.keyH.xPressed) {
+            animationSpeed = 4;
+            speed = 7;
+        }
+        else {
+            animationSpeed = 10;
+            speed = defaultSpeed;
+            action = IDLE;
+        }
+    }
+
+    /**
      * AIMING
      * Runs aiming animation and logic
      * Called by startAction() when player action is AIMING
@@ -1475,7 +1498,7 @@ public class Player extends Entity {
     @Override
     protected void getSpriteImage() {
         image = switch (action) {
-            case IDLE -> getIdleSprite();
+            case IDLE, RUNNING -> getIdleSprite();
             case ROLLING -> getRollingSprite();
             case GUARDING -> getGuardSprite();
             case ATTACKING, SPINCHARGING -> getAttackSprite();

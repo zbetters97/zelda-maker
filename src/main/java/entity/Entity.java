@@ -32,6 +32,7 @@ public class Entity {
         ROLLING(false, true, true),
         GUARDING(true, false, false),
         DIGGING(false, false, false),
+        RUNNING(true, true, false),
         AIMING(true, true, true),
         GRABBING(false, false, false),
         CARRYING(true, true, false),
@@ -117,7 +118,7 @@ public class Entity {
     protected String availableAction = "";
     protected boolean grabbed = false;
     protected Object grabbedObject;
-    protected Entity capturedBy, capturedTarget;
+    protected Entity capturedBy, capturedEntity;
 
     /** COMBAT VALUES */
     protected int defaultAttack, attack;
@@ -534,7 +535,7 @@ public class Entity {
     }
     private void detectEnemySwordCollision() {
 
-        if (gp.player.getCapturedTarget() == this) {
+        if (gp.player.getCapturedEntity() == this) {
             detectPlayerSwordCollision();
             return;
         }
@@ -614,7 +615,7 @@ public class Entity {
         }
 
         // Can't take damage by own captured target
-        if (attacker == capturedTarget) return;
+        if (attacker == capturedEntity) return;
 
         // Target is buzzing, hurt attacker
         if (buzzing && !(attacker instanceof Projectile)) {
@@ -1126,11 +1127,11 @@ public class Entity {
     public void capture(Entity target) {
 
         // Release current target first
-        if (capturedTarget != null) {
-            capturedTarget.capturedBy = null;
+        if (capturedEntity != null) {
+            capturedEntity.capturedBy = null;
         }
 
-        capturedTarget = target;
+        capturedEntity = target;
 
         if (target != null) {
             target.capturedBy = this;
@@ -1148,8 +1149,8 @@ public class Entity {
     public boolean isCaptured() {
         return capturedBy != null;
     }
-    public Entity getCapturedTarget() {
-        return capturedTarget;
+    public Entity getCapturedEntity() {
+        return capturedEntity;
     }
     public Entity getCapturedBy() {
         return capturedBy;

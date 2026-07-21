@@ -70,6 +70,7 @@ public class EntityGenerator {
         // Items
         itemFactory.put(ITM_Bomb.itmName, () -> new ITM_Bomb(gp, null));
         itemFactory.put(ITM_Boomerang.itmName, () -> new ITM_Boomerang(gp, null));
+        itemFactory.put(ITM_Boots.itmName, () -> new ITM_Boots(gp, null));
         itemFactory.put(ITM_Bow.itmName, () -> new ITM_Bow(gp, null));
         itemFactory.put(ITM_Cape.itmName, () -> new ITM_Cape(gp, null));
         itemFactory.put(ITM_Feather.itmName, () -> new ITM_Feather(gp, null));

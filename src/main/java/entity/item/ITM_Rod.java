@@ -21,7 +21,7 @@ public class ITM_Rod extends Item {
     @Override
     public void use() {
 
-        if (user.getCapturedTarget() != null) {
+        if (user.getCapturedEntity() != null) {
             user.capture(null);
             super.use();
 

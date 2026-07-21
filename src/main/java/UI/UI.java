@@ -493,7 +493,7 @@ public class UI {
 
         for (Entity enemy : gp.enemies) {
 
-            if (enemy != null && enemy.isAvailable()) {
+            if (enemy != null && enemy.isAvailable() && !enemy.isCaptured()) {
 
                 // Enemy distance from player
                 int enemyDistance = enemy.getAI().getTileDistance(gp.player);
@@ -1102,6 +1102,7 @@ public class UI {
 
         return image;
     }
+
     /**
      * SETUP IMAGE
      * @param imagePath Path to image file

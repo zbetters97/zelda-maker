@@ -45,7 +45,8 @@ public class OBJ_Chest extends Object {
         }
 
         // User must be looking up at chest
-        if (user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT) {
+        boolean facingDirection = user.getDirection() == UP || user.getDirection() == UPLEFT || user.getDirection() == UPRIGHT;
+        if (facingDirection) {
             opened = true;
             availableAction = "";
             user.receiveLoot(loot);
