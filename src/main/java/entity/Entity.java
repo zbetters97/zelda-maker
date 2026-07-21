@@ -696,6 +696,8 @@ public class Entity {
 
     protected void dropLoot() {
 
+        setLoot();
+
         // Loot must be a collectable
         if (loot == null || !(loot instanceof Collectable)) return;
 
@@ -989,6 +991,7 @@ public class Entity {
     public void setLoot(Entity loot) {
         this.loot = loot;
     }
+    protected void setLoot() {}
 
     public Entity getItem() {
         return item;

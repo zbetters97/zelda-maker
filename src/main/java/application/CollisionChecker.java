@@ -3,6 +3,7 @@ package application;
 import entity.Entity;
 import entity.enemy.Enemy;
 import entity.npc.NPC;
+import entity.object.OBJ_DigSpot;
 import entity.object.Object;
 import tile.Tile;
 import tile.TileManager;
@@ -225,28 +226,29 @@ public record CollisionChecker(GamePanel gp) {
     public <T extends Entity> T checkMovementCollision(Entity entity, ArrayList<T> targets) {
 
         Rectangle futureRect = entity.getWorldHitbox();
+        int speed = entity.getSpeed();
 
         switch (entity.getMoveDirection()) {
-            case UP -> futureRect.y -= entity.getSpeed();
+            case UP -> futureRect.y -= speed;
             case UPLEFT -> {
-                futureRect.x -= entity.getSpeed();
-                futureRect.y -= entity.getSpeed();
+                futureRect.x -= speed;
+                futureRect.y -= speed;
             }
             case UPRIGHT -> {
-                futureRect.x += entity.getSpeed();
-                futureRect.y -= entity.getSpeed();
+                futureRect.x += speed;
+                futureRect.y -= speed;
             }
-            case DOWN -> futureRect.y += entity.getSpeed();
+            case DOWN -> futureRect.y += speed;
             case DOWNLEFT -> {
-                futureRect.x -= entity.getSpeed();
-                futureRect.y += entity.getSpeed();
+                futureRect.x -= speed;
+                futureRect.y += speed;
             }
             case DOWNRIGHT -> {
-                futureRect.x += entity.getSpeed();
-                futureRect.y += entity.getSpeed();
+                futureRect.x += speed;
+                futureRect.y += speed;
             }
-            case LEFT -> futureRect.x -= entity.getSpeed();
-            case RIGHT -> futureRect.x += entity.getSpeed();
+            case LEFT -> futureRect.x -= speed;
+            case RIGHT -> futureRect.x += speed;
         }
 
         Rectangle currentRect = entity.getWorldHitbox();
@@ -322,6 +324,46 @@ public record CollisionChecker(GamePanel gp) {
                 break;
             }
         }
+    }
+
+    public Object checkDigSpot(Entity entity) {
+
+        Rectangle futureRect = entity.getWorldHitbox();
+
+        switch (entity.getMoveDirection()) {
+            case UP -> futureRect.y -= gp.tileSize;
+            case UPLEFT -> {
+                futureRect.x -= gp.tileSize;
+                futureRect.y -= gp.tileSize;
+            }
+            case UPRIGHT -> {
+                futureRect.x += gp.tileSize;
+                futureRect.y -= gp.tileSize;
+            }
+            case DOWN -> futureRect.y += gp.tileSize;
+            case DOWNLEFT -> {
+                futureRect.x -= gp.tileSize;
+                futureRect.y += gp.tileSize;
+            }
+            case DOWNRIGHT -> {
+                futureRect.x += gp.tileSize;
+                futureRect.y += gp.tileSize;
+            }
+            case LEFT -> futureRect.x -= gp.tileSize;
+            case RIGHT -> futureRect.x += gp.tileSize;
+        }
+
+        for (Object object : gp.objects) {
+
+            boolean isDigSpot = object.getName().equals(OBJ_DigSpot.objName);
+            Rectangle targetRect = object.getWorldHitbox();
+
+            if (isDigSpot && futureRect.intersects(targetRect)) {
+                return object;
+            }
+        }
+
+        return null;
     }
 
     /**

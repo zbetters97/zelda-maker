@@ -1230,6 +1230,10 @@ public class Player extends Entity {
         }
         else if (digCounter < 24 ) {
             digNum = 2;
+
+            // Check for dig spot in front of player
+            Object digSpot = gp.cChecker.checkDigSpot(this);
+            if (digSpot != null) digSpot.interact(this);
         }
         else {
             digNum = 1;

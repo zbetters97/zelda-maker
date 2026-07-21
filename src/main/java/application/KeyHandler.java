@@ -79,13 +79,11 @@ public class KeyHandler implements KeyListener {
             yPressed = true;
             lock = false;
         }
-        if (code == btn_R && lock) {
+        if (code == btn_R) {
             rPressed = true;
-            lock = false;
         }
-        if (code == btn_L && lock) {
+        if (code == btn_L) {
             lPressed = true;
-            lock = false;
         }
     }
 

@@ -167,13 +167,22 @@ public class TileManager {
             waterNum = waterNum == 1 ? 2 : 1;
         }
 
+        int startCol = 0, endCol = -1;
+        int startRow = 0, endRow = -1;
+        if (gp.ui.selectedTile != null) {
+            startCol = Math.min(gp.ui.selectedTile.x, gp.ui.cursor.getWorldX()) / gp.tileSize;
+            endCol = Math.max(gp.ui.selectedTile.x, gp.ui.cursor.getWorldX()) / gp.tileSize;
+            startRow = Math.min(gp.ui.selectedTile.y, gp.ui.cursor.getWorldY()) / gp.tileSize;
+            endRow = Math.max(gp.ui.selectedTile.y, gp.ui.cursor.getWorldY()) / gp.tileSize;
+        }
+
         for (int row = 0; row < gp.maxWorldRow; row++) {
             for (int col = 0; col < gp.maxWorldCol; col++) {
 
                 int tileNum = mapTileNum[col][row];
 
                 // Animate ocean
-                if (tileNum == 1 & waterNum == 2) {
+                if (tileNum == 1 && waterNum == 2) {
                     tileNum = 2;
                 }
 
@@ -184,6 +193,13 @@ public class TileManager {
 
                 gp.camera.worldToScreen(worldPoint, screenPoint);
                 g2.drawImage(tiles[tileNum].image, screenPoint.x, screenPoint.y, null);
+
+                // Highlight tiles to fill when editing with yellow (shift select)
+                boolean isSelectedTile = gp.ui.selectedTile != null && col >= startCol && col <= endCol && row >= startRow && row <= endRow;
+                if (isSelectedTile) {
+                    g2.setColor(new Color(105, 65, 90, 75));
+                    g2.fillRect(screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize);
+                }
             }
         }
     }

@@ -63,6 +63,7 @@ public class UI {
             {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}, // Dungeon 1
             {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63} // Dungeon 2
     };
+    public Point selectedTile;
 
     /** SPRITES */
     private BufferedImage
@@ -603,14 +604,15 @@ public class UI {
         // Detect if Y is pressed
         wasYPressed = gp.keyH.yPressed;
 
-        // Switch tile editing on/off
-        if (gp.keyH.xPressed) {
-            gp.keyH.xPressed = false;
+        // Switch tile editing on/off (prevent when grabbing entity)
+        if (gp.keyH.lPressed && selectedEntity == null) {
+            gp.keyH.lPressed = false;
 
             editingTiles = !editingTiles;
 
             entityListIndex = 0;
             entityIndex = 0;
+            selectedTile = null;
         }
     }
 
@@ -625,6 +627,10 @@ public class UI {
             g2.drawImage(cursor.getSelect(), screenPoint.x - 6, screenPoint.y - 6, gp.tileSize + 13, gp.tileSize + 13,null);
         }
         else {
+            BufferedImage sprite = editingTiles && gp.keyH.rPressed ?
+                    cursor.getSelect() :
+                    cursor.getCursor();
+
             UIEntity uiEntity = editingTiles ?
                     tileLibrary.get(entityListIndex).get(entityIndex) :
                     entityLibrary.get(entityListIndex).get(entityIndex);
@@ -632,7 +638,7 @@ public class UI {
             float alpha = editingTiles ? 0.9f : 0.4f;
 
             drawCurrentSprite(screenPoint, alpha, uiEntity.getSprite());
-            g2.drawImage(cursor.getCursor(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
+            g2.drawImage(sprite, screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
         }
     }
 
@@ -748,33 +754,60 @@ public class UI {
     private void drawEditing_Map() {
 
         if (editingTiles) {
+            if (!gp.keyH.rPressed) {
+                selectedTile = null;
+            }
             editing_Map_Tile_Input_A();
             editing_Map_Tile_Input_B();
         }
         else {
             editing_Map_Entity_Input_A();
             editing_Map_Entity_Input_B();
-            editing_Map_Entity_Input_LR();
+            editing_Map_Entity_Input_X();
         }
 
         editing_Map_Input_Dir();
     }
 
     private void editing_Map_Tile_Input_A() {
-        if (gp.keyH.aPressed) {
-            gp.keyH.aPressed = false;
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
 
-            UIEntity currentTile = tileLibrary.get(entityListIndex).get(entityIndex);
+        UIEntity currentTile = tileLibrary.get(entityListIndex).get(entityIndex);
+        int tileNum = Integer.parseInt(currentTile.getName());
 
-            editing_PlaceTile(Integer.parseInt(currentTile.getName()));
+        if (gp.keyH.rPressed) {
+            editing_FillTiles(tileNum);
+        }
+        else {
+            editing_PlaceTile(tileNum);
+        }
+    }
+    private void editing_FillTiles(int tileNum) {
+
+        if (selectedTile != null) {
+
+            int startCol = Math.min(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+            int endCol = Math.max(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+
+            int startRow = Math.min(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+            int endRow = Math.max(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+
+            for (int col = startCol; col <= endCol; col++) {
+                for (int row = startRow; row <= endRow; row++) {
+                    gp.tileM.mapTileNum[col][row] = tileNum;
+                }
+            }
+        }
+        else {
+            selectedTile = new Point(cursor.getWorldPoint());
         }
     }
     private void editing_Map_Tile_Input_B() {
-        if (gp.keyH.bPressed) {
-            gp.keyH.bPressed = false;
+        if (!gp.keyH.bPressed) return;
+        gp.keyH.bPressed = false;
 
-            editing_PlaceTile(0);
-        }
+        editing_PlaceTile(0);
     }
     private void editing_PlaceTile(int tileNum) {
 
@@ -785,9 +818,7 @@ public class UI {
     }
 
     private void editing_Map_Entity_Input_A() {
-
         if (!gp.keyH.aPressed) return;
-
         gp.keyH.aPressed = false;
 
         editing_GetEntity();
@@ -914,9 +945,7 @@ public class UI {
     }
 
     private void editing_Map_Entity_Input_B() {
-
         if (!gp.keyH.bPressed) return;
-
         gp.keyH.bPressed = false;
 
         editing_RemoveEntity();
@@ -949,10 +978,9 @@ public class UI {
         }
     }
 
-    private void editing_Map_Entity_Input_LR() {
-        if (!gp.keyH.lPressed && !gp.keyH.rPressed) return;
-        gp.keyH.lPressed = false;
-        gp.keyH.rPressed = false;
+    private void editing_Map_Entity_Input_X() {
+        if (!gp.keyH.xPressed) return;
+        gp.keyH.xPressed = false;
 
         editing_RotateEntity();
     }

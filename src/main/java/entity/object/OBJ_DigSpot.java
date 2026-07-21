@@ -9,30 +9,30 @@ import entity.collectable.COL_Rupee_Red;
 
 import java.awt.*;
 
-public class OBJ_Grass extends Object {
+public class OBJ_DigSpot extends Object {
 
-    public static final String objName = "Grass";
+    public static final String objName = "DigSpot";
 
-    public OBJ_Grass(GamePanel gp, int worldX, int worldY) {
+    public OBJ_DigSpot(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
+        interactable = false;
     }
 
     @Override
     protected void getImages() {
-        sprite = setupImage("/objects/obj_grass");
-    }
-
-    @Override
-    public void interact() {
-        shatter();
+        sprite = setupImage("/objects/obj_digspot");
     }
 
     @Override
     public boolean canCollideWith(Entity target) {
-        return false;
+        return target.getAction() == Action.DIGGING;
     }
 
-    private void shatter() {
+    @Override
+    public void interact(Entity user) {
+
+        if (user.getAction() != Action.DIGGING) return;
+
         alive = false;
         dropLoot();
         createParticles();
@@ -69,10 +69,6 @@ public class OBJ_Grass extends Object {
     @Override
     protected int getParticleSpeed() {
         return 1;
-    }
-    @Override
-    protected Color getParticleColor() {
-        return new Color(30, 150, 23);
     }
     @Override
     protected int getParticleSize() {
