@@ -30,6 +30,7 @@ public class EntityGenerator {
         // Enemies
         enemyFactory.put(EMY_Beamos.emyName, () -> new EMY_Beamos(gp, 0, 0));
         enemyFactory.put(EMY_Beetle.emyName, () -> new EMY_Beetle(gp, 0, 0));
+        enemyFactory.put(EMY_Blade.emyName, () -> new EMY_Blade(gp, 0, 0));
         enemyFactory.put(EMY_Buzzblob.emyName, () -> new EMY_Buzzblob(gp, 0, 0));
         enemyFactory.put(EMY_ChuChu_Green.emyName, () -> new EMY_ChuChu_Green(gp, 0, 0));
         enemyFactory.put(EMY_ChuChu_Red.emyName, () -> new EMY_ChuChu_Red(gp, 0, 0));

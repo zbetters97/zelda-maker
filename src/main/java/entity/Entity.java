@@ -674,6 +674,10 @@ public class Entity {
         direction = target.getDirection();
         speed = defaultSpeed;
     }
+
+    public boolean canBeTargeted() {
+        return isAvailable() && !isCaptured();
+    }
     /** END COMBAT*/
 
     public boolean isAvailable() {

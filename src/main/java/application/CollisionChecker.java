@@ -462,6 +462,14 @@ public record CollisionChecker(GamePanel gp) {
         return gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
     }
 
+    public boolean checkTileCollision(int col, int row) {
+
+        int tileNum = gp.tileM.mapTileNum[col][row];
+        Tile tile = gp.tileM.tiles[tileNum];
+
+        return tile != null && tile.isNotTraversable(tileNum);
+    }
+
     private boolean outOfBounds(Rectangle box) {
         return (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
                 box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize);

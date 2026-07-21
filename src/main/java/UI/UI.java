@@ -487,7 +487,7 @@ public class UI {
 
         for (Entity enemy : gp.enemies) {
 
-            if (enemy != null && enemy.isAvailable() && !enemy.isCaptured()) {
+            if (enemy != null && enemy.canBeTargeted()) {
 
                 // Enemy distance from player
                 int enemyDistance = enemy.getAI().getTileDistance(gp.player);
@@ -758,7 +758,6 @@ public class UI {
                 selectedTile = null;
             }
             editing_Map_Tile_Input_A();
-            editing_Map_Tile_Input_B();
         }
         else {
             editing_Map_Entity_Input_A();
@@ -802,12 +801,6 @@ public class UI {
         else {
             selectedTile = new Point(cursor.getWorldPoint());
         }
-    }
-    private void editing_Map_Tile_Input_B() {
-        if (!gp.keyH.bPressed) return;
-        gp.keyH.bPressed = false;
-
-        editing_PlaceTile(0);
     }
     private void editing_PlaceTile(int tileNum) {
 
