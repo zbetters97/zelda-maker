@@ -15,7 +15,7 @@ public class OBJ_Grass extends Object {
 
     public OBJ_Grass(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
-        if (loot == null) setLoot();
+        setLoot();
 
         defaultAttack = 1;
         attack = defaultAttack;

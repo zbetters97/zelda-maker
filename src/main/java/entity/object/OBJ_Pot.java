@@ -13,7 +13,7 @@ public class OBJ_Pot extends Object {
 
     public OBJ_Pot(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
-        if (loot == null) setLoot();
+        setLoot();
 
         maxHealth = 1;
         health = maxHealth;

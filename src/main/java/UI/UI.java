@@ -864,37 +864,47 @@ public class UI {
 
         // Hovering over existing entity on map
         if (mapEntity != null) {
-
-            // Attempt to give loot
-            if (editing_GiveLoot(mapEntity)) {
-                selectedEntity = null;
-                return;
-            }
-
-            // Grab map entity if not currently holding an entity
-            if (selectedEntity == null) {
-                selectedEntity = mapEntity;
-                gp.removeEntity(mapEntity);
-            }
+            editing_HandleMapEntityAPress(mapEntity);
         }
         // Currently holding an entity over an empty spot
         else if (selectedEntity != null) {
-
-            // Cannot place on current tile
-            if (cannotPlaceEntity(selectedEntity)) return;
-
-            // Place on map
-            editing_PlaceEntity(selectedEntity);
-            selectedEntity = null;
+            editing_HandleEntityAPress(selectedEntity);
         }
         // Not currently holding an entity over an empty spot
         else {
-            // Cannot place on current tile
-            if (cannotPlaceEntity(currentEntity)) return;
-
-            // Place on map
-            editing_PlaceEntity(currentEntity);
+            editing_HandleEntityAPress(currentEntity);
         }
+    }
+
+    private void editing_HandleMapEntityAPress(Entity mapEntity) {
+
+        // Attempt to give loot
+        if (editing_GiveLoot(mapEntity)) {
+            selectedEntity = null;
+            return;
+        }
+
+        // Grab map entity if not currently holding an entity
+        if (selectedEntity == null) {
+            selectedEntity = mapEntity;
+
+            // Move player offscreen when selected
+            if (mapEntity == gp.player) {
+                gp.player.setWorldPoint(new Point(-48, -48));
+            }
+            else {
+                gp.removeEntity(mapEntity);
+            }
+        }
+    }
+    private void editing_HandleEntityAPress(Entity entity) {
+
+        // Cannot place on current tile
+        if (cannotPlaceEntity(entity)) return;
+
+        // Place on map
+        editing_PlaceEntity(entity);
+        selectedEntity = null;
     }
 
     private Entity editing_GetEntityAtTile() {
@@ -904,12 +914,7 @@ public class UI {
 
         // If player is selected
         if (gp.player.getCol() == cursorCol && gp.player.getRow() == cursorRow) {
-
-            // Move player offscreen when selected
-            gp.player.setWorldPoint(new Point(-48, -48));
-            selectedEntity = gp.player;
-
-            return null;
+            return gp.player;
         }
 
         for (ArrayList<? extends Entity> list : gp.entities) {
@@ -929,7 +934,7 @@ public class UI {
     private boolean editing_GiveLoot(Entity entity) {
 
         // Not valid
-        if (entity == null || !entity.canTakeLoot()) return false;
+        if (entity == null || !entity.canTakeLoot() || entity == gp.player) return false;
 
         if (selectedEntity != null && selectedEntity instanceof Collectable) {
             entity.setLoot(selectedEntity.getName());
