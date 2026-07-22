@@ -105,7 +105,7 @@ public class PRJ_Orb extends Projectile {
 
         // Slightly transparent if attached to entity
         if (capturedEntity != null) {
-            changeAlpha(g2, 0.4f);
+            changeAlpha(g2, 0.6f);
         }
 
         super.draw(g2);

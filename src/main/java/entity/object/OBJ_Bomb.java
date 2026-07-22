@@ -50,12 +50,10 @@ public class OBJ_Bomb extends Object {
 
     @Override
     public void interact(Entity user) {
-
-        if (!gp.keyH.aPressed) return;
-
-        user.setAction(Action.GRABBING);
-        user.setGrabbedObject(this);
-        resetValues();
+        if (gp.keyH.aPressed) {
+            user.grab(this);
+            resetValues();
+        }
     }
 
     @Override

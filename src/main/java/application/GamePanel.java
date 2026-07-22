@@ -303,14 +303,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
     private void drawLayer(Entity.DrawLayer layer, boolean sort) {
 
-        Stream<Entity> stream = entityList.stream()
-                .filter(e -> e.getDrawLayer() == layer);
+        Stream<Entity> stream = entityList.stream().filter(e -> e.getDrawLayer() == layer);
 
         if (sort) {
-            stream = stream.sorted(
-                    Comparator.comparing(Entity::getIsGrabbed)
-                            .thenComparingInt(Entity::getWorldPointY)
-            );
+            stream = stream.sorted(Comparator.comparing(Entity::getWorldPointY));
         }
 
         stream.forEach(e -> e.draw(g2));

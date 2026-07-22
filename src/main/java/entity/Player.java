@@ -1148,9 +1148,9 @@ public class Player extends Entity {
             return;
         }
 
-        boolean isBomb = grabbedObject.getName().equals(OBJ_Bomb.objName);
+        boolean isNotBomb = !grabbedObject.getName().equals(OBJ_Bomb.objName);
 
-        if (!isBomb && !gp.keyH.aPressed) {
+        if (isNotBomb && !gp.keyH.aPressed) {
             resetGrab();
             return;
         }
@@ -1167,17 +1167,14 @@ public class Player extends Entity {
         else {
             grabNum = 1;
             grabCounter = 0;
-            grabbedObject.setInteractable(false);
-            action = Action.CARRYING;
-
+            pickup(grabbedObject);
             gp.keyH.aPressed = false;
         }
     }
     private void resetGrab() {
         grabNum = 1;
         grabCounter = 0;
-        grabbedObject = null;
-        action = Action.IDLE;
+        releaseGrab();
     }
 
     /**
@@ -1186,14 +1183,9 @@ public class Player extends Entity {
      * Called by startAction() when player action is CARRYING
      */
     private void carrying() {
-
         if (grabbedObject == null || !grabbedObject.getAlive()) {
             resetGrab();
-            return;
         }
-
-        grabbedObject.setGrabbed(true);
-        grabbedObject.setCanMove(false);
     }
 
     /**
@@ -1210,7 +1202,7 @@ public class Player extends Entity {
             throwNum = 2;
         }
         // Do not reset throw animation if using Hookshot/Boomerang
-        else if (grabbedObject != null) {
+        else {
             throwNum = 1;
             throwCounter = 0;
             grabbedObject = null;
@@ -1490,9 +1482,6 @@ public class Player extends Entity {
         if (action == JUMPING || action == SOARING) {
             g2.setColor(Color.BLACK);
             g2.fillOval(screenPoint.x + 10, screenPoint.y + 40, 30, 10);
-        }
-        else if (action == CARRYING && grabbedObject != null) {
-            grabbedObject.setWorldPoint(new Point(worldPoint.x, worldPoint.y - sprite.getHeight() + 12));
         }
 
         // Reset opacity

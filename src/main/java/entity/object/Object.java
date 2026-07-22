@@ -36,8 +36,7 @@ public class Object extends Entity {
 
     public void place(Entity user) {
 
-        grabbed = false;
-        interactable = true;
+        breakGrab();
 
         // Direction same as user
         direction = user.getDirection();
@@ -62,9 +61,10 @@ public class Object extends Entity {
 
     public void toss(Entity user) {
 
-        grabbed = false;
+        breakGrab();
         tossed = true;
         canMove = false;
+        elevated = true;
 
         // Start at user's location
         worldPoint.setLocation(user.getWorldPoint());
@@ -151,6 +151,7 @@ public class Object extends Entity {
 
         // Toss disrupted, end toss
         if (!tossed) {
+            elevated = false;
             canMove = true;
             tossCounter = 0;
             tTime = 0;
@@ -183,6 +184,9 @@ public class Object extends Entity {
     @Override
     public void checkCollision() {
 
+        // No collision detection for grabbed objects
+        if (isGrabbed()) return;
+
         collisionOn = false;
 
         gp.cChecker.checkTile(this);
@@ -206,15 +210,17 @@ public class Object extends Entity {
 
     @Override
     public void draw(Graphics2D g2) {
+
+        if (grabbedBy != null) {
+            worldPoint.setLocation(new Point(grabbedBy.getWorldPoint().x, grabbedBy.getWorldPoint().y - grabbedBy.getSprite().getHeight() + 12));
+        }
+
         super.draw(g2);
 
         g2.setColor(Color.RED);
         g2.drawRect(screenPoint.x + hitbox.x, screenPoint.y + hitbox.y, hitbox.width, hitbox.height);
     }
 
-    public void setGrabbed(boolean grabbed) {
-        this.grabbed = grabbed;
-    }
     public boolean getTossed() {
         return tossed;
     }
@@ -233,5 +239,10 @@ public class Object extends Entity {
     }
     protected int getParticleSize() {
         return 0;
+    }
+
+    @Override
+    public DrawLayer getDrawLayer() {
+        return isGrabbed() ? DrawLayer.ABOVE : DrawLayer.ENTITY;
     }
 }

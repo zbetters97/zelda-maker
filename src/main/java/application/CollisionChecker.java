@@ -107,10 +107,10 @@ public record CollisionChecker(GamePanel gp) {
         if (tile.isPit()) {
 
             // Entity in air
-            if (entity.getElevated()) return;
+            if (entity.getElevated() || entity.isKnockedBack()) return;
 
-            // NPCs and enemies
-            if (entity instanceof NPC || entity instanceof Enemy) {
+            // NPCs and Enemies, and Objects
+            if (entity instanceof NPC || entity instanceof Enemy || entity instanceof Object) {
                 entity.setCollision(true);
             }
         }
@@ -118,10 +118,10 @@ public record CollisionChecker(GamePanel gp) {
         else if (tile.isWater()) {
 
             // Entity in air or can swim
-            if (entity.getElevated() || entity.getCanSwim()) return;
+            if (entity.getElevated() || entity.isKnockedBack() || entity.getCanSwim()) return;
 
             // NPCs and enemies
-            if (entity instanceof NPC || entity instanceof Enemy) {
+            if (entity instanceof NPC || entity instanceof Enemy || entity instanceof Object) {
                 entity.setCollision(true);
             }
         }

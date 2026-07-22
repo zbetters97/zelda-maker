@@ -23,10 +23,6 @@ public class EntityAI {
 
     public void searchPath(Entity target) {
 
-        if (entity.getAction() == ATTACKING) {
-            return;
-        }
-
         int goalCol = getGoalCol(target);
         int goalRow = getGoalRow(target);
 

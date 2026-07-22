@@ -40,11 +40,9 @@ public class OBJ_Rock extends Object {
 
     @Override
     public void interact(Entity user) {
-
-        if (!gp.keyH.aPressed) return;
-
-        user.setAction(Action.GRABBING);
-        user.setGrabbedObject(this);
+        if (gp.keyH.aPressed) {
+            user.grab(this);
+        }
     }
 
     @Override

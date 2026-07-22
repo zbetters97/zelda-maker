@@ -141,8 +141,7 @@ public class OBJ_Cucco extends Object {
 
         // Can be picked up if not hostile
         if (gp.keyH.aPressed && action != Action.ATTACKING) {
-            user.setAction(Action.GRABBING);
-            user.setGrabbedObject(this);
+            user.grab(this);
         }
     }
 

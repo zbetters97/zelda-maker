@@ -21,15 +21,14 @@ public class ITM_Bomb extends Item {
     @Override
     public void use() {
 
-        if (0 < user.getBombs() && user.getGrabbedObject() == null) {
+        if (user.getBombs() <= 0) return;
 
-            Object bomb = new OBJ_Bomb(gp, -gp.tileSize, -gp.tileSize);
-            gp.objects.add(bomb);
+        Object bomb = new OBJ_Bomb(gp, -gp.tileSize, -gp.tileSize);
+        gp.objects.add(bomb);
 
-            user.addBombs(-1);
-            user.setGrabbedObject(bomb);
+        user.addBombs(-1);
+        user.grab(bomb);
 
-            super.use();
-        }
+        super.use();
     }
 }

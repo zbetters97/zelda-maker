@@ -80,6 +80,7 @@ public class Projectile extends Entity {
         gp.cChecker.checkMovementCollision(this, gp.objects);
         checkObjectCollision();
 
+        // Shot by player or player used spell to shoot
         if (user == gp.player || user.getCapturedBy() == gp.player) {
             checkEnemyCollision();
         }

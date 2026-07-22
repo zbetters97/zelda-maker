@@ -39,6 +39,11 @@ public class EMY_Blade extends Enemy {
 
     @Override
     public void update() {
+
+        if (isCaptured()) {
+            breakCapture();
+        }
+
         if (returning) {
             returnToStart();
         }

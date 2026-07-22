@@ -116,7 +116,7 @@ public class Entity {
     protected boolean needsWater = false;
     protected boolean shielded = false;
     protected String availableAction = "";
-    protected boolean grabbed = false;
+    protected Entity grabbedBy;
     protected Object grabbedObject;
     protected Entity capturedBy, capturedEntity;
 
@@ -642,7 +642,10 @@ public class Entity {
             return;
         }
 
-        dealDamage(attacker.getAttack(), attacker.getDirection(), attacker.getKnockbackPower());
+        // Target protected from damage
+        if (!shielded) {
+            dealDamage(attacker.getAttack(), attacker.getDirection(), attacker.getKnockbackPower());
+        }
     }
     public void dealDamage(int damage, Direction direction, int knockbackPower) {
 
@@ -1068,6 +1071,9 @@ public class Entity {
     public int getKnockbackPower() {
         return knockbackPower;
     }
+    public boolean isKnockedBack() {
+        return knockback;
+    }
 
     public void setInvincible(boolean invincible) {
         this.invincible = invincible;
@@ -1114,16 +1120,6 @@ public class Entity {
         return buzzing;
     }
 
-    public boolean getIsGrabbed() {
-        return grabbed;
-    }
-    public Object getGrabbedObject() {
-        return grabbedObject;
-    }
-    public void setGrabbedObject(Object grabbedObject) {
-        this.grabbedObject = grabbedObject;
-    }
-
     public Entity getUser() {
         return user;
     }
@@ -1131,15 +1127,47 @@ public class Entity {
         this.user = user;
     }
 
+    public void grab(Object target) {
+        grabbedObject = target;
+        action = GRABBING;
+    }
+    public void pickup(Object target) {
+
+        if (target == null) return;
+
+        grabbedObject = target;
+        grabbedObject.grabbedBy = this;
+        grabbedObject.setInteractable(false);
+
+        action = CARRYING;
+    }
+    public void releaseGrab() {
+        grabbedObject = null;
+        action = IDLE;
+    }
+    public void breakGrab() {
+
+        if (grabbedBy != null) {
+            grabbedBy.releaseGrab();
+            grabbedBy = null;
+        }
+
+        interactable = true;
+        action = IDLE;
+    }
+    public boolean isGrabbed() {
+        return grabbedBy != null;
+    }
+
     public void capture(Entity target) {
 
         // Release current target first
         if (capturedEntity != null) {
+            capturedEntity.setAction(IDLE);
             capturedEntity.capturedBy = null;
         }
 
         capturedEntity = target;
-
         if (target != null) {
             target.capturedBy = this;
         }
@@ -1148,10 +1176,11 @@ public class Entity {
         capture(null);
     }
     public void breakCapture() {
-
         if (capturedBy != null) {
             capturedBy.releaseCapture();
         }
+
+        action = IDLE;
     }
     public boolean isCaptured() {
         return capturedBy != null;
