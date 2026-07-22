@@ -57,10 +57,12 @@ public class UI {
     /** TILE EDITING */
     private final ArrayList<ArrayList<UIEntity>> tileLibrary = new ArrayList<>();
     private static final int[][] TILE_GROUPS = {
+            {4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 86, 87, 88, 89}, // Land 1
             {0, 1, 2, 3, 9, 38, 21}, // Hazard
-            {4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18}, // Land 1
-            {20, 19}, // House 1
-            {22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37}, // Dungeon 1
+            {90, 91, 92, 93, 94, 95, 96, 97}, // House 1
+            {20, 78, 19, 64, 65, 74, 75, 76, 77, 79, 80, }, // Inside 1
+            {66, 67, 68, 69, 70, 71, 72, 73, 85, 81, 82, 83, 84}, // Inside 2
+            {22, 23, 24, 37, 25, 36, 35, 26, 27, 28, 29, 30, 31, 32, 33, 34}, // Dungeon 1
             {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63} // Dungeon 2
     };
     public Point selectedTile;
@@ -665,10 +667,10 @@ public class UI {
         int listSpacingX = (int) (gp.tileSize * 1.50);
         int padding = 25;
 
-        int baseX = (int) (gp.tileSize * 4.5);
-        int baseY = gp.tileSize * 5;
         int width = (library.size() - 1) * listSpacingX + gp.tileSize + padding * 2;
         int height = gp.tileSize * 2;
+        int baseX = (gp.screenWidth - width) / 2;
+        int baseY = gp.tileSize * 5;
         g2.setColor(new Color(0, 0, 0, 235));
         g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
 

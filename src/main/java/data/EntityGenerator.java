@@ -24,6 +24,8 @@ public class EntityGenerator {
 
         // NPCs
         npcFactory.put(NPC_Farmer.npcName, () -> new NPC_Farmer(gp, 0, 0));
+        npcFactory.put(NPC_Girl.npcName, () -> new NPC_Girl(gp, 0, 0));
+        npcFactory.put(NPC_Kid.npcName, () -> new NPC_Kid(gp, 0, 0));
         npcFactory.put(NPC_Merchant.npcName, () -> new NPC_Merchant(gp, 0, 0));
         npcFactory.put(NPC_OldMan.npcName, () -> new NPC_OldMan(gp, 0, 0));
 
