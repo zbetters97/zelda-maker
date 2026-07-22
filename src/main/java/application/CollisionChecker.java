@@ -380,7 +380,7 @@ public record CollisionChecker(GamePanel gp) {
         Rectangle entityRect = entity.getWorldHitbox();
         Rectangle playerRect = gp.player.getWorldHitbox();
 
-        switch (entity.getDirection()) {
+        switch (entity.getMoveDirection()) {
             case UP -> entityRect.y -= entity.getSpeed();
             case DOWN -> entityRect.y += entity.getSpeed();
             case LEFT -> entityRect.x -= entity.getSpeed();

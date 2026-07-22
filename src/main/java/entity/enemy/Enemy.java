@@ -158,7 +158,8 @@ public class Enemy extends Entity {
                 case LEFT -> left1;
                 case RIGHT -> right1;
             };
-        } else if (spriteNum == 2) {
+        }
+        else if (spriteNum == 2) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> up2;
                 case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
@@ -181,7 +182,8 @@ public class Enemy extends Entity {
                 }
                 case RIGHT -> attackRight1;
             };
-        } else if (attackNum == 2) {
+        }
+        else if (attackNum == 2) {
             image = switch (direction) {
                 case UP, UPLEFT, UPRIGHT -> {
                     drawOffset.y -= up1.getHeight();

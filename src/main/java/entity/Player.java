@@ -596,7 +596,7 @@ public class Player extends Entity {
 
         for (Entity e : gp.enemies) {
 
-            if (e != null && e != lockedOnTarget && e.isAvailable()) {
+            if (e != null && e != lockedOnTarget && e.canBeTargeted()) {
 
                 int enemyDistance = ai.getTileDistance(e);
                 if (enemyDistance < currentDistance) {

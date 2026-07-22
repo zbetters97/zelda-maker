@@ -586,9 +586,9 @@ public class Entity {
     protected void handleKnockback() {
 
         collisionOn = false;
+        checkCollision();
 
         // Don't knockback if collision
-        checkCollision();
         if (collisionOn) {
             resetKnockback();
             return;

@@ -89,9 +89,9 @@ public class EMY_Beetle extends Enemy {
     public void deflect(Entity target) {
         shielded = false;
 
+        speed = 3;
         knockback = true;
         knockbackDirection = getOppositeDirection(direction);
-        speed++;
     }
 
     @Override
