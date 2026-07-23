@@ -11,6 +11,7 @@ import static entity.Entity.Action.THROWING;
 
 public class Object extends Entity {
 
+    protected boolean latchable;
     protected boolean tossed = false;
     private int tossCounter;
     private double tTime = 0;
@@ -216,6 +217,11 @@ public class Object extends Entity {
         }
 
         super.draw(g2);
+    }
+
+    /** GETTERS AND SETTERS */
+    public boolean isLatchable() {
+        return latchable;
     }
 
     public boolean getTossed() {

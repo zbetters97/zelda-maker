@@ -120,7 +120,7 @@ public class EMY_Zora extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return false;
     }
 

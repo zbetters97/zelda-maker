@@ -3,16 +3,14 @@ package entity.item;
 import application.GamePanel;
 import entity.Entity;
 
-import java.awt.*;
-
 public class Item extends Entity {
 
     public Item(GamePanel gp, String itmName, Action action) {
         super(gp, itmName);
         this.action = action;
     }
-    public Item(GamePanel gp, String itmName, Entity user, Action action) {
-        super(gp, itmName, user);
+    public Item(GamePanel gp, String itmName, Entity owner, Action action) {
+        super(gp, itmName, owner);
         this.action = action;
     }
 

@@ -9,9 +9,9 @@ public class ITM_Bomb extends Item {
 
     public static final String itmName = "Bomb";
 
-    public ITM_Bomb(GamePanel gp, Entity user) {
-        super(gp, itmName, user, Action.GRABBING);
-        setUser(user);
+    public ITM_Bomb(GamePanel gp, Entity owner) {
+        super(gp, itmName, owner, Action.GRABBING);
+        setUser(owner);
         formattedName = "a Bomb Bag";
         description = "Press X to grab a bomb.\nPress A to throw or pick one up.";
     }

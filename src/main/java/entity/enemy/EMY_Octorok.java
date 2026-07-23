@@ -125,7 +125,7 @@ public class EMY_Octorok extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return false;
     }
 

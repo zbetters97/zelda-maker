@@ -68,9 +68,7 @@ public class OBJ_Rock extends Object {
     }
 
     @Override
-    protected void setLoot() {
-
-        if (loot != null) return;
+    protected void assignLoot() {
 
         int rand = (int) (Math.random() * 10);
         loot = switch (rand) {
@@ -82,7 +80,7 @@ public class OBJ_Rock extends Object {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return loot instanceof Collectable;
     }
 

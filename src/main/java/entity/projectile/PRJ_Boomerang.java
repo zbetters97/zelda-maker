@@ -4,8 +4,6 @@ import application.GamePanel;
 import entity.Entity;
 import entity.enemy.Enemy;
 
-import java.awt.*;
-
 public class PRJ_Boomerang extends Projectile {
 
     public static final String prjName = "Boomerang Projectile";

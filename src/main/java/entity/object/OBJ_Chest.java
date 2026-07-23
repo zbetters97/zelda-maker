@@ -48,12 +48,13 @@ public class OBJ_Chest extends Object {
         if (facingDirection) {
             opened = true;
             availableAction = "";
-            user.receiveReward(loot);
+            user.receiveLoot(loot);
+            user.showReward(loot);
         }
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return true;
     }
 

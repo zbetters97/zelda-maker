@@ -100,7 +100,7 @@ public class Enemy extends Entity {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return true;
     }
 

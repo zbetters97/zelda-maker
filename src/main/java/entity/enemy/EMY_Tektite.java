@@ -66,7 +66,7 @@ public class EMY_Tektite extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return false;
     }
 

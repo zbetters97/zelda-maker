@@ -682,7 +682,7 @@ public class UI {
 
         resetDialogue();
 
-        gp.player.setNewItem(null);
+        gp.player.showReward(null);
         gp.GAME_STATE = gp.PLAY_STATE;
     }
 
@@ -1006,7 +1006,7 @@ public class UI {
     private boolean editing_GiveLoot(Entity target, Entity loot) {
 
         // Not valid
-        if (target == null || !target.canTakeLoot(loot) || loot == null || target == gp.player) return false;
+        if (target == null || !target.canHoldLoot(loot) || loot == null || target == gp.player) return false;
 
         if (loot instanceof Collectable || loot instanceof Item) {
             target.setLoot(loot);

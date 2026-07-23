@@ -77,6 +77,10 @@ public class Entity {
             startPoint = new Point(),
             drawOffset = new Point();
 
+    /** ANIMATION VALUES */
+    protected int actionLockCounter = 0;
+    protected int animationSpeed;
+
     /** COLLISION VALUES */
     protected boolean collisionOn = true;
     protected Rectangle hitbox = new Rectangle(0, 0, 48, 48);
@@ -86,14 +90,37 @@ public class Entity {
     protected boolean interactable = true;
 
     /** MOVEMENT VALUES */
-    protected EntityAI ai;
     protected Direction direction = DOWN;
     protected Action action = IDLE;
+    protected String availableAction = "";
     protected int defaultSpeed = 1, speed = defaultSpeed;
     protected boolean canMove = true;
-    protected boolean moving = false;
-    protected boolean onPath = false;
-    protected boolean pathCompleted = false;
+    protected boolean moving;
+    protected boolean onPath;
+    protected boolean pathCompleted;
+    protected EntityAI ai;
+
+    /** RPG VALUES */
+    protected String name, formattedName;
+    protected String description;
+    protected int maxHealth = 1, health = maxHealth;
+    protected int value;
+    protected boolean opened, elevated;
+    protected boolean canSwim, needsWater;
+    protected Entity grabbedBy;
+    protected Object grabbedObject;
+    protected Entity capturedBy, capturedEntity;
+
+    /** COMBAT VALUES */
+    protected boolean alive = true;
+    protected int defaultAttack, attack = defaultAttack;
+    protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
+    protected int attackNum = 1, attackCounter;
+    protected int swingSpeed1, swingSpeed2, swingSpeed3;
+    protected int knockbackPower;
+    protected GamePanel.Direction knockbackDirection;
+    protected boolean knockback, buzzing, shielded, stunned, invincible, dying;
+    protected int knockbackCounter, stunnedCounter, invincibleCounter, dyingCounter;
 
     /** Z-TARGETING */
     protected boolean lockedOn;
@@ -101,63 +128,24 @@ public class Entity {
     protected Direction lockonDirection;
     public final static int maxZTargetDistance = 7;
 
-    /** ANIMATION VALUES */
-    protected int actionLockCounter = 0;
-    protected int animationSpeed;
-
-    /** RPG VALUES */
-    protected String name, formattedName;
-    protected String description;
-    protected boolean alive = true;
-    protected int maxHealth = 1, health = 1;
-    protected int value = 0;
-    protected boolean opened = false;
-    protected boolean elevated = false;
-    protected boolean canSwim = false;
-    protected boolean needsWater = false;
-    protected boolean shielded = false;
-    protected String availableAction = "";
-    protected Entity grabbedBy;
-    protected Object grabbedObject;
-    protected Entity capturedBy, capturedEntity;
-
-    /** COMBAT VALUES */
-    protected int defaultAttack, attack;
-    protected Rectangle attackBox = new Rectangle(0, 0, 0, 0);
-    protected int attackNum = 1, attackCounter = 0;
-    protected int swingSpeed1, swingSpeed2, swingSpeed3;
-    protected int knockbackPower;
-    protected boolean knockback;
-    protected GamePanel.Direction knockbackDirection;
-    protected int knockbackCounter = 0;
-    protected boolean buzzing = false;
-    protected boolean invincible = false;
-    protected int invincibleCounter = 0;
-    protected boolean stunned = false;
-    protected int stunnedCounter = 0;
-    protected boolean dying = false;
-    private int dyingCounter = 0;
-
     /** INVENTORY VALUES */
     protected Entity loot;
     protected final ArrayList<Item> items = new ArrayList<>();
     protected Item item;
     protected Entity newItem;
-    protected int keys = 0;
-    protected boolean hasBossKey = false;
-    protected int maxRupees = 99, rupees = 0, maxArrows = 99, arrows = 0, maxBombs = 99, bombs = 0;
+    protected int maxRupees = 99, rupees, keys;
+    protected boolean hasBossKey;
+    protected int maxArrows = 30, arrows = maxArrows, maxBombs = 30, bombs = maxBombs;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
     protected Entity user;
-    public int charge = 0;
-    protected boolean latchable = false;
+    public int charge;
 
     /** SPRITE ATTRIBUTES */
     protected boolean drawing = true;
-    protected int spriteNum = 1, spriteCounter = 0;
-    protected BufferedImage
-            sprite, image,
+    protected int spriteNum = 1, spriteCounter;
+    protected BufferedImage sprite, image,
             up1, up2, up3, down1, down2, left1, left2, right1, right2,
             attackUp1, attackUp2, attackUp3, attackUp4, attackDown1, attackDown2, attackDown3, attackDown4,
             attackLeft1, attackLeft2, attackLeft3, attackLeft4, attackRight1, attackRight2, attackRight3, attackRight4;
@@ -228,6 +216,59 @@ public class Entity {
 
     protected void setAction() { }
 
+    public boolean canCollideWith(Entity target) {
+        return true;
+    }
+    public void forceMove(Direction forcedDirection) {
+
+        direction = fixDirection(forcedDirection);
+
+        collisionOn = false;
+        checkCollision();
+
+        if (collisionOn) {
+            moving = false;
+            return;
+        }
+
+        moving = true;
+        moveInDirection(direction);
+
+        cycleSprites();
+    }
+    private Direction fixDirection(Direction direction) {
+        return switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> UP;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> DOWN;
+            case LEFT -> LEFT;
+            case RIGHT -> RIGHT;
+        };
+    }
+
+    protected void setDirection(int rate) {
+
+        if (isCaptured()) return;
+
+        if (rate <= ++actionLockCounter) {
+
+            int dir = 1 + (int) (Math.random() * 4);
+            if (dir == 1) {
+                direction = UP;
+            }
+            else if (dir == 2) {
+                direction = DOWN;
+            }
+            else if (dir == 3) {
+                direction = LEFT;
+            }
+            else {
+                direction = RIGHT;
+            }
+
+            actionLockCounter = 0;
+        }
+    }
+
     protected void updateDirection() {
 
         if (isCaptured()) return;
@@ -235,18 +276,6 @@ public class Entity {
         checkCollision();
         move(direction);
         cycleSprites();
-    }
-
-    public Direction getMoveDirection() {
-        if (knockback) {
-            return knockbackDirection;
-        }
-        else if (lockedOn || action.locksFacing()) {
-            return lockonDirection;
-        }
-        else {
-            return direction;
-        }
     }
 
     public void checkCollision() {
@@ -266,9 +295,16 @@ public class Entity {
 
         gp.cChecker.checkHazard(this);
     }
-
-    public boolean canCollideWith(Entity target) {
-        return true;
+    public Direction getMoveDirection() {
+        if (knockback) {
+            return knockbackDirection;
+        }
+        else if (lockedOn || action.locksFacing()) {
+            return lockonDirection;
+        }
+        else {
+            return direction;
+        }
     }
 
     protected void move() {
@@ -284,35 +320,7 @@ public class Entity {
         moving = true;
         moveInDirection(direction);
     }
-
-    public void forceMove(Direction forcedDirection) {
-
-        collisionOn = false;
-        checkCollision();
-
-        if (collisionOn) {
-            moving = false;
-            return;
-        }
-
-        moving = true;
-        direction = fixDirection(forcedDirection);
-        moveInDirection(direction);
-
-        cycleSprites();
-    }
-
-    private Direction fixDirection(Direction direction) {
-        return switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> UP;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> DOWN;
-            case LEFT -> LEFT;
-            case RIGHT -> RIGHT;
-        };
-    }
-
     protected void moveInDirection(Direction movingDirection) {
-
         switch (movingDirection) {
             case UP -> worldPoint.y -= speed;
             case UPLEFT -> {
@@ -349,30 +357,6 @@ public class Entity {
             }
 
             spriteCounter = 0;
-        }
-    }
-
-    protected void setDirection(int rate) {
-
-        if (isCaptured()) return;
-
-        if (rate <= ++actionLockCounter) {
-
-            int dir = 1 + (int) (Math.random() * 4);
-            if (dir == 1) {
-                direction = UP;
-            }
-            else if (dir == 2) {
-                direction = DOWN;
-            }
-            else if (dir == 3) {
-                direction = LEFT;
-            }
-            else {
-                direction = RIGHT;
-            }
-
-            actionLockCounter = 0;
         }
     }
 
@@ -416,7 +400,6 @@ public class Entity {
     protected void attack() {
 
     }
-
     protected void attacking() {
 
         // Prevent glitch
@@ -539,7 +522,6 @@ public class Entity {
 
         speed += knockbackPower;
     }
-
     protected void handleKnockback() {
 
         collisionOn = false;
@@ -558,7 +540,6 @@ public class Entity {
            resetKnockback();
         }
     }
-
     private void resetKnockback() {
         knockback = false;
         knockbackCounter = 0;
@@ -617,7 +598,6 @@ public class Entity {
 
         setKnockback(direction, knockbackPower);
     }
-
     protected void reactToDamage() {
 
     }
@@ -625,7 +605,6 @@ public class Entity {
     protected boolean canBeDeflected(boolean usingShield) {
         return false;
     }
-
     protected void deflect(Entity target) {
         collisionOn = false;
         alive = true;
@@ -642,24 +621,22 @@ public class Entity {
     public boolean isAvailable() {
         return alive && !dying && action != FALLING && action != DROWNING;
     }
-
     public boolean isNotInteractable() {
         return !interactable;
     }
-
     public boolean unableToMove() {
         return !canMove || stunned;
     }
 
     protected void checkDeath() { }
 
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return false;
     }
-
+    protected void assignLoot() {}
     protected void dropLoot() {
 
-        setLoot();
+        if (loot == null) assignLoot();
 
         // Loot must be a collectable or an item
         boolean lootIsValid = loot != null && (loot instanceof Collectable) || (loot instanceof Item);
@@ -675,25 +652,30 @@ public class Entity {
             ((Collectable) loot).use(this);
         }
         else if (loot instanceof Item) {
-            setNewItem(loot);
+            showReward(loot);
             addItem((Item) loot);
         }
 
         loot.setAlive(false);
     }
+    public void addItem(Item item) {
 
-    public void receiveReward(Entity loot) {
+        item.setUser(this);
+        items.add(item);
 
-        if (loot instanceof Collectable) {
-            ((Collectable) loot).use(this);
-        }
-        else if (loot instanceof Item) {
-            setNewItem(loot);
-            addItem((Item) loot);
+        if (this.item == null) {
+            this.item = item;
         }
 
-        setNewItem(loot);
-        loot.setAlive(false);
+        item.setAlive(false);
+    }
+    public void showReward(Entity newItem) {
+        this.newItem = newItem;
+
+        if (newItem == null) return;
+
+        gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());
+        gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 
     protected void handleCapture() {
@@ -734,7 +716,6 @@ public class Entity {
         opened = false;
         elevated = false;
     }
-
     public void resetCounters() {
         spriteNum = 1; spriteCounter = 0;
         attackNum = 1; attackCounter = 0;
@@ -758,38 +739,6 @@ public class Entity {
         // Draw held loot
         drawLoot(g2);
     }
-
-    protected void getSpriteImage() {
-
-        if (spriteNum == 1) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up1;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
-                case LEFT -> left1;
-                case RIGHT -> right1;
-            };
-        }
-        else if (spriteNum == 2) {
-            image = switch (direction) {
-                case UP, UPLEFT, UPRIGHT -> up2;
-                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
-                case LEFT -> left2;
-                case RIGHT -> right2;
-            };
-        }
-    }
-
-    protected void drawLoot(Graphics2D g2) {
-
-        if (gp.GAME_STATE != gp.EDIT_STATE || loot == null) return;
-
-        g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
-    }
-
-    protected void changeAlpha(Graphics2D g2, float alphaValue) {
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
-    }
-
     protected void playHurtAnimation(Graphics2D g2) {
 
         if (++invincibleCounter % 5 == 0) {
@@ -815,27 +764,42 @@ public class Entity {
             dropLoot();
         }
     }
+    protected void getSpriteImage() {
 
-    public BufferedImage getSprite() {
-        return sprite;
+        if (spriteNum == 1) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down1;
+                case LEFT -> left1;
+                case RIGHT -> right1;
+            };
+        }
+        else if (spriteNum == 2) {
+            image = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> up2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> down2;
+                case LEFT -> left2;
+                case RIGHT -> right2;
+            };
+        }
+    }
+    protected void changeAlpha(Graphics2D g2, float alphaValue) {
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
+    }
+    protected void drawLoot(Graphics2D g2) {
+
+        if (gp.GAME_STATE != gp.EDIT_STATE || loot == null) return;
+
+        g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
     }
 
     /** GETTERS AND SETTERS */
-    public void setDrawing(boolean drawing) {
-        this.drawing = drawing;
-    }
-
-    public DrawLayer getDrawLayer() {
-        return DrawLayer.ENTITY;
-    }
-
     public Point getScreenPoint() {
         return new Point(
                 worldPoint.x - gp.player.worldPoint.x + gp.player.screenPoint.x,
                 worldPoint.y - gp.player.worldPoint.y + gp.player.screenPoint.y
         );
     }
-
     public Point getWorldPoint() {
         return worldPoint;
     }
@@ -851,14 +815,12 @@ public class Entity {
     public void setWorldPointY(int y) {
         this.worldPoint.y = y;
     }
-
     public int getCol() {
         return getCenterX() / gp.tileSize;
     }
     public int getRow() {
         return getCenterY() / gp.tileSize;
     }
-
     public int getCenterX() {
         return worldPoint.x + sprite.getWidth() / 2;
     }
@@ -866,6 +828,12 @@ public class Entity {
         return worldPoint.y + sprite.getHeight() / 2;
     }
 
+    public boolean getCollision() {
+        return collisionOn;
+    }
+    public void setCollision(boolean collisionOn) {
+        this.collisionOn = collisionOn;
+    }
     public Rectangle getHitbox() {
         return hitbox;
     }
@@ -876,24 +844,8 @@ public class Entity {
                 hitbox.width,
                 hitbox.height);
     }
-
     public void setInteractable(boolean interactable) {
         this.interactable = interactable;
-    }
-
-    public EntityAI getAI() {
-        return ai;
-    }
-
-    public boolean getAlive() {
-        return alive;
-    }
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-    }
-
-    public boolean getDying() {
-        return dying;
     }
 
     public Direction getDirection() {
@@ -902,23 +854,32 @@ public class Entity {
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
-
-    public void setOnPath(boolean onPath) {
-        this.onPath = onPath;
-    }
-
-    public boolean getCollision() {
-        return collisionOn;
-    }
-    public void setCollision(boolean collisionOn) {
-        this.collisionOn = collisionOn;
-    }
-
     public Action getAction() {
         return action;
     }
     public void setAction(Action action) {
         this.action = action;
+    }
+    public int getSpeed() {
+        return speed;
+    }
+    public String getAvailableAction(Entity user) {
+        return availableAction;
+    }
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+    public void modifySpeed(int change) {
+        speed += change;
+    }
+    public void setCanMove(boolean canMove) {
+        this.canMove = canMove;
+    }
+    public void setOnPath(boolean onPath) {
+        this.onPath = onPath;
+    }
+    public EntityAI getAI() {
+        return ai;
     }
 
     public String getName() {
@@ -927,11 +888,9 @@ public class Entity {
     public String getFormattedName() {
         return formattedName;
     }
-
     public String getDescription() {
         return description;
     }
-
     public int getMaxHealth() {
         return maxHealth;
     }
@@ -951,165 +910,12 @@ public class Entity {
             health = maxHealth;
         }
     }
-
-    public Entity getLoot() {
-        return loot;
-    }
-    public void setLoot(Entity loot) {
-        this.loot = loot;
-    }
-    protected void setLoot() {}
-
-    public Entity getItem() {
-        return item;
-    }
-    public void setItem(Item item) {
-        this.item = item;
-    }
-    public ArrayList<Item> getItems() {
-        return items;
-    }
-    public void addItem(Item item) {
-
-        item.setUser(this);
-        items.add(item);
-
-        if (this.item == null) {
-            this.item = item;
-        }
-
-        item.setAlive(false);
-    }
-
-    public void setNewItem(Entity newItem) {
-        this.newItem = newItem;
-
-        if (newItem == null) return;
-
-        gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());
-        gp.GAME_STATE = gp.DIALOGUE_STATE;
-    }
-
-    public int getMaxRupees() {
-        return maxRupees;
-    }
-    public void setMaxRupees(int maxRupees) {
-        this.maxRupees = maxRupees;
-    }
-    public int getRupees() {
-        return rupees;
-    }
-    public void setRupees(int rupees) {
-        this.rupees = rupees;
-    }
-    public void addRupees(int amount) {
-        this.rupees += amount;
-    }
-
-    public int getKeys() {
-        return keys;
-    }
-    public void setKeys(int keys) {
-        this.keys = keys;
-    }
-    public void addKeys(int amount) {
-        this.keys += amount;
-    }
-
-    public boolean getHasBossKey() {
-        return hasBossKey;
-    }
-    public void setHasBossKey(boolean hasBossKey) {
-        this.hasBossKey = hasBossKey;
-    }
-
-    public int getMaxArrows() {
-        return maxArrows;
-    }
-    public void setMaxArrows(int maxArrows) {
-        this.maxArrows = maxArrows;
-    }
-    public int getArrows() {
-        return arrows;
-    }
-    public void setArrows(int arrows) {
-        this.arrows = arrows;
-    }
-    public void addArrows(int arrows) {
-
-        this.arrows += arrows;
-
-        if (this.arrows > maxArrows) {
-            this.arrows = maxArrows;
-        }
-    }
-
-    public int getMaxBombs() {
-        return maxBombs;
-    }
-    public void setMaxBombs(int maxBombs) {
-        this.maxBombs = maxBombs;
-    }
-    public int getBombs() {
-        return bombs;
-    }
-    public void setBombs(int bombs) {
-        this.bombs= bombs;
-    }
-    public void addBombs(int bombs) {
-
-        this.bombs += bombs;
-        if (this.bombs > maxBombs) {
-            this.bombs = bombs;
-        }
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-    public void modifySpeed(int change) {
-        speed += change;
-    }
-
-    public int getAttack() {
-        return attack;
-    }
-    public void setAttack(int attack) {
-        this.attack = attack;
-    }
-    public void modifyAttack(int change) {
-        attack += change;
-    }
-
-    public int getKnockbackPower() {
-        return knockbackPower;
-    }
-    public boolean isKnockedBack() {
-        return knockback;
-    }
-
-    public void setInvincible(boolean invincible) {
-        this.invincible = invincible;
-    }
-    public void setStunned(boolean stunned) {
-        this.stunned = stunned;
-        action = IDLE;
-        resetCounters();
-    }
-    public void setCanMove(boolean canMove) {
-        this.canMove = canMove;
-    }
-
     public boolean getOpened() {
         return opened;
     }
     public void setOpened(boolean opened) {
         this.opened = opened;
     }
-
     public boolean getElevated() {
         return elevated;
     }
@@ -1119,29 +925,12 @@ public class Entity {
     public boolean isOnSameElevation(Entity target) {
         return target.getElevated() == elevated;
     }
-
-    public boolean isLatchable() {
-        return latchable;
-    }
-
     public boolean getCanSwim() {
         return canSwim;
     }
     public boolean getNeedsWater() {
         return needsWater;
     }
-
-    public boolean getBuzzing() {
-        return buzzing;
-    }
-
-    public Entity getUser() {
-        return user;
-    }
-    public void setUser(Entity user) {
-        this.user = user;
-    }
-
     public void grab(Object target) {
         grabbedObject = target;
         action = GRABBING;
@@ -1173,7 +962,6 @@ public class Entity {
     public boolean isGrabbed() {
         return grabbedBy != null;
     }
-
     public void capture(Entity target) {
 
         // Release current target first
@@ -1206,7 +994,142 @@ public class Entity {
         return capturedBy;
     }
 
-    public String getAvailableAction(Entity user) {
-        return availableAction;
+    public boolean getAlive() {
+        return alive;
+    }
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+    public int getAttack() {
+        return attack;
+    }
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+    public void modifyAttack(int change) {
+        attack += change;
+    }
+    public int getKnockbackPower() {
+        return knockbackPower;
+    }
+    public boolean isKnockedBack() {
+        return knockback;
+    }
+    public boolean getBuzzing() {
+        return buzzing;
+    }
+    public void setStunned(boolean stunned) {
+        this.stunned = stunned;
+        action = IDLE;
+        resetCounters();
+    }
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
+    }
+    public boolean getDying() {
+        return dying;
+    }
+
+    public Entity getLoot() {
+        return loot;
+    }
+    public void setLoot(Entity loot) {
+        this.loot = loot;
+    }
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+    public Entity getItem() {
+        return item;
+    }
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public int getMaxRupees() {
+        return maxRupees;
+    }
+    public void setMaxRupees(int maxRupees) {
+        this.maxRupees = maxRupees;
+    }
+    public int getRupees() {
+        return rupees;
+    }
+    public void setRupees(int rupees) {
+        this.rupees = rupees;
+    }
+    public void addRupees(int amount) {
+        this.rupees += amount;
+    }
+    public int getKeys() {
+        return keys;
+    }
+    public void setKeys(int keys) {
+        this.keys = keys;
+    }
+    public void addKeys(int amount) {
+        this.keys += amount;
+    }
+    public boolean getHasBossKey() {
+        return hasBossKey;
+    }
+    public void setHasBossKey(boolean hasBossKey) {
+        this.hasBossKey = hasBossKey;
+    }
+    public int getMaxArrows() {
+        return maxArrows;
+    }
+    public void setMaxArrows(int maxArrows) {
+        this.maxArrows = maxArrows;
+    }
+    public int getArrows() {
+        return arrows;
+    }
+    public void setArrows(int arrows) {
+        this.arrows = arrows;
+    }
+    public void addArrows(int arrows) {
+
+        this.arrows += arrows;
+
+        if (this.arrows > maxArrows) {
+            this.arrows = maxArrows;
+        }
+    }
+    public int getMaxBombs() {
+        return maxBombs;
+    }
+    public void setMaxBombs(int maxBombs) {
+        this.maxBombs = maxBombs;
+    }
+    public int getBombs() {
+        return bombs;
+    }
+    public void setBombs(int bombs) {
+        this.bombs= bombs;
+    }
+    public void addBombs(int bombs) {
+
+        this.bombs += bombs;
+        if (this.bombs > maxBombs) {
+            this.bombs = bombs;
+        }
+    }
+
+    public Entity getUser() {
+        return user;
+    }
+    public void setUser(Entity owner) {
+        this.user = owner;
+    }
+
+    public void setDrawing(boolean drawing) {
+        this.drawing = drawing;
+    }
+    public BufferedImage getSprite() {
+        return sprite;
+    }
+    public DrawLayer getDrawLayer() {
+        return DrawLayer.ENTITY;
     }
 }

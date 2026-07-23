@@ -109,7 +109,7 @@ public class EMY_Beamos extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot(Entity loot) {
+    public boolean canHoldLoot(Entity loot) {
         return false;
     }
 
