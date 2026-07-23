@@ -214,6 +214,10 @@ public class Entity {
         manageValues();
     }
 
+    protected void handleCapture() {
+
+    }
+
     protected void setAction() { }
 
     public boolean canCollideWith(Entity target) {
@@ -306,6 +310,14 @@ public class Entity {
             return direction;
         }
     }
+    public Direction getOppositeDirection(Direction direction) {
+        return switch (direction) {
+            case UP, UPLEFT, UPRIGHT -> DOWN;
+            case DOWN, DOWNLEFT, DOWNRIGHT -> UP;
+            case LEFT -> RIGHT;
+            case RIGHT -> LEFT;
+        };
+    }
 
     protected void move() {
 
@@ -319,6 +331,9 @@ public class Entity {
 
         moving = true;
         moveInDirection(direction);
+    }
+    public boolean unableToMove() {
+        return !canMove || stunned;
     }
     protected void moveInDirection(Direction movingDirection) {
         switch (movingDirection) {
@@ -369,15 +384,6 @@ public class Entity {
         };
     }
 
-    public Direction getOppositeDirection(Direction direction) {
-        return switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> DOWN;
-            case DOWN, DOWNLEFT, DOWNRIGHT -> UP;
-            case LEFT -> RIGHT;
-            case RIGHT -> LEFT;
-        };
-    }
-
     protected void useProjectile(Projectile projectile) {
 
         if (projectile.getAlive()) return;
@@ -395,6 +401,16 @@ public class Entity {
             // Force 30 frame delay in between shots
             actionLockCounter = 30;
         }
+    }
+
+    public boolean canBeTargeted() {
+        return isAvailable() && !isCaptured();
+    }
+    public boolean isAvailable() {
+        return alive && !dying && action != FALLING && action != DROWNING;
+    }
+    public boolean isCaptured() {
+        return capturedBy != null;
     }
 
     protected void attack() {
@@ -465,7 +481,7 @@ public class Entity {
 
     protected void detectPlayerSwordCollision() {
 
-        damageEnemies(this);
+        attackEnemies(this);
 
         Projectile projectile = gp.cChecker.checkOverlapCollision(this, gp.projectiles);
         if (projectile != null && projectile.canBeDeflected(false)) {
@@ -473,9 +489,11 @@ public class Entity {
         }
 
         Object object = gp.cChecker.checkOverlapCollision(this, gp.objects);
-        if (object != null) object.interact();
+        if (object != null) {
+            object.interact();
+        }
     }
-    private void damageEnemies(Entity attacker) {
+    private void attackEnemies(Entity attacker) {
 
         // Find enemy that intersects collision box
         for (Enemy enemy : gp.enemies) {
@@ -490,60 +508,10 @@ public class Entity {
 
         if (gp.player.getCapturedEntity() == this) {
             detectPlayerSwordCollision();
-            return;
         }
-
-        if (gp.cChecker.checkPlayer(this)) {
+        else if (gp.cChecker.checkPlayer(this)) {
             gp.player.takeDamage(this);
         }
-    }
-
-    public void shiftToCenter() {
-        Point center = getCenterPoint();
-
-        worldPoint.setLocation(
-                (center.x / gp.tileSize) * gp.tileSize,
-                (center.y / gp.tileSize) * gp.tileSize
-        );
-    }
-    public Point getCenterPoint() {
-        return new Point(
-                worldPoint.x + hitbox.x + hitbox.width / 2,
-                worldPoint.y + hitbox.y + hitbox.height / 2
-        );
-    }
-
-    protected void setKnockback(Direction direction, int knockbackPower) {
-
-        knockback = true;
-
-        // Direction attacker was facing when hit
-        knockbackDirection = direction;
-
-        speed += knockbackPower;
-    }
-    protected void handleKnockback() {
-
-        collisionOn = false;
-        checkCollision();
-
-        // Don't knockback if collision
-        if (collisionOn) {
-            resetKnockback();
-            return;
-        }
-
-        moveInDirection(knockbackDirection);
-
-        // Run for 10 frames
-        if (10 <= ++knockbackCounter) {
-           resetKnockback();
-        }
-    }
-    private void resetKnockback() {
-        knockback = false;
-        knockbackCounter = 0;
-        speed = defaultSpeed;
     }
 
     public void takeDamage(Entity attacker) {
@@ -585,6 +553,9 @@ public class Entity {
             dealDamage(attacker.getAttack(), attacker.getDirection(), attacker.getKnockbackPower());
         }
     }
+    public boolean isNotInteractable() {
+        return !interactable;
+    }
     public void dealDamage(int damage, Direction direction, int knockbackPower) {
 
         health -= damage;
@@ -614,18 +585,37 @@ public class Entity {
         speed = defaultSpeed;
     }
 
-    public boolean canBeTargeted() {
-        return isAvailable() && !isCaptured();
-    }
+    protected void setKnockback(Direction direction, int knockbackPower) {
 
-    public boolean isAvailable() {
-        return alive && !dying && action != FALLING && action != DROWNING;
+        knockback = true;
+
+        // Direction attacker was facing when hit
+        knockbackDirection = direction;
+
+        speed += knockbackPower;
     }
-    public boolean isNotInteractable() {
-        return !interactable;
+    protected void handleKnockback() {
+
+        collisionOn = false;
+        checkCollision();
+
+        // Don't knockback if collision
+        if (collisionOn) {
+            resetKnockback();
+            return;
+        }
+
+        moveInDirection(knockbackDirection);
+
+        // Run for 10 frames
+        if (10 <= ++knockbackCounter) {
+            resetKnockback();
+        }
     }
-    public boolean unableToMove() {
-        return !canMove || stunned;
+    private void resetKnockback() {
+        knockback = false;
+        knockbackCounter = 0;
+        speed = defaultSpeed;
     }
 
     protected void checkDeath() { }
@@ -676,10 +666,6 @@ public class Entity {
 
         gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());
         gp.GAME_STATE = gp.DIALOGUE_STATE;
-    }
-
-    protected void handleCapture() {
-
     }
 
     protected void manageValues() {
@@ -791,6 +777,21 @@ public class Entity {
         if (gp.GAME_STATE != gp.EDIT_STATE || loot == null) return;
 
         g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
+    }
+
+    public void shiftToCenter() {
+        Point center = getCenterPoint();
+
+        worldPoint.setLocation(
+                (center.x / gp.tileSize) * gp.tileSize,
+                (center.y / gp.tileSize) * gp.tileSize
+        );
+    }
+    public Point getCenterPoint() {
+        return new Point(
+                worldPoint.x + hitbox.x + hitbox.width / 2,
+                worldPoint.y + hitbox.y + hitbox.height / 2
+        );
     }
 
     /** GETTERS AND SETTERS */
@@ -983,9 +984,6 @@ public class Entity {
             capturedBy.releaseCapture();
             action = IDLE;
         }
-    }
-    public boolean isCaptured() {
-        return capturedBy != null;
     }
     public Entity getCapturedEntity() {
         return capturedEntity;
