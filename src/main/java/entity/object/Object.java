@@ -216,9 +216,6 @@ public class Object extends Entity {
         }
 
         super.draw(g2);
-
-        g2.setColor(Color.RED);
-        g2.drawRect(screenPoint.x + hitbox.x, screenPoint.y + hitbox.y, hitbox.width, hitbox.height);
     }
 
     public boolean getTossed() {

@@ -1,6 +1,7 @@
 package entity.enemy;
 
 import application.GamePanel;
+import entity.Entity;
 
 import java.awt.*;
 
@@ -65,7 +66,7 @@ public class EMY_Tektite extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return false;
     }
 

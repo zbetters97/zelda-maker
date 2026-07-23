@@ -402,8 +402,11 @@ public class UI {
 
         return rupeeCount;
     }
-    public void setRupeeChange(int rupees) {
+    public void addRupees(int rupees) {
         rupeeChange += rupees;
+    }
+    public void setRupeeChange(int rupees) {
+        rupeeChange = rupees;
     }
 
     /**
@@ -897,7 +900,7 @@ public class UI {
     private boolean editing_GiveLoot(Entity target, Entity loot) {
 
         // Not valid
-        if (target == null || !target.canTakeLoot() || loot == null || target == gp.player) return false;
+        if (target == null || !target.canTakeLoot(loot) || loot == null || target == gp.player) return false;
 
         if (loot instanceof Collectable || loot instanceof Item) {
             target.setLoot(loot);

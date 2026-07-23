@@ -93,7 +93,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final ArrayList<NPC> npcs = new ArrayList<>();
     public final ArrayList<Enemy> enemies = new ArrayList<>();
     public final ArrayList<Object> objects = new ArrayList<>();
-    public final ArrayList<Collectable> collectables = new ArrayList<>();
+    public final ArrayList<Entity> collectables = new ArrayList<>();
     public final ArrayList<Projectile> projectiles = new ArrayList<>();
     public final ArrayList<Particle> particles = new ArrayList<>();
 

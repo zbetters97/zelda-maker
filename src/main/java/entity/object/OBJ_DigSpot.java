@@ -53,7 +53,7 @@ public class OBJ_DigSpot extends Object {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return true;
     }
 

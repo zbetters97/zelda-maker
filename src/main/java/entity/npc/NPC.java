@@ -28,4 +28,9 @@ public class NPC extends Entity {
         gp.keyH.aPressed = false;
         direction = getOppositeDirection(user.getDirection());
     }
+
+    @Override
+    public boolean canTakeLoot(Entity loot) {
+        return true;
+    }
 }

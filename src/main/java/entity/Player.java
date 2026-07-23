@@ -3,7 +3,6 @@ package entity;
 import ai.EntityAI;
 import application.GamePanel;
 import application.GamePanel.Direction;
-import entity.collectable.Collectable;
 import entity.enemy.Enemy;
 import entity.item.*;
 import entity.npc.NPC;
@@ -15,7 +14,6 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -29,7 +27,6 @@ public class Player extends Entity {
 
     /** INVENTORY VALUES */
     private int currentItemSlot = 0;
-    protected int maxRupees = 99;
 
     /** ICE VALUES */
     private int slideCounter = 0;
@@ -335,23 +332,6 @@ public class Player extends Entity {
         defaultAttack = 2;
         attack = defaultAttack;
         knockbackPower = 1;
-
-        arrows = 50;
-        bombs = 50;
-
-        items.addAll(Arrays.asList(
-                new ITM_Shovel(gp, this),
-                new ITM_Boomerang(gp, this),
-                new ITM_Boots(gp, this),
-                new ITM_Feather(gp, this),
-                new ITM_Bomb(gp, this),
-                new ITM_Bow(gp, this),
-                new ITM_Hookshot(gp, this),
-                new ITM_Cape(gp, this),
-                new ITM_Rod(gp, this)
-        ));
-
-        item = items.getFirst();
     }
 
     /**
@@ -708,6 +688,8 @@ public class Player extends Entity {
 
     private void switchItem() {
 
+        if (items.isEmpty()) return;
+
         currentItemSlot++;
         if (items.size() <= currentItemSlot) {
             currentItemSlot = 0;
@@ -914,8 +896,8 @@ public class Player extends Entity {
     }
     private void checkInteractiveCollision() {
 
-        Collectable collectable = gp.cChecker.checkOverlapCollision(this, gp.collectables);
-        if (collectable != null) collectable.use(this);
+        Entity loot = gp.cChecker.checkOverlapCollision(this, gp.collectables);
+        if (loot != null) receiveLoot(loot);
 
         Projectile projectile = gp.cChecker.checkOverlapCollision(this, gp.projectiles);
         if (projectile != null && projectile.getCanPickup()){
@@ -1442,6 +1424,8 @@ public class Player extends Entity {
     @Override
     public void resetValues() {
         super.resetValues();
+        items.clear();
+        item = null;
         resetHandlers();
     }
 
@@ -1926,7 +1910,10 @@ public class Player extends Entity {
         return lockedOnTarget;
     }
 
-    public int getMaxRupees() {
-        return maxRupees;
+    public int getCurrentItemSlot() {
+        return currentItemSlot;
+    }
+    public void setCurrentItemSlot(int currentItemSlot) {
+        this.currentItemSlot = currentItemSlot;
     }
 }

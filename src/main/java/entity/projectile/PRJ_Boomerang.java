@@ -2,7 +2,6 @@ package entity.projectile;
 
 import application.GamePanel;
 import entity.Entity;
-import entity.collectable.Collectable;
 import entity.enemy.Enemy;
 
 import java.awt.*;
@@ -12,7 +11,7 @@ public class PRJ_Boomerang extends Projectile {
     public static final String prjName = "Boomerang Projectile";
 
     private boolean returning = false;
-    private Collectable grabbedEntity;
+    private Entity grabbedEntity;
 
     public PRJ_Boomerang(GamePanel gp) {
         super(gp, prjName);
@@ -57,8 +56,8 @@ public class PRJ_Boomerang extends Projectile {
     public void checkCollision() {
         super.checkCollision();
 
-        Collectable collectable = gp.cChecker.checkOverlapCollision(this, gp.collectables);
-        if (collectable != null) grabbedEntity = collectable;
+        Entity loot = gp.cChecker.checkOverlapCollision(this, gp.collectables);
+        if (loot != null) grabbedEntity = loot;
     }
 
     @Override

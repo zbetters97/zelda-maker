@@ -54,7 +54,7 @@ public class OBJ_Chest extends Object {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return true;
     }
 

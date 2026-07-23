@@ -3,6 +3,7 @@ package data;
 import application.GamePanel;
 import entity.Entity;
 import entity.enemy.Enemy;
+import entity.item.Item;
 import entity.npc.NPC;
 import entity.object.Object;
 
@@ -36,7 +37,27 @@ public class SaveLoad {
             ds.pWorldX = gp.player.getWorldPoint().x;
             ds.pWorldY = gp.player.getWorldPoint().y;
             ds.direction = gp.player.getDirection().toString();
+            ds.maxHealth = gp.player.getHealth();
             ds.health = gp.player.getHealth();
+            ds.maxRupees = gp.player.getMaxRupees();
+            ds.rupees = gp.player.getRupees();
+            ds.maxArrows = gp.player.getMaxArrows();
+            ds.arrows = gp.player.getArrows();
+            ds.maxBombs = gp.player.getMaxBombs();
+            ds.bombs = gp.player.getBombs();
+            ds.keys = gp.player.getKeys();
+            ds.hasBossKey = gp.player.getHasBossKey();
+
+            ds.currentItemSlot = gp.player.getCurrentItemSlot();
+            ds.items = new String[gp.player.getItems().size()];
+            for (int i = 0; i < gp.player.getItems().size(); i++) {
+
+                Item item = gp.player.getItems().get(i);
+
+                if (item != null) {
+                    ds.items[i] = item.getName();
+                }
+            }
 
             // NPCs
             ds.npcNames = new String[gp.npcs.size()];
@@ -134,7 +155,33 @@ public class SaveLoad {
             // PLAYER DATA
             gp.player.setWorldPoint(new Point(ds.pWorldX, ds.pWorldY));
             gp.player.setDirection(GamePanel.Direction.valueOf(ds.direction));
+            gp.player.setMaxHealth(ds.maxHealth);
             gp.player.setHealth(ds.health);
+            gp.player.setMaxRupees(ds.maxRupees);
+            gp.player.setRupees(ds.rupees);
+            gp.ui.setRupeeChange(ds.rupees);
+            gp.player.setMaxArrows(ds.maxArrows);
+            gp.player.setArrows(ds.arrows);
+            gp.player.setMaxBombs(ds.maxBombs);
+            gp.player.setBombs(ds.bombs);
+            gp.player.setKeys(ds.keys);
+            gp.player.setHasBossKey(ds.hasBossKey);
+
+            gp.player.setCurrentItemSlot(ds.currentItemSlot);
+
+            for (int i = 0; i < ds.items.length; i++) {
+
+                String itemName = ds.items[i];
+                if (itemName == null) continue;
+
+                Entity item = gp.eGenerator.getEntity(itemName);
+                if (!(item instanceof Item)) continue;
+
+                gp.player.addItem((Item) item);
+                if (i == ds.currentItemSlot) {
+                    gp.player.setItem((Item) item);
+                }
+            }
 
             // TILES
             int c = 0;

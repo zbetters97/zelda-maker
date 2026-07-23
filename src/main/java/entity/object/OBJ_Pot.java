@@ -100,8 +100,8 @@ public class OBJ_Pot extends Object {
     }
 
     @Override
-    public boolean canTakeLoot() {
-        return true;
+    public boolean canTakeLoot(Entity loot) {
+        return loot instanceof Collectable;
     }
 
     @Override

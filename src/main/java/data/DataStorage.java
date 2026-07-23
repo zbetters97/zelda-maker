@@ -14,7 +14,10 @@ public class DataStorage implements Serializable {
     // PLAYER DATA
     int pWorldX, pWorldY;
     String direction;
-    int health;
+    int maxHealth, health, maxRupees, rupees, maxArrows, arrows, maxBombs, bombs, keys;
+    boolean hasBossKey;
+    String[] items;
+    int currentItemSlot;
 
     // NPCs
     String[] npcNames, npcDirections;

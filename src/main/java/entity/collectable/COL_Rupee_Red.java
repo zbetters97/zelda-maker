@@ -21,7 +21,7 @@ public class COL_Rupee_Red extends Collectable {
 
     @Override
     public void use(Entity user) {
-        gp.ui.setRupeeChange(value);
+        gp.ui.addRupees(value);
         alive = false;
     }
 }

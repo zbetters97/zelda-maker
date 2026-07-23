@@ -100,7 +100,7 @@ public class Enemy extends Entity {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return true;
     }
 
@@ -131,9 +131,6 @@ public class Enemy extends Entity {
         // Draw sprite
         gp.camera.worldToScreen(worldPoint, screenPoint);
         g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
-
-        g2.setColor(Color.RED);
-        g2.drawRect(screenPoint.x + hitbox.x, screenPoint.y + hitbox.y, hitbox.width, hitbox.height);
 
         // Reset opacity
         changeAlpha(g2, 1f);

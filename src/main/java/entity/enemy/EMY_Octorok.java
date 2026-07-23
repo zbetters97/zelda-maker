@@ -1,6 +1,7 @@
 package entity.enemy;
 
 import application.GamePanel;
+import entity.Entity;
 import entity.projectile.PRJ_Seed;
 
 import java.awt.*;
@@ -124,7 +125,7 @@ public class EMY_Octorok extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return false;
     }
 

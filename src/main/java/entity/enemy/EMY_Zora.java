@@ -1,6 +1,7 @@
 package entity.enemy;
 
 import application.GamePanel;
+import entity.Entity;
 import entity.projectile.PRJ_Fireball;
 
 import java.awt.*;
@@ -119,7 +120,7 @@ public class EMY_Zora extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return false;
     }
 

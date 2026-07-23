@@ -1,6 +1,7 @@
 package entity.enemy;
 
 import application.GamePanel;
+import entity.Entity;
 import entity.projectile.PRJ_Beam;
 
 import static application.GamePanel.Direction.*;
@@ -108,7 +109,7 @@ public class EMY_Beamos extends Enemy {
     }
 
     @Override
-    public boolean canTakeLoot() {
+    public boolean canTakeLoot(Entity loot) {
         return false;
     }
 

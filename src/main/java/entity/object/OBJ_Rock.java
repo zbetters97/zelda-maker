@@ -2,10 +2,7 @@ package entity.object;
 
 import application.GamePanel;
 import entity.Entity;
-import entity.collectable.COL_Heart;
-import entity.collectable.COL_Rupee_Blue;
-import entity.collectable.COL_Rupee_Green;
-import entity.collectable.COL_Rupee_Red;
+import entity.collectable.*;
 import entity.enemy.Enemy;
 
 import java.awt.*;
@@ -85,8 +82,8 @@ public class OBJ_Rock extends Object {
     }
 
     @Override
-    public boolean canTakeLoot() {
-        return true;
+    public boolean canTakeLoot(Entity loot) {
+        return loot instanceof Collectable;
     }
 
     @Override

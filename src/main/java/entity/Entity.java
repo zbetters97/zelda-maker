@@ -143,7 +143,7 @@ public class Entity {
     protected Item item;
     protected int keys = 0;
     protected boolean hasBossKey = false;
-    protected int rupees = 0, maxArrows = 99, arrows = 0, maxBombs = 99, bombs = 0;
+    protected int maxRupees = 99, rupees = 0, maxArrows = 99, arrows = 0, maxBombs = 99, bombs = 0;
 
     /** PROJECTILE VALUES */
     public Projectile projectile;
@@ -215,11 +215,6 @@ public class Entity {
         return GamePanel.utility.setupImage(gp, imagePath);
     }
 
-    /**
-     * UPDATE
-     * Updates the entity
-     * Called every frame by GamePanel
-     */
     public void update() {
 
         if (isCaptured()) {
@@ -229,15 +224,8 @@ public class Entity {
         manageValues();
     }
 
-    /**
-     * SET ACTION
-     */
     protected void setAction() { }
 
-    /**
-     * UPDATE DIRECTION
-     * Handles logic involving moving the entity
-     */
     protected void updateDirection() {
 
         if (isCaptured()) return;
@@ -247,11 +235,6 @@ public class Entity {
         cycleSprites();
     }
 
-    /**
-     * GET MOVE DIRECTION
-     * Called by CollisionDetector
-     * @return Current direction of the entity
-     */
     public Direction getMoveDirection() {
         if (knockback) {
             return knockbackDirection;
@@ -264,10 +247,6 @@ public class Entity {
         }
     }
 
-    /**
-     * CHECK COLLISION
-     * Checks if the entity collides with something
-     */
     public void checkCollision() {
 
         collisionOn = false;
@@ -290,11 +269,6 @@ public class Entity {
         return true;
     }
 
-    /**
-     * MOVE
-     * Repositions the entity's X, Y based on direction and speed
-     * Called by updateDirection() if o collision
-     */
     protected void move() {
 
     }
@@ -308,6 +282,7 @@ public class Entity {
         moving = true;
         moveInDirection(direction);
     }
+
     public void forceMove(Direction forcedDirection) {
 
         collisionOn = false;
@@ -324,6 +299,7 @@ public class Entity {
 
         cycleSprites();
     }
+
     private Direction fixDirection(Direction direction) {
         return switch (direction) {
             case UP, UPLEFT, UPRIGHT -> UP;
@@ -332,6 +308,7 @@ public class Entity {
             case RIGHT -> RIGHT;
         };
     }
+
     protected void moveInDirection(Direction movingDirection) {
 
         switch (movingDirection) {
@@ -358,10 +335,6 @@ public class Entity {
         }
     }
 
-    /**
-     * CYCLE SPRITES
-     * Changes the animation counter for draw to render the correct sprite
-     */
     protected void cycleSprites() {
 
         if (animationSpeed < ++spriteCounter && animationSpeed != 0) {
@@ -377,11 +350,6 @@ public class Entity {
         }
     }
 
-    /**
-     * SET DIRECTION
-     * Randomly re-assigns the direction the Entity is facing
-     * @param rate Integer frequency of updates (60 = 1 sec)
-     */
     protected void setDirection(int rate) {
 
         if (isCaptured()) return;
@@ -545,11 +513,6 @@ public class Entity {
         }
     }
 
-    /**
-     * SHIFT TO CENTER
-     * Moves the current entity to the center of the current tile
-     * Useful for Pit/Water tile handling
-     */
     public void shiftToCenter() {
         Point center = getCenterPoint();
 
@@ -565,10 +528,6 @@ public class Entity {
         );
     }
 
-    /**
-     * SET KNOCKBACK
-     * Starts the knockback animation on the target
-     */
     protected void setKnockback(Direction direction, int knockbackPower) {
 
         knockback = true;
@@ -579,10 +538,6 @@ public class Entity {
         speed += knockbackPower;
     }
 
-    /**
-     * HANDLE KNOCKBACK
-     * Runs the knockback animation
-     */
     protected void handleKnockback() {
 
         collisionOn = false;
@@ -681,7 +636,6 @@ public class Entity {
     public boolean canBeTargeted() {
         return isAvailable() && !isCaptured();
     }
-    /** END COMBAT*/
 
     public boolean isAvailable() {
         return alive && !dying && action != FALLING && action != DROWNING;
@@ -695,21 +649,22 @@ public class Entity {
         return !canMove || stunned;
     }
 
-    /**
-     * CHECK DEATH
-     * Checks if the entity has died
-     */
     protected void checkDeath() { }
+
+    public boolean canTakeLoot(Entity loot) {
+        return false;
+    }
 
     protected void dropLoot() {
 
         setLoot();
 
-        // Loot must be a collectable
-        if (loot == null || !(loot instanceof Collectable)) return;
+        // Loot must be a collectable or an item
+        boolean lootIsValid = loot != null && (loot instanceof Collectable) || (loot instanceof Item);
+        if (!lootIsValid) return;
 
         loot.setWorldPoint(new Point(worldPoint));
-        gp.collectables.add((Collectable) loot);
+        gp.collectables.add(loot);
     }
 
     public void receiveLoot(Entity loot) {
@@ -718,20 +673,16 @@ public class Entity {
             ((Collectable) loot).use(this);
         }
         else if (loot instanceof Item) {
-            loot.setUser(this);
-            items.add((Item) loot);
+            addItem((Item) loot);
         }
+
+        loot.setAlive(false);
     }
 
     protected void handleCapture() {
 
     }
 
-    /**
-     * MANAGE VALUES
-     * Resets or reassigns entity attributes
-     * Called at the end of update
-     */
     protected void manageValues() {
 
         if (stunned) {
@@ -742,10 +693,6 @@ public class Entity {
         }
     }
 
-    /**
-     * RESET VALUES
-     * Resets values to defaults
-     */
     public void resetValues() {
 
         alive = true;
@@ -763,6 +710,8 @@ public class Entity {
         canMove = true; moving = false;
         onPath = false; pathCompleted = false;
 
+        grabbedObject = null; grabbedBy = null;
+        capturedEntity = null; capturedBy = null;
         lockedOn = false; lockedOnTarget = null;
 
         opened = false;
@@ -775,11 +724,6 @@ public class Entity {
         charge = 0; actionLockCounter = 0;
     }
 
-    /**
-     * DRAW
-     * Draws the sprite data to the graphics
-     * @param g2 GamePanel
-     */
     public void draw(Graphics2D g2) {
 
         if (!drawing) return;
@@ -825,12 +769,6 @@ public class Entity {
         g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
     }
 
-    /**
-     * CHANGE ALPHA
-     * Changes the opacity of the image
-     * @param g2 Graphics2D
-     * @param alphaValue Opacity value
-     */
     protected void changeAlpha(Graphics2D g2, float alphaValue) {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
     }
@@ -861,7 +799,6 @@ public class Entity {
         }
     }
 
-    /** GETTERS and SETTERS */
     public BufferedImage getSprite() {
         return sprite;
     }
@@ -973,7 +910,9 @@ public class Entity {
     public int getMaxHealth() {
         return maxHealth;
     }
-
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+    }
     public int getHealth() {
         return health;
     }
@@ -988,10 +927,6 @@ public class Entity {
         }
     }
 
-    public boolean canTakeLoot() {
-        return false;
-    }
-
     public Entity getLoot() {
         return loot;
     }
@@ -1003,9 +938,35 @@ public class Entity {
     public Entity getItem() {
         return item;
     }
+    public void setItem(Item item) {
+        this.item = item;
+    }
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+    public void addItem(Item item) {
 
+        item.setUser(this);
+        items.add(item);
+
+        if (this.item == null) {
+            this.item = item;
+        }
+
+        item.setAlive(false);
+    }
+
+    public int getMaxRupees() {
+        return maxRupees;
+    }
+    public void setMaxRupees(int maxRupees) {
+        this.maxRupees = maxRupees;
+    }
     public int getRupees() {
         return rupees;
+    }
+    public void setRupees(int rupees) {
+        this.rupees = rupees;
     }
     public void addRupees(int amount) {
         this.rupees += amount;
@@ -1013,6 +974,9 @@ public class Entity {
 
     public int getKeys() {
         return keys;
+    }
+    public void setKeys(int keys) {
+        this.keys = keys;
     }
     public void addKeys(int amount) {
         this.keys += amount;
@@ -1025,8 +989,17 @@ public class Entity {
         this.hasBossKey = hasBossKey;
     }
 
+    public int getMaxArrows() {
+        return maxArrows;
+    }
+    public void setMaxArrows(int maxArrows) {
+        this.maxArrows = maxArrows;
+    }
     public int getArrows() {
         return arrows;
+    }
+    public void setArrows(int arrows) {
+        this.arrows = arrows;
     }
     public void addArrows(int arrows) {
 
@@ -1037,8 +1010,17 @@ public class Entity {
         }
     }
 
+    public int getMaxBombs() {
+        return maxBombs;
+    }
+    public void setMaxBombs(int maxBombs) {
+        this.maxBombs = maxBombs;
+    }
     public int getBombs() {
         return bombs;
+    }
+    public void setBombs(int bombs) {
+        this.bombs= bombs;
     }
     public void addBombs(int bombs) {
 
@@ -1111,7 +1093,6 @@ public class Entity {
     public boolean getCanSwim() {
         return canSwim;
     }
-
     public boolean getNeedsWater() {
         return needsWater;
     }
