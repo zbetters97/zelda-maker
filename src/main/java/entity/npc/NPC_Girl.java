@@ -36,12 +36,8 @@ public class NPC_Girl extends NPC {
 
     @Override
     public void interact(Entity user) {
+        dialogue = user.getName().equals("Link") ? "You're my hero!" : "Where's Link?";
         super.interact(user);
-        if (user.getName().equals("Link")) {
-            System.out.println("You're my hero!");
-        }
-        else {
-            System.out.println("Where's Link?");
-        }
+
     }
 }

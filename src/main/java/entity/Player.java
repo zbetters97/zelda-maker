@@ -78,8 +78,9 @@ public class Player extends Entity {
 
             soarUp1, soarDown1, soarLeft1, soarRight1,
 
-            fall1, fall2, fall3,
-            drown1;
+            fall1, fall2, fall3, drown1,
+
+            itemGet1, itemGet2;
 
     /**
      * CONSTRUCTOR
@@ -131,6 +132,7 @@ public class Player extends Entity {
         getSoarImages();
         getFallImages();
         getDrownImages();
+        getItemImages();
     }
     private void getIdleImages() {
         up1 = setupImage("/player/boy_up_1");
@@ -293,6 +295,10 @@ public class Player extends Entity {
     }
     private void getDrownImages() {
         drown1 = setupImage("/player/boy_drown");
+    }
+    private void getItemImages() {
+        itemGet1 = setupImage("/player/boy_item_get_1");
+        itemGet2 = setupImage("/player/boy_item_get_2");
     }
 
     /**
@@ -1453,15 +1459,22 @@ public class Player extends Entity {
 
         if (!drawing) return;
 
-        drawOffset.setLocation(0, 0);
-        getSpriteImage();
-
         if (invincible) {
            playHurtAnimation(g2);
         }
 
+        drawOffset.setLocation(0, 0);
         gp.camera.worldToScreen(worldPoint, screenPoint);
-        g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
+
+        if (newItem != null) {
+            image = getNewItemSprite();
+            g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
+            g2.drawImage(newItem.getSprite(), screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y - sprite.getHeight(), null);
+        }
+        else {
+            getSpriteImage();
+            g2.drawImage(image, screenPoint.x + drawOffset.x, screenPoint.y + drawOffset.y, null);
+        }
 
         if (action == JUMPING || action == SOARING) {
             g2.setColor(Color.BLACK);
@@ -1474,6 +1487,7 @@ public class Player extends Entity {
 
     @Override
     protected void getSpriteImage() {
+
         image = switch (action) {
             case IDLE, RUNNING -> getIdleSprite();
             case ROLLING -> getRollingSprite();
@@ -1903,6 +1917,9 @@ public class Player extends Entity {
     }
     private BufferedImage getDrownSprite() {
         return drown1;
+    }
+    private BufferedImage getNewItemSprite() {
+        return newItem instanceof Item ? itemGet2 : itemGet1;
     }
 
     /** GETTERS */

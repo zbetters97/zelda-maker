@@ -10,6 +10,8 @@ public class NPC_Merchant extends NPC {
     public NPC_Merchant(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
 
+        dialogue = "Buy somethin', will ya?";
+
         animationSpeed = 25;
 
         defaultSpeed = 0;
@@ -37,7 +39,6 @@ public class NPC_Merchant extends NPC {
     @Override
     public void interact(Entity user) {
         super.interact(user);
-        System.out.println("Buy somethin', will ya?");
     }
 
     @Override

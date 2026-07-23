@@ -141,6 +141,7 @@ public class Entity {
     protected Entity loot;
     protected final ArrayList<Item> items = new ArrayList<>();
     protected Item item;
+    protected Entity newItem;
     protected int keys = 0;
     protected boolean hasBossKey = false;
     protected int maxRupees = 99, rupees = 0, maxArrows = 99, arrows = 0, maxBombs = 99, bombs = 0;
@@ -673,9 +674,24 @@ public class Entity {
             ((Collectable) loot).use(this);
         }
         else if (loot instanceof Item) {
+            setNewItem(loot);
             addItem((Item) loot);
         }
 
+        loot.setAlive(false);
+    }
+
+    public void receiveReward(Entity loot) {
+
+        if (loot instanceof Collectable) {
+            ((Collectable) loot).use(this);
+        }
+        else if (loot instanceof Item) {
+            setNewItem(loot);
+            addItem((Item) loot);
+        }
+
+        setNewItem(loot);
         loot.setAlive(false);
     }
 
@@ -764,7 +780,7 @@ public class Entity {
 
     protected void drawLoot(Graphics2D g2) {
 
-        if (gp.gameState != gp.editState || loot == null) return;
+        if (gp.GAME_STATE != gp.EDIT_STATE || loot == null) return;
 
         g2.drawImage(loot.getSprite(), screenPoint.x - 10, screenPoint.y - 10, null);
     }
@@ -954,6 +970,15 @@ public class Entity {
         }
 
         item.setAlive(false);
+    }
+
+    public void setNewItem(Entity newItem) {
+        this.newItem = newItem;
+
+        if (newItem == null) return;
+
+        gp.ui.setDialogue("You got the " + newItem.getName() + "!");
+        gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 
     public int getMaxRupees() {
@@ -1159,9 +1184,8 @@ public class Entity {
     public void breakCapture() {
         if (capturedBy != null) {
             capturedBy.releaseCapture();
+            action = IDLE;
         }
-
-        action = IDLE;
     }
     public boolean isCaptured() {
         return capturedBy != null;

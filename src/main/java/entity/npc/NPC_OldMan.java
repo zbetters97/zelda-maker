@@ -37,7 +37,7 @@ public class NPC_OldMan extends NPC {
 
     @Override
     public void interact(Entity user) {
+        dialogue = "Hello there, " + user.getName() + "!";
         super.interact(user);
-        System.out.println("Hello there, " + user.getName() + "!");
     }
 }

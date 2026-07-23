@@ -38,6 +38,13 @@ public class UI {
     private int rupeeChange;
     private int rupeeCounter = 0;
 
+    /** DIALOGUE VALUES */
+    private String dialogue = "";
+    private String currentDialogue = "";
+    private int dialogueCounter = 0;
+    private int charIndex = 0;
+    private String combinedText = "";
+
     /** Z-TARGETING */
     private int zTargetCounter = 0;
     private int zTargetDirection = 0;
@@ -167,10 +174,13 @@ public class UI {
         g2.setFont(PK_DS);
         g2.setColor(Color.white);
 
-        if (gp.gameState == gp.playState) {
+        if (gp.GAME_STATE == gp.PLAY_STATE) {
             drawHUD();
         }
-        else if (gp.gameState == gp.editState) {
+        else if (gp.GAME_STATE == gp.DIALOGUE_STATE) {
+            drawDialogueState();
+        }
+        else if (gp.GAME_STATE == gp.EDIT_STATE) {
             drawEditState();
         }
     }
@@ -586,6 +596,70 @@ public class UI {
         g2.drawString("Column: " + gp.camera.getWorldPoint().x / gp.tileSize, x, y);
         y += lineHeight;
         g2.drawString("Row: " + gp.camera.getWorldPoint().y / gp.tileSize, x, y);
+    }
+
+    private void drawDialogueState() {
+        drawDialogueWindow();
+        handleFinishDialogue();
+    }
+    private void drawDialogueWindow() {
+
+        int x = gp.tileSize * 2;
+        int y = (gp.screenWidth / 2) - gp.tileSize;
+        int width = gp.screenWidth - (gp.tileSize * 4);
+        int height = gp.tileSize * 4;
+
+        // Black rectangle
+        g2.setColor(new Color(0, 0, 0, 220));
+        g2.fillRoundRect(x, y, width, height, 25, 25);
+
+        // White border
+        g2.setColor(new Color(255, 255, 255));
+        g2.setStroke(new BasicStroke(5));
+        g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 15, 15);
+
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 37F));
+        x += gp.tileSize;
+        y += gp.tileSize;
+
+        int textSpeed = 1;
+        if (dialogueCounter == textSpeed) {
+            char[] characters = dialogue.toCharArray();
+
+            if (charIndex < characters.length) {
+                String text = String.valueOf(characters[charIndex]);
+                combinedText += text;
+                currentDialogue = combinedText;
+                charIndex++;
+            }
+
+            dialogueCounter = 0;
+        }
+        else {
+            dialogueCounter++;
+        }
+
+        for (String line : currentDialogue.split("\n")) {
+            g2.drawString(line, x, y);
+            y += 40;
+        }
+    }
+    private void handleFinishDialogue() {
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
+
+        resetDialogue();
+
+        gp.player.setNewItem(null);
+        gp.GAME_STATE = gp.PLAY_STATE;
+    }
+
+    private void resetDialogue() {
+        dialogue = "";
+        currentDialogue = "";
+        dialogueCounter = 0;
+        charIndex = 0;
+        combinedText = "";
     }
 
     /** EDITING */
@@ -1084,5 +1158,9 @@ public class UI {
         }
 
         return image;
+    }
+
+    public void setDialogue(String dialogue) {
+        this.dialogue = dialogue;
     }
 }

@@ -8,6 +8,8 @@ import java.awt.*;
 
 public class NPC extends Entity {
 
+    protected String dialogue = "";
+
     public NPC(GamePanel gp, int worldX, int worldY, String npcName) {
         super(gp, worldX, worldY, npcName);
 
@@ -26,7 +28,11 @@ public class NPC extends Entity {
 
     public void interact(Entity user) {
         gp.keyH.aPressed = false;
+
         direction = getOppositeDirection(user.getDirection());
+
+        gp.ui.setDialogue(dialogue);
+        gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 
     @Override

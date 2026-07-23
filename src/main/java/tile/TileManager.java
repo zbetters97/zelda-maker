@@ -162,7 +162,7 @@ public class TileManager {
      */
     public void draw(Graphics2D g2) {
 
-        if (gp.gameState == gp.playState && --waterFrames <= 0) {
+        if (gp.GAME_STATE == gp.PLAY_STATE && --waterFrames <= 0) {
             waterFrames = 60;
             waterNum = waterNum == 1 ? 2 : 1;
         }

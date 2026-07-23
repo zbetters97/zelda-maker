@@ -10,6 +10,7 @@ public class NPC_Farmer extends NPC {
     public NPC_Farmer(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
         availableAction = "TALK";
+        dialogue = "Have you seen my Cucco, SPLADOODLES?\nYes, that's his name!";
     }
 
     @Override
@@ -37,6 +38,5 @@ public class NPC_Farmer extends NPC {
     @Override
     public void interact(Entity user) {
         super.interact(user);
-        System.out.println("Have you seen my Cucco, " + user.getName() + "?!");
     }
 }

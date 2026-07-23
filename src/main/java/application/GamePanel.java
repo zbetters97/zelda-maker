@@ -76,9 +76,10 @@ public class GamePanel extends JPanel implements Runnable {
     private BufferedImage tempScreen;
 
     /** GAME STATES */
-    public int gameState;
-    public final int playState = 1;
-    public final int editState = 2;
+    public int GAME_STATE;
+    public final int PLAY_STATE = 1;
+    public final int DIALOGUE_STATE = 2;
+    public final int EDIT_STATE = 3;
 
     /** HANDLERS */
     public final SaveLoad saveLoad = new SaveLoad(this);
@@ -116,7 +117,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     protected void setupGame() {
 
-        gameState = editState;
+        GAME_STATE = EDIT_STATE;
 
         // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
@@ -207,33 +208,39 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
 
-        if (gameState == playState) {
+        if (GAME_STATE == PLAY_STATE) {
 
             camera.follow(player.getWorldPoint());
 
             player.update();
             updateEntities();
 
-            if (keyH.startPressed) {
-                keyH.startPressed = false;
-
-                resetGame();
-
-                saveLoad.load();
-                ui.cursor.setWorldPoint(player.getWorldPoint());
-                gameState = editState;
-            }
+            handleStartPressPlay();
         }
-        else if (gameState == editState) {
-
+        else if (GAME_STATE == EDIT_STATE) {
             camera.follow(ui.cursor.getWorldPoint());
-
-            if (keyH.startPressed) {
-                keyH.startPressed = false;
-                saveLoad.save();
-                gameState = playState;
-            }
+            handleStartPressEdit();
         }
+    }
+
+    private void handleStartPressPlay() {
+        if (!keyH.startPressed) return;
+        keyH.startPressed = false;
+
+        resetGame();
+
+        saveLoad.load();
+        ui.cursor.setWorldPoint(player.getWorldPoint());
+
+        GAME_STATE = EDIT_STATE;
+    }
+    private void handleStartPressEdit() {
+        if (!keyH.startPressed) return;
+        keyH.startPressed = false;
+
+        saveLoad.save();
+
+        GAME_STATE = PLAY_STATE;
     }
 
     /** UPDATERS **/
@@ -277,7 +284,7 @@ public class GamePanel extends JPanel implements Runnable {
         drawTiles();
         drawEntities();
 
-        if (gameState == editState) {
+        if (GAME_STATE == EDIT_STATE) {
             drawGrid();
         }
 

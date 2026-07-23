@@ -9,6 +9,7 @@ public class NPC_Kid extends NPC {
 
     public NPC_Kid(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, npcName);
+        dialogue = "You look stupid!";
         availableAction = "TALK";
     }
 
@@ -37,6 +38,5 @@ public class NPC_Kid extends NPC {
     @Override
     public void interact(Entity user) {
         super.interact(user);
-        System.out.println("You look stupid!");
     }
 }
