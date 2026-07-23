@@ -9,6 +9,8 @@ public class COL_Key_Boss extends Collectable {
 
     public COL_Key_Boss(GamePanel gp) {
         super(gp, colName);
+        formattedName = "a Boss Key";
+        description = "Use this on any boss door!\nOne time only.";
     }
 
     @Override

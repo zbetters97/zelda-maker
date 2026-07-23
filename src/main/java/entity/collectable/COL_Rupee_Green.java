@@ -9,6 +9,8 @@ public class COL_Rupee_Green extends Collectable {
 
     public COL_Rupee_Green(GamePanel gp) {
         super(gp, colName);
+        formattedName = "a green rupee";
+        description = "Not too shabby!";
         value = 1;
     }
 

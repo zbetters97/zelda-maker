@@ -9,6 +9,8 @@ public class COL_Heart extends Collectable {
 
     public COL_Heart(GamePanel gp) {
         super(gp, colName);
+        formattedName = "a heart";
+        description = "You feel just a little better!";
         value = 1;
     }
 

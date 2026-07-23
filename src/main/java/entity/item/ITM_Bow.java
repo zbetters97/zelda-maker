@@ -10,11 +10,23 @@ public class ITM_Bow extends Item {
 
     public ITM_Bow(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.AIMING);
+        setUser(user);
+        formattedName = "the Hylian Bow";
+        description = "Press X to shoot an arrow.\nHold X to charge power and speed.";
     }
 
     @Override
     protected void getImages() {
         sprite = setupImage("/items/itm_bow");
+    }
+
+    @Override
+    public void setUser(Entity user) {
+        if (user == null) return;
+
+        super.setUser(user);
+        user.setMaxArrows(30);
+        user.setArrows(30);
     }
 
     @Override

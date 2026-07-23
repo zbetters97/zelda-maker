@@ -33,8 +33,8 @@ public class OBJ_Door_Locked extends Object {
 
     @Override
     public void interact(Entity user) {
-
-        if (opened) return;
+        if (opened || !gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
 
         boolean userFacing = user.getDirection() == getOppositeDirection(direction);
         boolean userHasKey = user.getKeys() > 0;

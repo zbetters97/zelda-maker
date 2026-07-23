@@ -10,6 +10,8 @@ public class ITM_Boomerang extends Item {
 
     public ITM_Boomerang(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.THROWING);
+        formattedName = "the Boomerang";
+        description = "Press X to throw at enemies or collectables.";
         projectile = new PRJ_Boomerang(gp);
     }
 

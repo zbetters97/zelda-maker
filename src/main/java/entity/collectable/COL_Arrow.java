@@ -9,6 +9,8 @@ public class COL_Arrow extends Collectable {
 
     public COL_Arrow(GamePanel gp) {
         super(gp, colName);
+        formattedName = "an arrow";
+        description = "Aim carefully!";
         value = 1;
     }
 

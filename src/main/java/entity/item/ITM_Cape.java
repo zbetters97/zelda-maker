@@ -9,6 +9,8 @@ public class ITM_Cape extends Item {
 
     public ITM_Cape(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.SOARING);
+        formattedName = "the Roc's Cape";
+        description = "Press X to soar over obstacles!";
     }
 
     @Override

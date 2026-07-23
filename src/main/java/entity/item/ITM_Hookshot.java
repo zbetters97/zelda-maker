@@ -10,6 +10,8 @@ public class ITM_Hookshot extends Item {
 
     public ITM_Hookshot(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.THROWING);
+        formattedName = "the Hookshot";
+        description = "Press X to fire a claw at enemies and\ncollectables.";
         projectile = new PRJ_Claw(gp, user);
     }
 

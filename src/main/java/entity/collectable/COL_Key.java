@@ -9,6 +9,8 @@ public class COL_Key extends Collectable {
 
     public COL_Key(GamePanel gp) {
         super(gp, colName);
+        formattedName = "a key";
+        description = "Use this on any locked door!";
     }
 
     @Override

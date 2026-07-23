@@ -9,6 +9,8 @@ public class COL_Fairy extends Collectable {
 
     public COL_Fairy(GamePanel gp) {
         super(gp, colName);
+        formattedName = "a fairy";
+        description = "You regained all your health!";
     }
 
     @Override

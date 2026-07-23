@@ -10,6 +10,8 @@ public class ITM_Rod extends Item {
 
     public ITM_Rod(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.SWINGING);
+        formattedName = "the Magic Rod";
+        description = "Press X to fire an orb to control enemies\nand objects.\nPress X again to release control.";
         projectile = new PRJ_Orb(gp, user);
     }
 

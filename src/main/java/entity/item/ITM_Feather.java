@@ -9,6 +9,8 @@ public class ITM_Feather extends Item {
 
     public ITM_Feather(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.JUMPING);
+        formattedName = "the Roc's Feather";
+        description = "Press X to hop over obstacles!";
     }
 
     @Override

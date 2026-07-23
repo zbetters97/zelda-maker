@@ -76,8 +76,8 @@ public class UI {
 
     /** SPRITES */
     private BufferedImage
-            rupee,
             heart_0, heart_1, heart_2, heart_3, heart_4,
+            rupee, key, bossKey,
             ztarget_arrow, ztarget_circle;
 
     /**
@@ -119,13 +119,16 @@ public class UI {
         ztarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
     }
     private void getHUDImages() {
-        rupee = setupImage("/ui/ui_rupee");
 
         heart_0 = setupImage("/ui/ui_heart_0", 23, 23);
         heart_1 = setupImage("/ui/ui_heart_1", 23, 23);
         heart_2 = setupImage("/ui/ui_heart_2", 23, 23);
         heart_3 = setupImage("/ui/ui_heart_3", 23, 23);
         heart_4 = setupImage("/ui/ui_heart_4", 23, 23);
+
+        rupee = setupImage("/ui/ui_rupee");
+        key = setupImage("/ui/ui_key");
+        bossKey = setupImage("/ui/ui_key_boss");
     }
 
     private void fillTileLibrary() {
@@ -195,6 +198,8 @@ public class UI {
         drawChargeBar();
         drawPlayerHealth();
         drawPlayerItem();
+        drawKeys();
+        drawBossKey();
         drawRupeeCount();
         drawAvailableAction();
         drawDebug();
@@ -339,6 +344,33 @@ public class UI {
         g2.setStroke(new BasicStroke(1));
     }
 
+    private void drawKeys() {
+
+        // Draw key image
+        int x = gp.tileSize * 14 + 30;
+        int y = gp.tileSize * 10 + 20;
+        g2.drawImage(key, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+
+        x += gp.tileSize - 8;
+        y += gp.tileSize - 12;
+
+        // Draw key count
+        String keyCount = Integer.toString(gp.player.getKeys());
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+        g2.drawString(keyCount, x, y);
+    }
+
+    private void drawBossKey() {
+
+        if (!gp.player.getHasBossKey()) return;
+
+        // Draw boss key image
+        int x = gp.tileSize * 15 + 40;
+        int y = gp.tileSize * 10 + 20;
+        g2.drawImage(bossKey, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+    }
+
     /**
      * DRAW RUPEE COUNT
      * Draws the current player's rupee count in the bottom-right corner of the screen
@@ -347,7 +379,7 @@ public class UI {
     private void drawRupeeCount() {
 
         // Draw rupee image
-        int x = gp.tileSize * 15;
+        int x = gp.tileSize * 14 + 30;
         int y = gp.tileSize * 11 + 20;
         g2.drawImage(rupee, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
 

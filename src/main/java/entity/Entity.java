@@ -106,7 +106,8 @@ public class Entity {
     protected int animationSpeed;
 
     /** RPG VALUES */
-    protected String name;
+    protected String name, formattedName;
+    protected String description;
     protected boolean alive = true;
     protected int maxHealth = 1, health = 1;
     protected int value = 0;
@@ -819,6 +820,7 @@ public class Entity {
         return sprite;
     }
 
+    /** GETTERS AND SETTERS */
     public void setDrawing(boolean drawing) {
         this.drawing = drawing;
     }
@@ -922,6 +924,13 @@ public class Entity {
     public String getName() {
         return name;
     }
+    public String getFormattedName() {
+        return formattedName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     public int getMaxHealth() {
         return maxHealth;
@@ -977,7 +986,7 @@ public class Entity {
 
         if (newItem == null) return;
 
-        gp.ui.setDialogue("You got the " + newItem.getName() + "!");
+        gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());
         gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 

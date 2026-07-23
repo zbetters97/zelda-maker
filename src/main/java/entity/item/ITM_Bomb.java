@@ -11,11 +11,23 @@ public class ITM_Bomb extends Item {
 
     public ITM_Bomb(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.GRABBING);
+        setUser(user);
+        formattedName = "a Bomb Bag";
+        description = "Press X to grab a bomb.\nPress A to throw or pick one up.";
     }
 
     @Override
     protected void getImages() {
         sprite = setupImage("/items/itm_bomb");
+    }
+
+    @Override
+    public void setUser(Entity user) {
+        if (user == null) return;
+
+        super.setUser(user);
+        user.setMaxBombs(30);
+        user.setBombs(30);
     }
 
     @Override
