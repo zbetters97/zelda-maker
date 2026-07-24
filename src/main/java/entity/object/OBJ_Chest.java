@@ -48,8 +48,9 @@ public class OBJ_Chest extends Object {
         if (facingDirection) {
             opened = true;
             availableAction = "";
-            user.receiveLoot(loot);
+
             user.showReward(loot);
+            user.receiveLoot(loot);
         }
     }
 

@@ -20,7 +20,7 @@ public class DataStorage implements Serializable {
     int currentItemSlot;
 
     // NPCs
-    String[] npcNames, npcDirections;
+    String[] npcNames, npcDirections, npcLoot;
     int[] npcWorldX, npcWorldY;
 
     // ENEMIES

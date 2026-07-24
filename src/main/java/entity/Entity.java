@@ -645,8 +645,6 @@ public class Entity {
             showReward(loot);
             addItem((Item) loot);
         }
-
-        loot.setAlive(false);
     }
     public void addItem(Item item) {
 
@@ -661,7 +659,6 @@ public class Entity {
     }
     public void showReward(Entity newItem) {
         this.newItem = newItem;
-
         if (newItem == null) return;
 
         gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());

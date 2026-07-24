@@ -27,12 +27,15 @@ public class NPC extends Entity {
     }
 
     public void interact(Entity user) {
+        if (!gp.keyH.aPressed) return;
         gp.keyH.aPressed = false;
 
+        // Look at player
         direction = getOppositeDirection(user.getDirection());
 
-        gp.ui.setDialogue(dialogue);
-        gp.GAME_STATE = gp.DIALOGUE_STATE;
+        // Show dialogue and gift player loot
+        gp.ui.setupDialogue(dialogue, loot);
+        loot = null;
     }
 
     @Override

@@ -44,6 +44,8 @@ public class UI {
     private int dialogueCounter = 0;
     private int charIndex = 0;
     private String combinedText = "";
+    private boolean canSkip;
+    private Entity dialogueReward;
 
     /** Z-TARGETING */
     private int zTargetCounter = 0;
@@ -664,6 +666,9 @@ public class UI {
                 currentDialogue = combinedText;
                 charIndex++;
             }
+            else {
+                canSkip = true;
+            }
 
             dialogueCounter = 0;
         }
@@ -677,13 +682,23 @@ public class UI {
         }
     }
     private void handleFinishDialogue() {
-        if (!gp.keyH.aPressed) return;
+        if (!gp.keyH.aPressed || !canSkip) return;
         gp.keyH.aPressed = false;
 
         resetDialogue();
 
-        gp.player.showReward(null);
-        gp.GAME_STATE = gp.PLAY_STATE;
+        // If dialogue has reward, set reward dialogue
+        gp.player.showReward(dialogueReward);
+
+        // Item gifted to player, show reward dialogue
+        if (dialogueReward != null) {
+            gp.player.receiveLoot(dialogueReward);
+            dialogueReward = null;
+        }
+        // No reward, continue to play state
+        else {
+            gp.GAME_STATE = gp.PLAY_STATE;
+        }
     }
 
     private void resetDialogue() {
@@ -692,6 +707,13 @@ public class UI {
         dialogueCounter = 0;
         charIndex = 0;
         combinedText = "";
+        canSkip = false;
+    }
+
+    public void setupDialogue(String dialogue, Entity reward) {
+        this.dialogue = dialogue;
+        this.dialogueReward = reward;
+        gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 
     /** EDITING */
