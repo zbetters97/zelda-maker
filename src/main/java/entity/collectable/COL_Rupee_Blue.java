@@ -10,8 +10,8 @@ public class COL_Rupee_Blue extends Collectable {
     public COL_Rupee_Blue(GamePanel gp) {
         super(gp, colName);
         formattedName = "a blue rupee";
-        description = "That's worth 5 rupees! Nice!";
         value = 5;
+        description = "That's worth " + value + " rupees! Not too shabby.";
     }
 
     @Override
