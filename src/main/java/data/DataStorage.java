@@ -9,28 +9,28 @@ public class DataStorage implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // FILE INFO
-    String file_date;
+    public String file_date;
 
-    // PLAYER DATA
-    int pWorldX, pWorldY;
-    String direction;
-    int maxHealth, health, maxRupees, rupees, maxArrows, arrows, maxBombs, bombs, keys;
-    boolean hasBossKey;
-    String[] items;
-    int currentItemSlot;
-
-    // NPCs
-    String[] npcNames, npcDirections, npcLoot;
-    int[] npcWorldX, npcWorldY;
-
-    // ENEMIES
-    String[] enemyNames, enemyDirections, enemyLoot;
-    int[] enemyWorldX, enemyWorldY, enemyHealth;
-
-    // OBJECTS
-    String[] objectNames, objectDirections, objectLoot;
-    int[] objectWorldX, objectWorldY;
+    // PLAYER
+    public int pWorldX, pWorldY;
+    public String direction;
+    public int maxHealth, health, maxRupees, rupees, maxArrows, arrows, maxBombs, bombs, keys;
+    public boolean hasBossKey;
+    public String[] items;
+    public int currentItemSlot;
 
     // TILES
-    int[] tileNums;
+    public int[] tileNums;
+
+    // NPCs
+    public String[] npcNames, npcDirections, npcLoot;
+    public int[] npcWorldX, npcWorldY;
+
+    // ENEMIES
+    public String[] enemyNames, enemyDirections, enemyLoot;
+    public int[] enemyWorldX, enemyWorldY, enemyHealth;
+
+    // OBJECTS
+    public String[] objectNames, objectDirections, objectLoot;
+    public int[] objectWorldX, objectWorldY;
 }

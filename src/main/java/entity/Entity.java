@@ -297,7 +297,7 @@ public class Entity {
             gp.player.takeDamage(this);
         }
 
-        gp.cChecker.checkHazard(this);
+        gp.cChecker.checkTileHazard(this);
     }
     public Direction getMoveDirection() {
         if (knockback) {

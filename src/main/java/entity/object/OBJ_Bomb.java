@@ -159,4 +159,11 @@ public class OBJ_Bomb extends Object {
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
     }
+
+    @Override
+    public DrawLayer getDrawLayer() {
+
+        // Draw below entities unless grabbed or tossed
+        return grabbedBy != null || tossed ? DrawLayer.ABOVE : DrawLayer.GROUND;
+    }
 }

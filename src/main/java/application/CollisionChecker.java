@@ -1,7 +1,6 @@
 package application;
 
 import entity.Entity;
-import entity.enemy.Enemy;
 import entity.npc.NPC;
 import entity.object.OBJ_DigSpot;
 import entity.object.Object;
@@ -17,7 +16,7 @@ import static entity.Entity.Action.*;
 
 public record CollisionChecker(GamePanel gp) {
 
-    // Offset points for explosion radius, directions for knockback
+    /** Offset points for explosion radius, directions for knockback */
     private static final Map<Point, Direction> EXPLOSION_OFFSETS = Map.ofEntries(
             Map.entry(new Point(0, 0), Direction.UP), // center
             Map.entry(new Point(0, -1), Direction.UP), // up
@@ -37,8 +36,8 @@ public record CollisionChecker(GamePanel gp) {
      */
     public void checkTile(Entity entity) {
 
-        Rectangle box = entity.getWorldHitbox();
-        if (outOfBounds(box)) return;
+        Rectangle futureRect = entity.getWorldHitbox();
+        if (outOfBounds(futureRect)) return;
 
         Point delta = new Point();
 
@@ -79,29 +78,36 @@ public record CollisionChecker(GamePanel gp) {
             }
         }
 
-        box.translate(delta.x, delta.y);
+        futureRect.translate(delta.x, delta.y);
 
-        if (outOfBounds(box)) {
+        if (outOfBounds(futureRect)) {
             entity.setCollision(true);
             return;
         }
 
-        int leftCol = box.x / gp.tileSize;
-        int rightCol = (box.x + box.width - 1) / gp.tileSize;
-        int topRow = box.y / gp.tileSize;
-        int bottomRow = (box.y + box.height - 1) / gp.tileSize;
+        int leftCol = futureRect.x / gp.tileSize;
+        int rightCol = (futureRect.x + futureRect.width - 1) / gp.tileSize;
+        int topRow = futureRect.y / gp.tileSize;
+        int bottomRow = (futureRect.y + futureRect.height - 1) / gp.tileSize;
 
         for (int row = topRow; row <= bottomRow; row++) {
             for (int col = leftCol; col <= rightCol; col++) {
 
-                Tile tile = getTileAtColRow(col, row);
+                Tile tile = gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
                 if (tile == null) continue;
 
-                checkTileCollision(entity, tile);
+                setEntityTileCollision(entity, tile);
             }
         }
     }
-    private void checkTileCollision(Entity entity, Tile tile) {
+
+    /**
+     * SET ENTITY TILE COLLISION
+     * Turns on entity collision based on tile and various factors
+     * @param entity Entity interacting with the tile
+     * @param tile Tile to check collision on
+     */
+    private void setEntityTileCollision(Entity entity, Tile tile) {
 
         // Bottomless pits
         if (tile.isPit()) {
@@ -109,8 +115,8 @@ public record CollisionChecker(GamePanel gp) {
             // Entity in air
             if (entity.getElevated() || entity.isKnockedBack()) return;
 
-            // NPCs and Enemies, and Objects
-            if (entity instanceof NPC || entity instanceof Enemy || entity instanceof Object) {
+            // Collision on if not player
+            if (entity != gp.player) {
                 entity.setCollision(true);
             }
         }
@@ -120,8 +126,8 @@ public record CollisionChecker(GamePanel gp) {
             // Entity in air or can swim
             if (entity.getElevated() || entity.isKnockedBack() || entity.getCanSwim()) return;
 
-            // NPCs and enemies
-            if (entity instanceof NPC || entity instanceof Enemy || entity instanceof Object) {
+            // Collision on if not player
+            if (entity != gp.player) {
                 entity.setCollision(true);
             }
         }
@@ -135,12 +141,33 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
 
-    public void checkHazard(Entity entity) {
+    /**
+     * CHECK TILE COLLISION
+     * Checks if the given tile has collision
+     * @param col Column tile is on
+     * @param row Row tile is on
+     * @return True if tile is not traversable, false if it is
+     */
+    public boolean checkTileCollision(int col, int row) {
+
+        int tileNum = gp.tileM.mapTileNum[col][row];
+        Tile tile = gp.tileM.tiles[tileNum];
+
+        return tile != null && tile.isNotTraversable(tileNum);
+    }
+
+    /**
+     * CHECK TILE HAZARD
+     * Runs hazard logic if the given entity is standing on a hazardous tile
+     * @param entity Entity that is on top of the tile
+     */
+    public void checkTileHazard(Entity entity) {
 
         if (outOfBounds(entity.getWorldHitbox())) return;
 
-        Tile tile = getCurrentTile(entity);
         int tileNum = getCurrentTileNum(entity);
+        Tile tile = gp.tileM.tiles[tileNum];
+        if (tile == null) return;
 
         if (tile.isPit()) {
             handlePit(entity);
@@ -156,21 +183,16 @@ public record CollisionChecker(GamePanel gp) {
             setSafePoint();
         }
     }
-    private Tile getCurrentTile(Entity entity) {
-
-        Point center = entity.getCenterPoint();
-
-        int col = center.x / gp.tileSize;
-        int row = center.y / gp.tileSize;
-
-        return getTileAtColRow(col, row);
-    }
     private int getCurrentTileNum(Entity entity) {
 
         Point center = entity.getCenterPoint();
 
         int col = center.x / gp.tileSize;
         int row = center.y / gp.tileSize;
+
+        if (col < 0 || row < 0 || gp.maxWorldCol < col || gp.maxWorldRow < row) {
+            return 0;
+        }
 
         return gp.tileM.mapTileNum[col][row];
     }
@@ -210,10 +232,16 @@ public record CollisionChecker(GamePanel gp) {
         int col = center.x / gp.tileSize;
         int row = center.y / gp.tileSize;
 
-        gp.player.safePoint = new Point(col * gp.tileSize, row * gp.tileSize);
+        gp.player.setSafePoint(new Point(col * gp.tileSize, row * gp.tileSize));
     }
 
-    public boolean checkIce(Entity entity) {
+    /**
+     * CHECK ICE TILE
+     * Checks if the given entity is standing on ice
+     * @param entity Entity standing on ice
+     * @return True if entity is standing on ice, false if not
+     */
+    public boolean checkIceTile(Entity entity) {
 
         Point center = entity.getCenterPoint();
 
@@ -223,35 +251,22 @@ public record CollisionChecker(GamePanel gp) {
         return gp.tileM.mapTileNum[col][row] == TileManager.iceTile;
     }
 
+    /**
+     * CHECK MOVEMENT COLLISION
+     * Checks if the given entity will move into a target in the list
+     * Turns on entity collision if entity will collide into target
+     * Ignores if entity is already colliding with target
+     * @param entity Entity that is moving
+     * @param targets List of entities to check movement collision on
+     * @return Target that given entity will move into, null if not
+     * @param <T> Objects that extend Entity class
+     */
     public <T extends Entity> T checkMovementCollision(Entity entity, ArrayList<T> targets) {
 
-        Rectangle futureRect = entity.getWorldHitbox();
-        int speed = entity.getSpeed();
-
-        switch (entity.getMoveDirection()) {
-            case UP -> futureRect.y -= speed;
-            case UPLEFT -> {
-                futureRect.x -= speed;
-                futureRect.y -= speed;
-            }
-            case UPRIGHT -> {
-                futureRect.x += speed;
-                futureRect.y -= speed;
-            }
-            case DOWN -> futureRect.y += speed;
-            case DOWNLEFT -> {
-                futureRect.x -= speed;
-                futureRect.y += speed;
-            }
-            case DOWNRIGHT -> {
-                futureRect.x += speed;
-                futureRect.y += speed;
-            }
-            case LEFT -> futureRect.x -= speed;
-            case RIGHT -> futureRect.x += speed;
-        }
-
         Rectangle currentRect = entity.getWorldHitbox();
+
+        Rectangle futureRect = entity.getWorldHitbox();
+        shiftRectangle(futureRect, entity.getMoveDirection(), entity.getSpeed());
 
         for (T target : targets) {
 
@@ -277,13 +292,22 @@ public record CollisionChecker(GamePanel gp) {
 
         return null;
     }
+
+    /**
+     * CHECK OVERLAP COLLISION
+     * Checks if the given entity is overlapping with a target in the list
+     * @param entity Entity that is overlapping
+     * @param targets List of entities to check overlap collision on
+     * @return Target that given entity is overlapping with, null if not
+     * @param <T> Objects that extend Entity class
+     */
     public <T extends Entity> T checkOverlapCollision(Entity entity, ArrayList<T> targets) {
 
         Rectangle entityRect = entity.getWorldHitbox();
 
         for (T target : targets) {
 
-            if (target == entity.getUser() || target == null || target == entity || target.isNotInteractable()) {
+            if (target == null || target == entity || target == entity.getUser() || target.isNotInteractable()) {
                 continue;
             }
 
@@ -296,18 +320,12 @@ public record CollisionChecker(GamePanel gp) {
         return null;
     }
 
-    public boolean hasOverlapCollision(Entity entity, Entity target) {
-
-        if (target == null || target == entity || target.isNotInteractable()) {
-            return false;
-        }
-
-        Rectangle entityRect = entity.getWorldHitbox();
-        Rectangle targetRect = target.getWorldHitbox();
-
-        return entityRect.intersects(targetRect);
-    }
-
+    /**
+     * SET OVERLAP COLLISION
+     * Turns on entity collision if it is currently overlapping with a target in the list
+     * @param entity Entity that is overlapping
+     * @param targets List of entities to check overlap collision on
+     */
     public void setOverlapCollision(Entity entity, ArrayList<? extends Entity> targets) {
 
         Rectangle entityRect = entity.getWorldHitbox();
@@ -321,37 +339,61 @@ public record CollisionChecker(GamePanel gp) {
             Rectangle targetRect = target.getWorldHitbox();
             if (entityRect.intersects(targetRect)) {
                 entity.setCollision(true);
-                break;
+                return;
             }
         }
     }
 
+    /**
+     * HAS OVERLAP COLLISION
+     * Checks if entity is currently overlapping with target
+     * @param entity Entity that is overlapping
+     * @param target Entity to check overlap on
+     * @return True if entity is overlapping target, false if not
+     */
+    public boolean hasOverlapCollision(Entity entity, Entity target) {
+
+        if (target == null || target == entity || target.isNotInteractable()) {
+            return false;
+        }
+
+        Rectangle entityRect = entity.getWorldHitbox();
+        Rectangle targetRect = target.getWorldHitbox();
+
+        return entityRect.intersects(targetRect);
+    }
+
+    /**
+     * CHECK NPC
+     * Checks if the given entity is looking at and within a half a tile of an NPC
+     * @param entity Entity that is interacting with NPCs
+     * @return the NPC the entity is looking at, null if not
+     */
+    public NPC checkNPC(Entity entity) {
+
+        Rectangle futureRect = entity.getWorldHitbox();
+        shiftRectangle(futureRect, entity.getMoveDirection(), gp.tileSize / 2);
+
+        for (NPC npc : gp.npcs) {
+            Rectangle targetRect = npc.getWorldHitbox();
+            if (futureRect.intersects(targetRect)) {
+                return npc;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * CHECK DIG SPOT
+     * Checks if the given entity within a tile of a DigSpot Object
+     * @param entity Entity that is looking for a DigSpot
+     * @return The DigSpot the entity is interacting with, null if not
+     */
     public Object checkDigSpot(Entity entity) {
 
         Rectangle futureRect = entity.getWorldHitbox();
-
-        switch (entity.getMoveDirection()) {
-            case UP -> futureRect.y -= gp.tileSize;
-            case UPLEFT -> {
-                futureRect.x -= gp.tileSize;
-                futureRect.y -= gp.tileSize;
-            }
-            case UPRIGHT -> {
-                futureRect.x += gp.tileSize;
-                futureRect.y -= gp.tileSize;
-            }
-            case DOWN -> futureRect.y += gp.tileSize;
-            case DOWNLEFT -> {
-                futureRect.x -= gp.tileSize;
-                futureRect.y += gp.tileSize;
-            }
-            case DOWNRIGHT -> {
-                futureRect.x += gp.tileSize;
-                futureRect.y += gp.tileSize;
-            }
-            case LEFT -> futureRect.x -= gp.tileSize;
-            case RIGHT -> futureRect.x += gp.tileSize;
-        }
+        shiftRectangle(futureRect, entity.getMoveDirection(), gp.tileSize);
 
         for (Object object : gp.objects) {
 
@@ -369,7 +411,9 @@ public record CollisionChecker(GamePanel gp) {
     /**
      * CHECK PLAYER
      * Checks if the given entity will collide with the player entity
+     * Turns on entity collision if so
      * @param entity Entity to check collision for
+     * @return True if entity is colliding with player and on same elevation, false if not
      */
     public boolean checkPlayer(Entity entity) {
 
@@ -377,19 +421,10 @@ public record CollisionChecker(GamePanel gp) {
             return false;
         }
 
-        Rectangle entityRect = entity.getWorldHitbox();
         Rectangle playerRect = gp.player.getWorldHitbox();
 
-        switch (entity.getMoveDirection()) {
-            case UP -> entityRect.y -= entity.getSpeed();
-            case DOWN -> entityRect.y += entity.getSpeed();
-            case LEFT -> entityRect.x -= entity.getSpeed();
-            case RIGHT -> entityRect.x += entity.getSpeed();
-            default -> {
-                entity.setCollision(true);
-                return false;
-            }
-        }
+        Rectangle entityRect = entity.getWorldHitbox();
+        shiftRectangle(entityRect, entity.getMoveDirection(), entity.getSpeed());
 
         if (!entityRect.intersects(playerRect)) {
             return false;
@@ -400,6 +435,11 @@ public record CollisionChecker(GamePanel gp) {
         return entity.isOnSameElevation(gp.player);
     }
 
+    /**
+     * CHECK EXPLOSION
+     * Loops over a 3x3 square around the given entity and runs explosion logic
+     * @param entity Entity that is exploding (usually a Bomb Object)
+     */
     public void checkExplosion(Entity entity) {
 
         // Current col, row of given entity
@@ -439,6 +479,16 @@ public record CollisionChecker(GamePanel gp) {
             handleExplosionCollision(entity, gp.player, col, row);
         }
     }
+
+    /**
+     * HANDLE EXPLOSION LOGIC
+     * Damages the target if it is within radius of the explosion
+     * Does nothing if the target is not interactable
+     * @param entity The entity that is exploding
+     * @param target The target that the entity is colliding with
+     * @param entityCol The column of the explosion radius
+     * @param entityRow The row of the explosion radius
+     */
     private void handleExplosionCollision(Entity entity, Entity target, int entityCol, int entityRow) {
 
         // Skip if not valid
@@ -458,20 +508,48 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
 
-    private Tile getTileAtColRow(int col, int row) {
-        return gp.tileM.tiles[gp.tileM.mapTileNum[col][row]];
+    /**
+     * SHIFT RECTANGLE
+     * Moves the given hitbox in the direction it is facing
+     * Used for future collision detection
+     * @param rectangle Hitbox of an entity
+     * @param direction Direction rectangle is facing
+     * @param offset Integer to shift
+     */
+    private void shiftRectangle(Rectangle rectangle, Direction direction, int offset) {
+
+        switch (direction) {
+            case UP -> rectangle.y -= offset;
+            case UPLEFT -> {
+                rectangle.x -= offset;
+                rectangle.y -= offset;
+            }
+            case UPRIGHT -> {
+                rectangle.x += offset;
+                rectangle.y -= offset;
+            }
+            case DOWN -> rectangle.y += offset;
+            case DOWNLEFT -> {
+                rectangle.x -= offset;
+                rectangle.y += offset;
+            }
+            case DOWNRIGHT -> {
+                rectangle.x += offset;
+                rectangle.y += offset;
+            }
+            case LEFT -> rectangle.x -= offset;
+            case RIGHT -> rectangle.x += offset;
+        }
     }
 
-    public boolean checkTileCollision(int col, int row) {
-
-        int tileNum = gp.tileM.mapTileNum[col][row];
-        Tile tile = gp.tileM.tiles[tileNum];
-
-        return tile != null && tile.isNotTraversable(tileNum);
-    }
-
-    private boolean outOfBounds(Rectangle box) {
-        return (box.y <= 0 || box.y + box.height >= gp.maxWorldRow * gp.tileSize ||
-                box.x <= 0 || box.x + box.width >= gp.maxWorldCol * gp.tileSize);
+    /**
+     * OUT OF BOUNDS
+     * Check if the given hitbox is out of world boundary
+     * @param rectangle Hitbox to check out of bounds on
+     * @return True if out of world boundary, false if not
+     */
+    private boolean outOfBounds(Rectangle rectangle) {
+        return (rectangle.y <= 0 || rectangle.y + rectangle.height >= gp.maxWorldRow * gp.tileSize ||
+                rectangle.x <= 0 || rectangle.x + rectangle.width >= gp.maxWorldCol * gp.tileSize);
     }
 }

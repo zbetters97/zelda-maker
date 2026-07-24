@@ -161,7 +161,7 @@ public class Object extends Entity {
             yT = 0;
 
             // If not killed by hazard, run land on ground logic
-            gp.cChecker.checkHazard(this);
+            gp.cChecker.checkTileHazard(this);
             if (alive) {
                 landOnGround();
             }
@@ -198,7 +198,7 @@ public class Object extends Entity {
 
         // Check hazard at end of toss
         if (!tossed) {
-            gp.cChecker.checkHazard(this);
+            gp.cChecker.checkTileHazard(this);
         }
     }
 

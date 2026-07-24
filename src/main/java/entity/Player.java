@@ -23,7 +23,7 @@ public class Player extends Entity {
     public static final String playerName = "Link";
 
     /** X/Y VALUES */
-    public Point safePoint;
+    private Point safePoint;
 
     /** INVENTORY VALUES */
     private int currentItemSlot = 0;
@@ -504,7 +504,7 @@ public class Player extends Entity {
 
     private void findInteraction() {
 
-        NPC npc = gp.cChecker.checkMovementCollision(this, gp.npcs);
+        NPC npc = gp.cChecker.checkNPC(this);
         if (npc != null) {
             npc.interact(this);
         }
@@ -761,7 +761,7 @@ public class Player extends Entity {
     private void handleIceSliding() {
 
         // Player can slip if on ice, running, or actively slipping
-        boolean onIce = gp.cChecker.checkIce(this) || action == RUNNING || slideCounter > 0;
+        boolean onIce = gp.cChecker.checkIceTile(this) || action == RUNNING || slideCounter > 0;
         if (!onIce || action == ROLLING) {
             slideCounter = 0;
             animationSpeed = 10;
@@ -893,7 +893,7 @@ public class Player extends Entity {
     }
     private void checkHarmfulCollision() {
 
-        gp.cChecker.checkHazard(this);
+        gp.cChecker.checkTileHazard(this);
 
         Enemy enemy = gp.cChecker.checkMovementCollision(this, gp.enemies);
         if (enemy != null && !enemy.invincible) {
@@ -1318,7 +1318,7 @@ public class Player extends Entity {
             elevated = false;
             action = IDLE;
 
-            gp.cChecker.checkHazard(this);
+            gp.cChecker.checkTileHazard(this);
         }
     }
 
@@ -1932,5 +1932,9 @@ public class Player extends Entity {
     }
     public void setCurrentItemSlot(int currentItemSlot) {
         this.currentItemSlot = currentItemSlot;
+    }
+
+    public void setSafePoint(Point safePoint) {
+        this.safePoint = safePoint;
     }
 }
