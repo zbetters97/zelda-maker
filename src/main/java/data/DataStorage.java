@@ -8,9 +8,6 @@ public class DataStorage implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // FILE INFO
-    public String file_date;
-
     // PLAYER
     public int pWorldX, pWorldY;
     public String direction;
@@ -20,7 +17,7 @@ public class DataStorage implements Serializable {
     public int currentItemSlot;
 
     // TILES
-    public int[] tileNums;
+    public int[] tileNumbers;
 
     // NPCs
     public String[] npcNames, npcDirections, npcLoot;

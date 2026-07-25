@@ -876,6 +876,9 @@ public class Entity {
     public void setOnPath(boolean onPath) {
         this.onPath = onPath;
     }
+    public void setPathCompleted(boolean pathCompleted) {
+        this.pathCompleted = pathCompleted;
+    }
     public EntityAI getAI() {
         return ai;
     }

@@ -3,6 +3,7 @@ package application;
 import UI.UI;
 import UI.Camera;
 import ai.PathFinder;
+import data.DataStorage;
 import data.EntityGenerator;
 import data.SaveLoad;
 import entity.Entity;
@@ -84,6 +85,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     /** HANDLERS */
     public final SaveLoad saveLoad = new SaveLoad(this);
+    public final DataStorage snapshot = new DataStorage();
     public TileManager tileM = new TileManager(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
@@ -129,7 +131,6 @@ public class GamePanel extends JPanel implements Runnable {
         player.setDefaultValues();
         entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
 
-        saveLoad.load();
         ui.cursor.setWorldPoint(player.getWorldPoint());
 
         if (fullScreenOn) setFullScreen();
@@ -216,32 +217,30 @@ public class GamePanel extends JPanel implements Runnable {
             player.update();
             updateEntities();
 
-            handleStartPressPlay();
+            handleStartPress(false);
         }
         else if (GAME_STATE == EDIT_STATE) {
             camera.follow(ui.cursor.getWorldPoint());
-            handleStartPressEdit();
+            handleStartPress(true);
         }
     }
 
-    private void handleStartPressPlay() {
+    private void handleStartPress(boolean save) {
         if (!keyH.startPressed) return;
         keyH.startPressed = false;
 
-        resetGame();
+        if (save) {
+            saveLoad.saveSnapshot(snapshot);
+            GAME_STATE = PLAY_STATE;
+        }
+        else {
+            resetGame();
 
-        saveLoad.load();
-        ui.cursor.setWorldPoint(player.getWorldPoint());
+            saveLoad.loadSnapshot(snapshot);
+            ui.cursor.setWorldPoint(player.getWorldPoint());
 
-        GAME_STATE = EDIT_STATE;
-    }
-    private void handleStartPressEdit() {
-        if (!keyH.startPressed) return;
-        keyH.startPressed = false;
-
-        saveLoad.save();
-
-        GAME_STATE = PLAY_STATE;
+            GAME_STATE = EDIT_STATE;
+        }
     }
 
     /** UPDATERS **/

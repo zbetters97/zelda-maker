@@ -13,7 +13,6 @@ public class EntityAI {
     private final GamePanel gp;
     private final Entity entity;
 
-    private boolean pathCompleted = false;
     private int counter = 0;
     
     public EntityAI(GamePanel gp, Entity entity) {
@@ -106,10 +105,12 @@ public class EntityAI {
 
         // GOAL REACHED
         if (!gp.pFinder.pathList.isEmpty()) {
+
             int nextCol = gp.pFinder.pathList.getFirst().col;
             int nextRow = gp.pFinder.pathList.getFirst().row;
+
             if (nextCol == goalCol && nextRow == goalRow) {
-                pathCompleted = true;
+                entity.setPathCompleted(true);
             }
         }
     }

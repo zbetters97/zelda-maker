@@ -175,18 +175,18 @@ public class PathFinder {
 
             // RESET BEST NODE (FIRST IS ALWAYS < 999)
             int bestNodeIndex = 0;
-            int bestNodefCost = 999;
+            int bestNodeOfCost = 999;
 
             // LOOP THROUGH EACH POTENTIAL NODE
             for (int i = 0; i < openList.size(); i++) {
 
                 // IF F COST IS BETTER
-                if (openList.get(i).fCost < bestNodefCost) {
+                if (openList.get(i).fCost < bestNodeOfCost) {
                     bestNodeIndex = i;
-                    bestNodefCost = openList.get(i).fCost;
+                    bestNodeOfCost = openList.get(i).fCost;
                 }
                 // IF F COST IS EQUAL, CHECK G COST
-                else if (openList.get(i).fCost == bestNodefCost) {
+                else if (openList.get(i).fCost == bestNodeOfCost) {
                     if (openList.get(i).gCost < openList.get(bestNodeIndex).gCost) {
                         bestNodeIndex = i;
                     }

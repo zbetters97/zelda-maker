@@ -2,7 +2,11 @@
   <dictionary name="project">
     <words>
       <w>cucco</w>
+      <w>downleft</w>
+      <w>npcs</w>
       <w>spincharging</w>
+      <w>upleft</w>
+      <w>ztarget</w>
     </words>
   </dictionary>
 </component>

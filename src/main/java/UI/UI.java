@@ -60,8 +60,6 @@ public class UI {
     private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
     private int entityListIndex = 0;
     private int entityIndex = 0;
-    private Entity currentEntity;
-    private Entity selectedEntity;
 
     /** TILE EDITING */
     private final ArrayList<ArrayList<UIEntity>> tileLibrary = new ArrayList<>();
@@ -80,7 +78,7 @@ public class UI {
     private BufferedImage
             heart_0, heart_1, heart_2, heart_3, heart_4,
             rupee, key, bossKey,
-            ztarget_arrow, ztarget_circle;
+            zTarget_arrow, zTarget_circle;
 
     /**
      * CONSTRUCTOR
@@ -117,8 +115,8 @@ public class UI {
         getZTargetImages();
     }
     private void getZTargetImages() {
-        ztarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
-        ztarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
+        zTarget_arrow = setupImage("/ui/ui_ztarget_arrow", 48 + 20, 48 + 20);
+        zTarget_circle = setupImage("/ui/ui_ztarget_circle", 48 + 20, 48 + 20);
     }
     private void getHUDImages() {
 
@@ -170,7 +168,7 @@ public class UI {
      * DRAW
      * Draws the UI
      * Called by GamePanel
-     * @param g2 Graphics2D enginge
+     * @param g2 Graphics2D engine
      */
     public void draw(Graphics2D g2) {
 
@@ -192,7 +190,7 @@ public class UI {
 
     /**
      * DRAW HUD
-     * Draws the HUD during playstate
+     * Draws the HUD during Play State
      * called by draw()
      */
     private void drawHUD() {
@@ -574,7 +572,7 @@ public class UI {
         int x = screen.x - 10;
         int y = screen.y - 30 + zTargetCounter;
 
-        g2.drawImage(ztarget_arrow, x, y, null);
+        g2.drawImage(zTarget_arrow, x, y, null);
     }
     private void drawZTargetCircle(Entity target) {
 
@@ -591,7 +589,7 @@ public class UI {
             zTargetRotation = 0;
         }
 
-        BufferedImage img = rotateImage(ztarget_circle, zTargetRotation);
+        BufferedImage img = rotateImage(zTarget_circle, zTargetRotation);
 
         g2.drawImage(img, screen.x - 10, screen.y - 10, null);
     }
@@ -738,7 +736,7 @@ public class UI {
         wasYPressed = gp.keyH.yPressed;
 
         // Switch tile editing on/off (prevent when grabbing entity)
-        if (gp.keyH.lPressed && selectedEntity == null) {
+        if (gp.keyH.lPressed && !cursor.hasSelectedEntity()) {
             gp.keyH.lPressed = false;
 
             editingTiles = !editingTiles;
@@ -755,8 +753,8 @@ public class UI {
         gp.camera.worldToScreen(cursor.getWorldPoint(), screenPoint);
 
         // Entity currently selected, draw sprite under cursor
-        if (!editingTiles && selectedEntity != null) {
-            g2.drawImage(selectedEntity.getSprite(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize, null);
+        if (!editingTiles && cursor.hasSelectedEntity()) {
+            g2.drawImage(cursor.getSelectedEntity().getSprite(), screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize, null);
             g2.drawImage(cursor.getSelect(), screenPoint.x - 6, screenPoint.y - 6, gp.tileSize + 13, gp.tileSize + 13,null);
         }
         else {
@@ -960,27 +958,27 @@ public class UI {
             editing_HandleMapEntityAPress(mapEntity);
         }
         // Currently holding an entity over an empty spot
-        else if (selectedEntity != null) {
-            editing_HandleEntityAPress(selectedEntity);
+        else if (cursor.hasSelectedEntity()) {
+            editing_HandleEntityAPress(cursor.getSelectedEntity());
         }
         // Not currently holding an entity over an empty spot
         else {
-            editing_HandleEntityAPress(currentEntity);
+            editing_HandleEntityAPress(cursor.getCurrentEntity());
         }
     }
 
     private void editing_HandleMapEntityAPress(Entity mapEntity) {
 
         // Attempt to give loot
-        if (editing_GiveLoot(mapEntity, selectedEntity) || editing_GiveLoot(mapEntity, currentEntity)) {
-            selectedEntity = null;
+        if (editing_GiveLoot(mapEntity, cursor.getSelectedEntity()) || editing_GiveLoot(mapEntity, cursor.getCurrentEntity())) {
+            cursor.setSelectedEntity(null);
             return;
         }
 
         // Grab map entity if not currently holding an entity
-        if (selectedEntity == null) {
+        if (!cursor.hasSelectedEntity()) {
 
-            selectedEntity = mapEntity;
+            cursor.setSelectedEntity(mapEntity);
 
             // Move player offscreen when selected
             if (mapEntity == gp.player) {
@@ -998,7 +996,7 @@ public class UI {
 
         // Place on map
         editing_PlaceEntity(entity);
-        selectedEntity = null;
+        cursor.setSelectedEntity(null);
     }
 
     private Entity editing_GetEntityAtTile() {
@@ -1042,7 +1040,8 @@ public class UI {
 
         UIEntity uiEntity = entityLibrary.get(entityListIndex).get(entityIndex);
 
-        currentEntity = gp.eGenerator.getEntity(uiEntity.getName());
+        Entity currentEntity = gp.eGenerator.getEntity(uiEntity.getName());
+        cursor.setCurrentEntity(currentEntity);
         if (currentEntity == null) return;
 
         currentEntity.setWorldPoint(cursor.getWorldPoint());
@@ -1185,7 +1184,7 @@ public class UI {
             image = utility.scaleImage(image, width, height);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         return image;
@@ -1208,7 +1207,7 @@ public class UI {
             image = utility.scaleImage(image, gp.tileSize, gp.tileSize);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         return image;

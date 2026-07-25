@@ -1,6 +1,7 @@
 package UI;
 
 import application.GamePanel;
+import entity.Entity;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -8,10 +9,9 @@ import java.awt.image.BufferedImage;
 public class Cursor {
 
     private final GamePanel gp;
-
-    private final Point worldPoint = new Point();
-
     private final BufferedImage cursor, cursor_select;
+    private final Point worldPoint = new Point();
+    private Entity currentEntity, selectedEntity;
 
     public Cursor(GamePanel gp) {
         this.gp = gp;
@@ -33,6 +33,11 @@ public class Cursor {
         worldPoint.x = Math.min(gp.worldWidth - gp.tileSize, worldPoint.x + gp.tileSize);
     }
 
+    public boolean hasSelectedEntity() {
+        return selectedEntity != null;
+    }
+
+    /** GETTERS AND SETTERS */
     public BufferedImage getCursor() {
         return cursor;
     }
@@ -43,7 +48,6 @@ public class Cursor {
     public Point getWorldPoint() {
         return worldPoint;
     }
-
     public void setWorldPoint(Point worldPoint) {
         int newX = Math.round((float) worldPoint.x / gp.tileSize) * gp.tileSize;
         int newY = Math.round((float) worldPoint.y / gp.tileSize) * gp.tileSize;
@@ -56,5 +60,19 @@ public class Cursor {
     }
     public int getWorldY() {
         return worldPoint.y;
+    }
+
+    public void setCurrentEntity(Entity currentEntity) {
+        this.currentEntity = currentEntity;
+    }
+    public Entity getCurrentEntity() {
+        return currentEntity;
+    }
+
+    public void setSelectedEntity(Entity selectedEntity) {
+        this.selectedEntity = selectedEntity;
+    }
+    public Entity getSelectedEntity() {
+        return selectedEntity;
     }
 }
