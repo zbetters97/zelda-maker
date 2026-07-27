@@ -8,10 +8,34 @@ import entity.npc.NPC;
 import entity.object.Object;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Path;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+import java.util.UUID;
 
-public record SaveLoad(GamePanel gp) {
+public class SaveLoad {
 
-    public void saveSnapshot(DataStorage ds) {
+    GamePanel gp;
+
+    public SaveLoad(GamePanel gp) {
+        this.gp = gp;
+    }
+
+    public void saveSnapshot() {
+
+        DataStorage ds = new DataStorage();
+
+        ds.world_name = "testing";
+
+        // 01/31/2026 format
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        sdf.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+        ds.file_date = sdf.format(new Date(System.currentTimeMillis()));
 
         // PLAYER DATA
         ds.pWorldX = gp.player.getWorldPoint().x;
@@ -123,9 +147,62 @@ public record SaveLoad(GamePanel gp) {
             ds.objectDirections[i] = object.getDirection().toString();
             ds.objectLoot[i] = object.getLoot() == null ? "NULL" : object.getLoot().getName();
         }
+
+        gp.snapshot = ds;
     }
 
-    public void loadSnapshot(DataStorage ds) {
+    public void save(String fileName) {
+        if (gp.dbNotConnected()) return;
+
+        try {
+            // Create new save or overwrite existing one
+            String fileID = fileName.isEmpty() ? UUID.randomUUID() + ".dat" : fileName;
+            Path tempFile = Path.of(fileID);
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tempFile.toFile()));
+
+            // Write to the DS object
+            oos.writeObject(gp.snapshot);
+            oos.close();
+
+            // Upload to Firebase storage
+            gp.db.uploadWorld(tempFile);
+
+            // Update stored save files
+            gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+        }
+        catch (Exception e) {
+            System.out.println("Error saving world: " + e.getMessage());
+        }
+    }
+
+    public void load(String fileName) {
+        loadWorld(fileName);
+        loadSnapshot();
+    }
+    private void loadWorld(String fileName) {
+        if (gp.dbNotConnected()) return;
+
+        try {
+            // Get save file from Firebase storage
+            byte[] data = gp.db.downloadWorld(fileName);
+            if (data == null) return;
+
+            // Read saved file
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+
+            // Load data to the DS object
+            gp.snapshot = (DataStorage) ois.readObject();
+
+            // Close file
+            ois.close();
+        }
+        catch (Exception e) {
+            System.out.println("Error loading world: " + e.getMessage());
+        }
+    }
+    public void loadSnapshot() {
+
+        DataStorage ds = gp.snapshot;
 
         // PLAYER DATA
         gp.player.setWorldPoint(new Point(ds.pWorldX, ds.pWorldY));

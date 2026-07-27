@@ -2,8 +2,11 @@
   <library name="gradle-wrapper">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../baba-is-you-editor/gradle/wrapper/gradle-wrapper.jar!/" />
+      <root url="file://$PROJECT_DIR$" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/src/main/java" />
+    </SOURCES>
   </library>
 </component>

@@ -772,7 +772,6 @@ public class UI {
             g2.drawImage(sprite, screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize,null);
         }
     }
-
     private void drawCurrentSprite(Point screenPoint, float alpha, BufferedImage sprite) {
 
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));

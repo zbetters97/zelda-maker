@@ -3,6 +3,21 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
+/.idea/
+/*.iml
+
+# Gradle
+/build/
+.gradle/
+
+# Logs
+*.log
+
+# Firebase secrets
+**/firebase-key.json
+
+# Google Auth secrets
+**/oauth.json
 
 ### Eclipse ###
 .apt_generated

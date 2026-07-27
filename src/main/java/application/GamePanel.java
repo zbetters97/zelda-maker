@@ -3,9 +3,7 @@ package application;
 import UI.UI;
 import UI.Camera;
 import ai.PathFinder;
-import data.DataStorage;
-import data.EntityGenerator;
-import data.SaveLoad;
+import data.*;
 import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
@@ -20,10 +18,7 @@ import tile.TileManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -84,11 +79,18 @@ public class GamePanel extends JPanel implements Runnable {
     public final int EDIT_STATE = 3;
 
     /** HANDLERS */
-    public final SaveLoad saveLoad = new SaveLoad(this);
-    public final DataStorage snapshot = new DataStorage();
     public TileManager tileM = new TileManager(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
+
+    /** DATA HANDLING */
+    private final SaveLoad saveLoad = new SaveLoad(this);
+    public DataStorage snapshot = new DataStorage();
+    public Map<String, String> saveFiles = new LinkedHashMap<>();
+    public final Firebase db = new Firebase(this);
+    private boolean dbConnected = false;
+    public Auth auth = new Auth();
+    public String filePath = "";
 
     /** ENTITIES */
     private final ArrayList<Entity> entityList = new ArrayList<>();
@@ -125,6 +127,9 @@ public class GamePanel extends JPanel implements Runnable {
         // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
         g2 = (Graphics2D) tempScreen.getGraphics();
+
+        // Connect to Firebase
+        dbConnected = db.init();
 
         tileM.loadMap();
 
@@ -229,14 +234,16 @@ public class GamePanel extends JPanel implements Runnable {
         if (!keyH.startPressed) return;
         keyH.startPressed = false;
 
+        keyH.stopAllKeys();
+
         if (save) {
-            saveLoad.saveSnapshot(snapshot);
+            saveLoad.saveSnapshot();
             GAME_STATE = PLAY_STATE;
         }
         else {
             resetGame();
 
-            saveLoad.loadSnapshot(snapshot);
+            saveLoad.loadSnapshot();
             ui.cursor.setWorldPoint(player.getWorldPoint());
 
             GAME_STATE = EDIT_STATE;
@@ -382,5 +389,36 @@ public class GamePanel extends JPanel implements Runnable {
         for (ArrayList<? extends Entity> list : entities) {
             list.clear();
         }
+    }
+
+    public void changeLogin() {
+
+        // Logout if already logged in
+        if (auth.isLoggedIn()) {
+            auth.logout();
+            saveFiles.clear();
+            return;
+        }
+
+        try {
+            // Attempt to log in via Google on the web browser
+            String idToken = auth.authorize();
+            auth.login(idToken);
+
+            // Failed to log in
+            if (!auth.isLoggedIn()) {
+                throw new Exception("User not logged in");
+            }
+
+            // Assign current user ID to world path
+            filePath = "worlds/" + auth.getUserId() + "/";
+        }
+        catch (Exception e) {
+            System.out.println("Error logging in: " + e.getMessage());
+        }
+    }
+
+    public boolean dbNotConnected() {
+        return !dbConnected;
     }
 }

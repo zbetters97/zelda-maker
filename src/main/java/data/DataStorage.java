@@ -8,6 +8,8 @@ public class DataStorage implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    public String world_name, file_date;
+
     // PLAYER
     public int pWorldX, pWorldY;
     public String direction;

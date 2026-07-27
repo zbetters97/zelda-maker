@@ -135,4 +135,18 @@ public class KeyHandler implements KeyListener {
             lock = true;
         }
     }
+
+    public void stopAllKeys() {
+        upPressed = false;
+        downPressed = false;
+        leftPressed = false;
+        rightPressed = false;
+
+        startPressed = false;
+
+        aPressed = false;
+        bPressed = false;
+        yPressed = false;
+        xPressed = false;
+    }
 }
