@@ -14,10 +14,10 @@ out/
 *.log
 
 # Firebase secrets
-**/firebase-key.json
+firebase-key.json
 
 # Google Auth secrets
-**/oauth.json
+oauth.json
 
 ### Eclipse ###
 .apt_generated
