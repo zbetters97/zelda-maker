@@ -31,14 +31,19 @@ public class UI {
     private int subState = 0;
     private int commandNum = 0;
     private Map<String, String> usersList = new HashMap<>();
-    private boolean viewingUserLevels = false;
-    private boolean isSaving = false;
-    private boolean isLoading = false;
+    private boolean viewingUserLevels;
+
+    /** SAVE/LOAD HANDLERS */
+    private final Map<Integer, String> keyboard = new LinkedHashMap<>();
+    private boolean capital = true;
+    private String textInput = "";
+    private boolean isSaving;
+    private boolean isLoading;
 
     /** EDITING HANDLERS */
     public Cursor cursor;
-    private boolean wasYPressed = false;
-    private boolean editingTiles = false;
+    private boolean wasYPressed ;
+    private boolean editingTiles;
 
     /** ENTITY EDITING */
     private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
@@ -57,7 +62,6 @@ public class UI {
             {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63} // Dungeon 2
     };
     public Point selectedTile;
-
 
     /** ITEM COLORS */
     private final Color itm_brown_1 = new Color(168, 127, 89);
@@ -203,18 +207,23 @@ public class UI {
     private void drawPauseState() {
 
         if (subState == 0) {
-            if (!gp.dbNotConnected() && gp.auth.isLoggedIn()) {
-                drawPause_Screen_User();
-            }
-            else {
+            if (gp.dbNotConnected() || !gp.auth.isLoggedIn()) {
                 drawPause_Screen();
             }
+            else {
+                drawPause_Screen_Auth();
+            }
+
+            pauseScreen_Input_Start();
+        }
+        else if (subState == 1) {
+            drawPause_Users();
         }
         else if (subState == 2) {
-            drawPause_Level();
+            drawPause_Levels();
         }
-        else if (subState == 4) {
-            drawPause_Users();
+        else if (subState == 3) {
+            drawPause_Name();
         }
     }
 
@@ -241,7 +250,7 @@ public class UI {
 
                 commandNum = 0;
                 subState = 0;
-                gp.saveLoad.saveSnapshot();
+                gp.saveLoad.saveSnapshot("temp");
                 gp.GAME_STATE = gp.PLAY_STATE;
             }
         }
@@ -271,7 +280,7 @@ public class UI {
                 if (usersList == null || usersList.isEmpty()) return;
 
                 commandNum = 0;
-                subState = 4;
+                subState = 1;
             }
         }
 
@@ -283,6 +292,9 @@ public class UI {
             if (gp.keyH.aPressed) {
                 gp.keyH.aPressed = false;
                 gp.changeLogin();
+
+                commandNum = 0;
+                subState = 0;
             }
         }
 
@@ -295,7 +307,7 @@ public class UI {
                 gp.keyH.aPressed = false;
 
                 commandNum = 0;
-                subState = 5;
+                subState = 4;
             }
         }
 
@@ -318,7 +330,7 @@ public class UI {
         }
     }
 
-    private void drawPause_Screen_User() {
+    private void drawPause_Screen_Auth() {
 
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
@@ -341,7 +353,7 @@ public class UI {
 
                 commandNum = 0;
                 subState = 0;
-                gp.saveLoad.saveSnapshot();
+                gp.saveLoad.saveSnapshot("temp");
                 gp.GAME_STATE = gp.PLAY_STATE;
             }
         }
@@ -370,8 +382,7 @@ public class UI {
                 gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
                 if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
 
-                isSaving = false;
-                isLoading = true;
+                isSaving = false; isLoading = true;
                 commandNum = 0;
                 subState = 2;
             }
@@ -386,10 +397,9 @@ public class UI {
                 gp.keyH.aPressed = false;
 
                 gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+                // if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
 
-                isSaving = true;
-                isLoading = false;
+                isSaving = true; isLoading = false;
                 commandNum = 0;
                 subState = 2;
             }
@@ -406,8 +416,7 @@ public class UI {
                 gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
                 if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
 
-                isSaving = false;
-                isLoading = false;
+                isSaving = false; isLoading = false;
                 commandNum = 0;
                 subState = 2;
             }
@@ -422,10 +431,7 @@ public class UI {
                 gp.keyH.aPressed = false;
 
                 commandNum = 0;
-                subState = 0;
-
-                gp.saveLoad.saveSnapshot();
-                gp.GAME_STATE = gp.PLAY_STATE;
+                subState = 3;
             }
         }
 
@@ -441,7 +447,7 @@ public class UI {
                 if (usersList == null || usersList.isEmpty()) return;
 
                 commandNum = 0;
-                subState = 4;
+                subState = 1;
             }
         }
 
@@ -454,6 +460,9 @@ public class UI {
             if (gp.keyH.aPressed) {
                 gp.keyH.aPressed = false;
                 gp.changeLogin();
+
+                commandNum = 0;
+                subState = 0;
             }
         }
 
@@ -466,7 +475,7 @@ public class UI {
                 gp.keyH.aPressed = false;
 
                 commandNum = 0;
-                subState = 5;
+                subState = 4;
             }
         }
 
@@ -489,7 +498,95 @@ public class UI {
         }
     }
 
-    private void drawPause_Level() {
+    private void pauseScreen_Input_Start() {
+        if (!gp.keyH.startPressed) return;
+        gp.keyH.startPressed = false;
+
+        commandNum = 0;
+        subState = 0;
+
+        gp.GAME_STATE = gp.EDIT_STATE;
+    }
+
+    private void drawPause_Users() {
+        if (usersList == null || usersList.isEmpty()) return;
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize * 2;
+        int y = gp.tileSize * 2;
+        int width = gp.tileSize * 12;
+        int height = (int) ((gp.tileSize * .95) * (usersList.size() + 1));
+        drawSubWindow(x, y, width, height);
+
+        drawPause_UsersList();
+
+        pauseUsers_Input_B();
+        pauseUsers_Input_Dir();
+    }
+    private void drawPause_UsersList() {
+
+        String text;
+        int index = 0;
+
+        int x = gp.tileSize * 3;
+        int y = gp.tileSize * 3;
+
+        for (Map.Entry<String, String> entry : usersList.entrySet()) {
+
+            text = index + 1 + ")  " + entry.getValue();
+            g2.drawString(text, x, y);
+
+            if (commandNum == index) {
+                g2.drawString(">", x - 25, y);
+                boolean aPressed = pauseUsers_Input_A(entry.getKey());
+                if (aPressed) break;
+            }
+
+            index++;
+            y += gp.tileSize;
+        }
+    }
+    private boolean pauseUsers_Input_A(String userId) {
+        if (!gp.keyH.aPressed) return false;
+        gp.keyH.aPressed = false;
+
+        gp.saveFiles = gp.db.getUserWorlds(userId);
+
+        viewingUserLevels = true;
+        isSaving = false;
+        isLoading = true;
+        commandNum = 0;
+        subState = 2;
+
+        return true;
+    }
+    private void pauseUsers_Input_B() {
+        if (!gp.keyH.bPressed) return;
+        gp.keyH.bPressed = false;
+
+        commandNum = 0;
+        subState = 0;
+    }
+    private void pauseUsers_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (usersList.size() - 1< ++commandNum) {
+                commandNum = usersList.size() - 1;
+            }
+        }
+    }
+
+    private void drawPause_Levels() {
 
         // Trying to load/delete a file from a blank list
         if (gp.saveFiles.isEmpty() && !isSaving) return;
@@ -516,7 +613,7 @@ public class UI {
 
         drawPause_ListLevels(x, y, index);
 
-        pauseLevel_Input_Back();
+        pauseLevel_Input_B();
         pauseLevel_Input_Dir();
     }
     private void drawPause_SaveLevel(int x, int y) {
@@ -544,8 +641,7 @@ public class UI {
 
             if (commandNum == index) {
                 g2.drawString(">", x - 25, y);
-
-                boolean aPressed = pauseLevel_Input_A(entry);
+                boolean aPressed = pauseLevel_Input_A(entry.getKey(), entry.getValue());
                 if (aPressed) break;
             }
 
@@ -553,43 +649,47 @@ public class UI {
             y += gp.tileSize;
         }
     }
-    private boolean pauseLevel_Input_A(Map.Entry<String, String> entry) {
+    private boolean pauseLevel_Input_A(String fileName, String levelName) {
         if (!gp.keyH.aPressed) return false;
         gp.keyH.aPressed = false;
 
+        if (isSaving) {
+            // Chop off date from level name
+            String lvlName = levelName.contains(" [") ?
+                    levelName.substring(0, levelName.indexOf(" [")) :
+                    levelName;
+
+            gp.saveLoad.save(lvlName, fileName);
+        }
+        else if (isLoading) {
+            gp.resetGame();
+
+            gp.saveLoad.load(fileName);
+
+            cursor.setWorldPoint(gp.player.getWorldPoint());
+            gp.camera.follow(cursor.getWorldPoint());
+        }
+        else {
+            gp.saveLoad.delete(fileName);
+        }
+
+        gp.saveFiles.clear();
         viewingUserLevels = false;
         commandNum = 0;
         subState = 0;
 
-        if (isSaving) {
-            // Chop off date from level name
-            String lvlName = entry.getValue().contains(" [") ?
-                    entry.getValue().substring(0, entry.getValue().indexOf(" [")) :
-                    entry.getValue();
-
-            gp.saveLoad.save(lvlName);
-        }
-        else if (isLoading) {
-            gp.saveLoad.load(entry.getKey());
-        }
-        else {
-            gp.saveLoad.delete(entry.getKey());
-        }
-
-        gp.saveFiles.clear();
         return true;
     }
-    private void pauseLevel_Input_Back() {
-        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
+    private void pauseLevel_Input_B() {
+        if (!gp.keyH.bPressed) return;
         gp.keyH.bPressed = false;
-        gp.keyH.startPressed = false;
 
         commandNum = 0;
-        subState = 1;
+        subState = 0;
 
         if (viewingUserLevels) {
             viewingUserLevels = false;
-            subState = 4;
+            subState = 1;
         }
 
         gp.saveFiles.clear();
@@ -612,74 +712,185 @@ public class UI {
         }
     }
 
-    private void drawPause_Users() {
-
-        if (usersList == null || usersList.isEmpty()) return;
+    private void drawPause_Name() {
 
         g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 40F));
 
-        int x = gp.tileSize * 2;
-        int y = gp.tileSize * 2;
-        int width = gp.tileSize * 12;
-        int height = (int) ((gp.tileSize * .95) * (usersList.size() + 1));
+        drawPause_Keyboard();
+    }
+    private void drawPause_Keyboard() {
+
+        String keyboardLetters = (capital) ? "QWERTYUIOPASDFGHJKLZXCVBNM_" : "qwertyuiopasdfghjklzxcvbnm_";
+
+        int defaultX = gp.tileSize * 2;
+        int x = defaultX;
+        int y = (int) (gp.tileSize * 1.5);
+        int width = gp.tileSize * 13;
+        int height = gp.tileSize * 9;
         drawSubWindow(x, y, width, height);
 
-        x = gp.tileSize * 3;
-        y = gp.tileSize * 3;
-        String text;
+        x = getXForCenteredTextOnWidth("Please name your level", width, x);
+        y += (int) (gp.tileSize * 1.25);
+        g2.drawString("Please name your level", x, y);
 
+        String text = textInput.length() <= 21 ?
+                "-> " + textInput + "_" :
+                "-> " + textInput;
+        defaultX += gp.tileSize;
+        x = defaultX;
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString(text, x, y);
+
+        y += gp.tileSize * 2;
         int index = 0;
-
-        for (Map.Entry<String, String> entry : usersList.entrySet()) {
-
-            text = index + 1 + ")  " + entry.getValue();
-            g2.drawString(text, x, y);
-
-            if (commandNum == index) {
-                g2.drawString(">", x - 25, y);
-
-                if (gp.keyH.aPressed) {
-                    gp.keyH.aPressed = false;
-
-                    gp.saveFiles = gp.db.getUserWorlds(entry.getKey());
-
-                    viewingUserLevels = true;
-                    isSaving = false;
-                    isLoading = true;
-                    commandNum = 0;
-                    subState = 2;
-                }
+        for (char key : keyboardLetters.toCharArray()) {
+            if (key == 'A' || key == 'a' || key == 'Z' || key == 'z') {
+                x = defaultX;
+                y += gp.tileSize;
             }
 
+            text = commandNum == index ?  "[" + key + "]" : " " + key + " ";
+            g2.drawString(text, x, y);
+
+            x += gp.tileSize;
             index++;
-            y += gp.tileSize;
         }
 
-        pauseUsers_Input_Back();
-        pauseUsers_Input_Dir();
-    }
-    private void pauseUsers_Input_Back() {
-        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
-        gp.keyH.bPressed = false;
-        gp.keyH.startPressed = false;
+        text = commandNum == keyboardLetters.length() ? "[DEL]" : " DEL ";
+        g2.drawString(text, x, y);
 
-        commandNum = 0;
-        subState = 0;
+        x += (int) (gp.tileSize * 1.75);
+        text = commandNum == keyboardLetters.length() + 1 ? "[CAP]" : " CAP ";
+        g2.drawString(text, x, y);
+
+        x = defaultX + gp.tileSize * 2;
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("GO BACK", x, y);
+        if (commandNum == keyboardLetters.length() + 2) {
+            g2.drawString(">", x - gp.tileSize / 2, y);
+        }
+
+        x += gp.tileSize * 5;
+        g2.drawString("SUBMIT", x, y);
+        if (commandNum == keyboardLetters.length() + 3) {
+            g2.drawString(">", x - gp.tileSize / 2, y);
+        }
+
+        for (int i = 0; i < keyboardLetters.length(); i++) {
+            keyboard.put(i, String.valueOf(keyboardLetters.charAt(i)));
+        }
+
+        pauseKeyboard_Input_A(keyboardLetters);
+        pauseKeyboard_Input_B();
+        pauseKeyboard_Input_Dir(keyboardLetters);
     }
-    private void pauseUsers_Input_Dir() {
+    private void pauseKeyboard_Input_A(String keyboardLetters) {
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
+
+        int MAX_WORLD_NAME = 20;
+
+        // LETTER SELECT
+        if (commandNum < keyboardLetters.length()) {
+            if (textInput.length() > MAX_WORLD_NAME) return;
+
+            // SPACE BUTTON
+            if (commandNum == keyboardLetters.length() - 1) {
+                textInput += " ";
+            }
+            // LETTER
+            else {
+                // Get char in map via corresponding key (EX: 0 -> Q, 10 -> A)
+                textInput += keyboard.get(commandNum);
+            }
+        }
+        // DEL BUTTON
+        else if (commandNum == keyboardLetters.length()) {
+            if (textInput.isEmpty()) return;
+            textInput = textInput.substring(0, textInput.length() - 1);
+        }
+        // CAPS BUTTON
+        else if (commandNum == keyboardLetters.length() + 1) {
+            capital = !capital;
+        }
+        // BACK BUTTON
+        else if (commandNum == keyboardLetters.length() + 2) {
+            textInput = "";
+            capital = true;
+            commandNum = 0;
+            subState = 0;
+        }
+        // SUBMIT BUTTON
+        else if (commandNum == keyboardLetters.length() + 3) {
+            if (textInput.length() < 3 || textInput.length() > MAX_WORLD_NAME) return;
+
+            gp.saveLoad.save(textInput, "");
+            commandNum = 0;
+            subState = 0;
+
+            textInput = "";
+            capital = true;
+        }
+    }
+    private void pauseKeyboard_Input_B() {
+        if (!gp.keyH.bPressed || textInput.isEmpty()) return;
+        gp.keyH.bPressed = false;
+
+        textInput = textInput.substring(0, textInput.length() - 1);
+    }
+    private void pauseKeyboard_Input_Dir(String keyboardLetters) {
+
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (commandNum >= 10 && commandNum <= 18) {
+                commandNum -= 10;
+            }
+            else if (commandNum >= 19 && commandNum <= 25) {
+                commandNum -= 9;
+            }
+            else if (commandNum == 26) {
+                commandNum = 17;
+            }
+            else if (commandNum == 27) {
+                commandNum = 18;
+            }
+            else if (commandNum >= 28) {
+                commandNum = 19;
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (usersList.size() < ++commandNum) {
-                commandNum = usersList.size();
+            if (commandNum >= 0 && commandNum <= 8) {
+                commandNum += 10;
+            }
+            else if (commandNum >= 9 && commandNum <= 17) {
+                commandNum += 9;
+            }
+            else if (commandNum == 18) {
+                commandNum += 9;
+            }
+            else if (commandNum >= 19 && commandNum <= keyboardLetters.length()) {
+                commandNum = keyboardLetters.length() + 2;
+            }
+            else if (commandNum < keyboardLetters.length() + 2) {
+                commandNum = keyboardLetters.length() + 2;
+            }
+        }
+        else if (gp.keyH.leftPressed) {
+            gp.keyH.leftPressed = false;
+
+            if (commandNum > 0) {
+                commandNum--;
+            }
+        }
+        else if (gp.keyH.rightPressed) {
+            gp.keyH.rightPressed = false;
+
+            if (commandNum < keyboardLetters.length() + 3) {
+                commandNum++;
             }
         }
     }

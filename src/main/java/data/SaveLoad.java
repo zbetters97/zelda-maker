@@ -26,11 +26,16 @@ public class SaveLoad {
         this.gp = gp;
     }
 
-    public void saveSnapshot() {
+    public void save(String worldName, String fileName) {
+        saveSnapshot(worldName);
+        saveToFile(fileName);
+    }
+
+    public void saveSnapshot(String worldName) {
 
         DataStorage ds = new DataStorage();
 
-        ds.world_name = "testing";
+        ds.world_name = worldName;
 
         // 01/31/2026 format
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -150,8 +155,7 @@ public class SaveLoad {
 
         gp.snapshot = ds;
     }
-
-    public void save(String fileName) {
+    private void saveToFile(String fileName) {
         if (gp.dbNotConnected()) return;
 
         try {

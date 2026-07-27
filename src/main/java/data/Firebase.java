@@ -88,7 +88,7 @@ public record Firebase(GamePanel gp) {
             Bucket bucket = StorageClient.getInstance().bucket();
 
             // Attempt to open the file
-            Blob file = bucket.get(gp.filePath + fileName);
+            Blob file = bucket.get(fileName);
             if (file == null) {
                 throw new IllegalStateException("File not found in Firebase Storage");
             }

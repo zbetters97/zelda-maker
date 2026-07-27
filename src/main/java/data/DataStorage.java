@@ -32,4 +32,8 @@ public class DataStorage implements Serializable {
     // OBJECTS
     public String[] objectNames, objectDirections, objectLoot;
     public int[] objectWorldX, objectWorldY;
+
+    public String toString() {
+        return world_name + " [" + file_date + "]";
+    }
 }

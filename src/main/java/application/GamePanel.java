@@ -212,7 +212,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
 
-        if (GAME_STATE == PAUSE_STATE || GAME_STATE == EDIT_STATE) {
+        if (GAME_STATE == EDIT_STATE) {
             camera.follow(ui.cursor.getWorldPoint());
             handleStartPress();
         }
@@ -231,16 +231,15 @@ public class GamePanel extends JPanel implements Runnable {
         if (!keyH.startPressed) return;
         keyH.stopAllKeys();
 
-        switch (GAME_STATE) {
-            case PAUSE_STATE -> GAME_STATE = EDIT_STATE;
-            case EDIT_STATE -> GAME_STATE = PAUSE_STATE;
-            case PLAY_STATE -> {
-                resetGame();
-                saveLoad.loadSnapshot();
-                ui.cursor.setWorldPoint(player.getWorldPoint());
+        if (GAME_STATE == EDIT_STATE) {
+            GAME_STATE = PAUSE_STATE;
+        }
+        else if (GAME_STATE == PLAY_STATE) {
+            resetGame();
+            saveLoad.loadSnapshot();
+            ui.cursor.setWorldPoint(player.getWorldPoint());
 
-                GAME_STATE = EDIT_STATE;
-            }
+            GAME_STATE = EDIT_STATE;
         }
     }
 
@@ -376,7 +375,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void resetGame() {
+    public void resetGame() {
 
         player.resetValues();
 
