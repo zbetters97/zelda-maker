@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class SaveLoad {
 
-    GamePanel gp;
+    private final GamePanel gp;
 
     public SaveLoad(GamePanel gp) {
         this.gp = gp;
@@ -311,6 +311,14 @@ public class SaveLoad {
             }
 
             gp.objects.add(object);
+        }
+    }
+
+    public void delete(String fileName) {
+        if (gp.dbNotConnected()) return;
+
+        if (gp.db.deleteWorld(fileName)) {
+            gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
         }
     }
 }

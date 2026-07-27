@@ -27,32 +27,16 @@ public class UI {
     private Graphics2D g2;
     private Font PK_DS;
 
-    public Cursor cursor;
-
-    /** UI COLORS */
-    private final Color itm_brown_1 = new Color(168, 127, 89);
-    private final Color itm_brown_2 = new Color(247, 219, 167);
-    private final Color itm_green = new Color(95, 190, 80);
-
-    /** HUD HANDLERS */
-    private int rupeeChange;
-    private int rupeeCounter = 0;
-
-    /** DIALOGUE VALUES */
-    private String dialogue = "";
-    private String currentDialogue = "";
-    private int dialogueCounter = 0;
-    private int charIndex = 0;
-    private String combinedText = "";
-    private boolean canSkip;
-    private Entity dialogueReward;
-
-    /** Z-TARGETING */
-    private int zTargetCounter = 0;
-    private int zTargetDirection = 0;
-    private int zTargetRotation = 0;
+    /** PAUSE HANDLERS */
+    private int subState = 0;
+    private int commandNum = 0;
+    private Map<String, String> usersList = new HashMap<>();
+    private boolean viewingUserLevels = false;
+    private boolean isSaving = false;
+    private boolean isLoading = false;
 
     /** EDITING HANDLERS */
+    public Cursor cursor;
     private boolean wasYPressed = false;
     private boolean editingTiles = false;
 
@@ -74,11 +58,35 @@ public class UI {
     };
     public Point selectedTile;
 
-    /** SPRITES */
+
+    /** ITEM COLORS */
+    private final Color itm_brown_1 = new Color(168, 127, 89);
+    private final Color itm_brown_2 = new Color(247, 219, 167);
+    private final Color itm_green = new Color(95, 190, 80);
+
+    /** HUD SPRITES */
     private BufferedImage
             heart_0, heart_1, heart_2, heart_3, heart_4,
             rupee, key, bossKey,
             zTarget_arrow, zTarget_circle;
+
+    /** RUPEE HANDLERS */
+    private int rupeeChange;
+    private int rupeeCounter = 0;
+
+    /** Z-TARGETING */
+    private int zTargetCounter = 0;
+    private int zTargetDirection = 0;
+    private int zTargetRotation = 0;
+
+    /** DIALOGUE VALUES */
+    private String dialogue = "";
+    private String currentDialogue = "";
+    private int dialogueCounter = 0;
+    private int charIndex = 0;
+    private String combinedText = "";
+    private boolean canSkip;
+    private Entity dialogueReward;
 
     /**
      * CONSTRUCTOR
@@ -177,541 +185,503 @@ public class UI {
         g2.setFont(PK_DS);
         g2.setColor(Color.white);
 
-        if (gp.GAME_STATE == gp.PLAY_STATE) {
-            drawHUD();
-        }
-        else if (gp.GAME_STATE == gp.DIALOGUE_STATE) {
-            drawDialogueState();
+        if (gp.GAME_STATE == gp.PAUSE_STATE) {
+            drawPauseState();
         }
         else if (gp.GAME_STATE == gp.EDIT_STATE) {
             drawEditState();
         }
-    }
-
-    /**
-     * DRAW HUD
-     * Draws the HUD during Play State
-     * called by draw()
-     */
-    private void drawHUD() {
-        drawZTarget();
-        drawChargeBar();
-        drawPlayerHealth();
-        drawPlayerItem();
-        drawKeys();
-        drawBossKey();
-        drawRupeeCount();
-        drawAvailableAction();
-        drawDebug();
-    }
-
-    /**
-     * DRAW PLAYER HEALTH
-     * Draws the current player's health in the top-left corner of the screen
-     * Called by drawHUD()
-     */
-    private void drawPlayerHealth() {
-
-        // Top-left corner of screen
-        int x = gp.tileSize / 2;
-        int y = gp.tileSize / 2;
-        int spacing = (int) (gp.tileSize / 1.7);
-
-        // Get count of whole hearts
-        int maxHearts = gp.player.getMaxHealth() / 4;
-        int currentHealth = gp.player.getHealth();
-
-        // Iterate through all whole hearts
-        for (int i = 0; i < maxHearts; i++) {
-
-            // 4 if currentHealth is above 4, otherwise currentHealth
-            int heartHealth = Math.min(4, currentHealth);
-
-            // Find which fraction heart to use
-            BufferedImage heart;
-            switch (heartHealth) {
-                case 4 -> heart = heart_4;
-                case 3 -> heart = heart_3;
-                case 2 -> heart = heart_2;
-                case 1 -> heart = heart_1;
-                default -> heart = heart_0;
-            }
-
-            g2.drawImage(heart, x, y, null);
-
-            // De-increment health
-            currentHealth -= 4;
-
-            // Move right for next heart
-            x += spacing;
+        else if (gp.GAME_STATE == gp.PLAY_STATE) {
+            drawPlayState();
+        }
+        else if (gp.GAME_STATE == gp.DIALOGUE_STATE) {
+            drawDialogueState();
         }
     }
 
-    /**
-     * DRAW PLAYER ITEM
-     * Draws the current player's item in the top-right corner of the screen
-     * Called by drawHUD()
-     */
-    private void drawPlayerItem() {
-
-        int x = gp.tileSize * 15;
-        int y = gp.tileSize / 3;
-        int width = gp.tileSize + 30;
-        int height = gp.tileSize + 30;
-
-        // DRAW ITEM CIRCLE
-        g2.setColor(itm_brown_1);
-        g2.fillOval(x, y, width, height);
-
-        g2.setColor(itm_green);
-        g2.setStroke(new BasicStroke(4));
-        g2.drawOval(x, y, width, height);
-
-        if (gp.player.getItem() != null) {
-
-            x += 10;
-            y += 10;
-            g2.drawImage(gp.player.getItem().getSprite(), x, y, gp.tileSize + 10, gp.tileSize + 10, null);
-
-            // DRAW ARROW COUNT
-            x += 45;
-            y += 43;
-            if (gp.player.getItem().getName().equals(ITM_Bow.itmName)) {
-                drawItemCount(x, y, Integer.toString(gp.player.getArrows()));
-            }
-            // DRAW BOMB COUNT
-            else if (gp.player.getItem().getName().equals(ITM_Bomb.itmName)) {
-                drawItemCount(x, y, Integer.toString(gp.player.getBombs()));
-            }
-        }
-
-        // DRAW ITEM BUTTON
-        x = gp.tileSize * 16 + 8;
-        y = 10;
-        width = 35;
-        height = 35;
-        g2.setColor(itm_green);
-        g2.fillOval(x, y, width, height);
-
-        g2.setColor(Color.BLACK);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
-        String text = KeyEvent.getKeyText(gp.keyH.btn_X);
-        x = getXForCenteredTextOnWidth(text, width, x);
-        y += 28;
-        g2.drawString(text, x, y);
-
-        g2.setStroke(new BasicStroke(1));
-    }
-
-    private void drawItemCount(int x, int y, String text) {
-
-        int width = 28;
-        int height = 28;
-        g2.setColor(itm_brown_2);
-        g2.fillOval(x, y, width, height);
-
-        g2.setColor(Color.BLACK);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
-        x = getXForCenteredTextOnWidth(text, width, x);
-        y += 24;
-        g2.drawString(text, x, y);
-    }
-
-    private void drawAvailableAction() {
-
-        String availableAction = gp.player.getAvailableAction(gp.player);
-
-        int x = gp.tileSize * 13;
-        int y = gp.tileSize / 3;
-        int width = gp.tileSize + 30;
-        int height = gp.tileSize + 30;
-
-        g2.setColor(Color.WHITE);
-        g2.fillOval(x, y, width, height);
-
-        g2.setStroke(new BasicStroke(4));
-        g2.drawOval(x, y, width, height);
-
-        g2.setColor(Color.BLUE);
-        g2.fillOval(x, y, width, height);
-
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
-        x = getXForCenteredTextOnWidth(availableAction, width, x);
-        y += gp.tileSize;
-        g2.drawString(availableAction, x + 2, y);
-
-        g2.setStroke(new BasicStroke(1));
-    }
-
-    private void drawKeys() {
-
-        // Draw key image
-        int x = gp.tileSize * 14 + 30;
-        int y = gp.tileSize * 10 + 20;
-        g2.drawImage(key, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
-
-        x += gp.tileSize - 8;
-        y += gp.tileSize - 12;
-
-        // Draw key count
-        String keyCount = Integer.toString(gp.player.getKeys());
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
-        g2.drawString(keyCount, x, y);
-    }
-
-    private void drawBossKey() {
-
-        if (!gp.player.getHasBossKey()) return;
-
-        // Draw boss key image
-        int x = gp.tileSize * 15 + 40;
-        int y = gp.tileSize * 10 + 20;
-        g2.drawImage(bossKey, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
-    }
-
-    /**
-     * DRAW RUPEE COUNT
-     * Draws the current player's rupee count in the bottom-right corner of the screen
-     * Called by drawHUD()
-     */
-    private void drawRupeeCount() {
-
-        // Draw rupee image
-        int x = gp.tileSize * 14 + 30;
-        int y = gp.tileSize * 11 + 20;
-        g2.drawImage(rupee, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
-
-        x += gp.tileSize - 8;
-        y += gp.tileSize - 12;
-
-        // Keep new rupees at maximum
-        if (rupeeChange >= gp.player.getMaxRupees()) {
-            rupeeChange = gp.player.getMaxRupees();
-        }
-
-        // Player adds rupees
-        if (gp.player.getRupees() < rupeeChange) {
-            modifyRupeeCount(1);
-        }
-        // Player loses rupees
-        else if (rupeeChange < gp.player.getRupees()) {
-            modifyRupeeCount(-1);
-        }
-
-        String formattedCount = formatRupeeCount();
-
-        // Draw rupee count
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
-        g2.drawString(formattedCount, x, y);
-    }
-
-    /**
-     * MODIFY RUPEE COUNT
-     * Changes player rupee count every 2 frames based on given value
-     * @param count Amount to add to player rupee count
-     */
-    private void modifyRupeeCount(int count) {
-        if (rupeeCounter == 2) {
-            gp.player.addRupees(count);
-            rupeeCounter = 0;
-        }
-        else {
-            rupeeCounter++;
-        }
-    }
-
-    /**
-     * FORMAT RUPEE COUNT
-     * Formats the player rupee count based on wallet size
-     * @return Formatted player rupee count
-     */
-    private String formatRupeeCount() {
-
-        String rupeeCount = "0";
-
-        if (gp.player.getMaxRupees() == 99) {
-            rupeeCount = String.format("%02d", gp.player.getRupees());
-        }
-        else if (gp.player.getMaxRupees() == 999) {
-            rupeeCount = String.format("%03d", gp.player.getRupees());
-        }
-        else if (gp.player.getMaxRupees() == 9999) {
-            rupeeCount = String.format("%04d", gp.player.getRupees());
-        }
-
-        return rupeeCount;
-    }
-    public void addRupees(int rupees) {
-        rupeeChange += rupees;
-    }
-    public void setRupeeChange(int rupees) {
-        rupeeChange = rupees;
-    }
-
-    /**
-     * DRAW CHARGE BAR
-     * Draws the spin attack charge bar
-     * Called by drawHUD()
-     */
-    private void drawChargeBar() {
-
-        // If player is charging spin attack
-        if (gp.player.charge > 0) {
-
-            // Position above player's head
-            int x = gp.player.getScreenPoint().x - 7;
-            int y = gp.player.getScreenPoint().y - 20;
-            int width = 62;
-            int height = 10;
-
-            // Draw black bar
-            Color barColor = Color.BLACK;
-            g2.setColor(barColor);
-            g2.fillRect(x, y, width, height);
-
-            // White outline if not ready, green fill if ready
-            int charge = gp.player.charge;
-            barColor = charge < 120 ? Color.WHITE : new Color(0, 240, 0);
-
-            g2.setColor(barColor);
-            g2.setStroke(new BasicStroke(2));
-            g2.drawRect(x, y, width, height);
-
-            barColor = getChargeColor(charge);
-            g2.setColor(barColor);
-
-            // Bar fill, slowly increase width
-            x++;
-            y++;
-            height -= 2;
-            width = charge / 2;
-            g2.fillRect(x, y, width, height);
-        }
-    }
-
-    /**
-     * GET CHARGE COLOR
-     * Gets the color of the spin attack charge bar based on charge
-     * Called by drawChargeBar()
-     * @param charge Current player charge value
-     * @return The new color of the charge bar
-     */
-    private Color getChargeColor(int charge) {
-        if (charge < 40) return new Color(0, 105, 0);
-        if (charge < 80) return new Color(0, 155, 0);
-        if (charge < 120) return new Color(0, 205, 0);
-
-        return new Color(0, 240, 0);
-    }
-
-    private void drawZTarget() {
-
-        Entity target = gp.player.getLockedOnTarget();
-
-        // No enemy locked on
-        if (target == null) {
-
-            // Find closest enemy
-            Entity newTarget = getNewTarget();
-
-            // Close enemy found, draw Z-target
-            if (newTarget != null) {
-                drawZTargetArrow(newTarget);
-            }
-        }
-        // Enemy locked on
-        else {
-            drawZTargetCircle(target);
-        }
-    }
-    private Entity getNewTarget() {
-
-        Entity newTarget = null;
-        int currentDistance = Entity.maxZTargetDistance;
-
-        for (Entity enemy : gp.enemies) {
-
-            if (enemy != null && enemy.canBeTargeted()) {
-
-                // Enemy distance from player
-                int enemyDistance = enemy.getAI().getTileDistance(gp.player);
-
-                // Find closest enemy distance within 8 tiles
-                if (enemyDistance < currentDistance) {
-                    currentDistance = enemyDistance;
-                    newTarget = enemy;
-                }
-            }
-        }
-
-        return newTarget;
-    }
-    private void drawZTargetArrow(Entity newTarget) {
-
-        if (zTargetCounter < 20 && zTargetDirection == 0) {
-            zTargetCounter++;
-        }
-        else if (zTargetCounter < 20 && zTargetDirection == 1) {
-            zTargetCounter--;
-        }
-        if (zTargetCounter == 20) {
-            zTargetCounter--;
-            zTargetDirection = 1;
-        }
-        else if (zTargetCounter == 0) {
-            zTargetCounter++;
-            zTargetDirection = 0;
-        }
-
-        Point screen = new Point();
-        gp.camera.worldToScreen(newTarget.getWorldPoint(), screen);
-
-        int x = screen.x - 10;
-        int y = screen.y - 30 + zTargetCounter;
-
-        g2.drawImage(zTarget_arrow, x, y, null);
-    }
-    private void drawZTargetCircle(Entity target) {
-
-        zTargetRotation += 3;
-        if (zTargetRotation >= 180) {
-            zTargetRotation = 0;
-        }
-
-        Point screen = new Point();
-        gp.camera.worldToScreen(target.getWorldPoint(), screen);
-
-        zTargetRotation += 3;
-        if (zTargetRotation >= 180) {
-            zTargetRotation = 0;
-        }
-
-        BufferedImage img = rotateImage(zTarget_circle, zTargetRotation);
-
-        g2.drawImage(img, screen.x - 10, screen.y - 10, null);
-    }
-    private BufferedImage rotateImage(BufferedImage img, int degrees) {
-
-        AffineTransform rotation = AffineTransform.getRotateInstance(
-                Math.toRadians(degrees), (double) img.getWidth() / 2, (double) img.getHeight() / 2
-        );
-
-        AffineTransformOp op = new AffineTransformOp(rotation, AffineTransformOp.TYPE_BICUBIC);
-
-        return op.filter(img, null);
-    }
-
-    /**
-     * DRAW DEBUG
-     * UI for debug information
-     * Called by drawHUD()
-     */
-    private void drawDebug() {
-        drawCoordinates();
-    }
-    private void drawCoordinates() {
-
-        int x = 10;
-        int y = gp.tileSize * 6;
-        int lineHeight = 20;
-
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 20));
-
-        g2.drawString("World X: " + gp.camera.getWorldPoint().x, x, y);
-        y += lineHeight;
-        g2.drawString("World Y: " + gp.camera.getWorldPoint().y, x, y);
-        y += lineHeight;
-        g2.drawString("Column: " + gp.camera.getWorldPoint().x / gp.tileSize, x, y);
-        y += lineHeight;
-        g2.drawString("Row: " + gp.camera.getWorldPoint().y / gp.tileSize, x, y);
-    }
-
-    private void drawDialogueState() {
-        drawDialogueWindow();
-        handleFinishDialogue();
-    }
-    private void drawDialogueWindow() {
-
-        int x = gp.tileSize * 2;
-        int y = (gp.screenWidth / 2) - gp.tileSize;
-        int width = gp.screenWidth - (gp.tileSize * 4);
-        int height = gp.tileSize * 4;
-
-        // Black rectangle
-        g2.setColor(new Color(0, 0, 0, 220));
-        g2.fillRoundRect(x, y, width, height, 25, 25);
-
-        // White border
-        g2.setColor(new Color(255, 255, 255));
-        g2.setStroke(new BasicStroke(5));
-        g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 15, 15);
-
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 37F));
-        x += gp.tileSize;
-        y += gp.tileSize;
-
-        int textSpeed = 1;
-        if (dialogueCounter == textSpeed) {
-            char[] characters = dialogue.toCharArray();
-
-            if (charIndex < characters.length) {
-                String text = String.valueOf(characters[charIndex]);
-                combinedText += text;
-                currentDialogue = combinedText;
-                charIndex++;
+    /** PAUSED */
+    private void drawPauseState() {
+
+        if (subState == 0) {
+            if (!gp.dbNotConnected() && gp.auth.isLoggedIn()) {
+                drawPause_Screen_User();
             }
             else {
-                canSkip = true;
+                drawPause_Screen();
+            }
+        }
+        else if (subState == 2) {
+            drawPause_Level();
+        }
+        else if (subState == 4) {
+            drawPause_Users();
+        }
+    }
+
+    private void drawPause_Screen() {
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize;
+        int y = gp.tileSize;
+        int width = gp.tileSize * 4;
+        int height = (int) (gp.tileSize * 6.5);
+        drawSubWindow(x, y, width, height);
+
+        x = gp.tileSize * 2;
+        y = gp.tileSize * 2;
+
+        // PLAY
+        g2.drawString("Play", x, y);
+        if (commandNum == 0) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 0;
+                gp.saveLoad.saveSnapshot();
+                gp.GAME_STATE = gp.PLAY_STATE;
+            }
+        }
+
+        // NEW
+        y += gp.tileSize;
+        g2.drawString("New", x, y);
+        if (commandNum == 1) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 0;
+            }
+        }
+
+        // ONLINE LEVELS
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Browse", x, y);
+        if (commandNum == 2) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                usersList = gp.db.getAllUsers();
+                if (usersList == null || usersList.isEmpty()) return;
+
+                commandNum = 0;
+                subState = 4;
+            }
+        }
+
+        // LOGIN
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Login", x, y);
+        if (commandNum == 3) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+                gp.changeLogin();
+            }
+        }
+
+        // SETTINGS
+        y += gp.tileSize;
+        g2.drawString("Settings", x, y);
+        if (commandNum == 4) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 5;
+            }
+        }
+
+        pauseScreen_Input_Dir();
+    }
+    private void pauseScreen_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (4 < ++commandNum) {
+                commandNum = 4;
+            }
+        }
+    }
+
+    private void drawPause_Screen_User() {
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize;
+        int y = gp.tileSize;
+        int width = gp.tileSize * 4;
+        int height = (int) (gp.tileSize * 10.5);
+        drawSubWindow(x, y, width, height);
+
+        x = gp.tileSize * 2;
+        y = gp.tileSize * 2;
+
+        // PLAY
+        g2.drawString("Play", x, y);
+        if (commandNum == 0) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 0;
+                gp.saveLoad.saveSnapshot();
+                gp.GAME_STATE = gp.PLAY_STATE;
+            }
+        }
+
+        // NEW
+        y += gp.tileSize;
+        g2.drawString("New", x, y);
+        if (commandNum == 1) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 0;
+            }
+        }
+
+        // LOAD
+        y += gp.tileSize;
+        g2.drawString("Load", x, y);
+        if (commandNum == 2) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+
+                isSaving = false;
+                isLoading = true;
+                commandNum = 0;
+                subState = 2;
+            }
+        }
+
+        // SAVE
+        y += gp.tileSize;
+        g2.drawString("Save", x, y);
+        if (commandNum == 3) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+
+                isSaving = true;
+                isLoading = false;
+                commandNum = 0;
+                subState = 2;
+            }
+        }
+
+        // DELETE
+        y += gp.tileSize;
+        g2.drawString("Delete", x, y);
+        if (commandNum == 4) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+
+                isSaving = false;
+                isLoading = false;
+                commandNum = 0;
+                subState = 2;
+            }
+        }
+
+        // UPLOAD
+        y += gp.tileSize;
+        g2.drawString("Upload", x, y);
+        if (commandNum == 5) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 0;
+
+                gp.saveLoad.saveSnapshot();
+                gp.GAME_STATE = gp.PLAY_STATE;
+            }
+        }
+
+        // ONLINE LEVELS
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Browse", x, y);
+        if (commandNum == 6) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                usersList = gp.db.getAllUsers();
+                if (usersList == null || usersList.isEmpty()) return;
+
+                commandNum = 0;
+                subState = 4;
+            }
+        }
+
+        // Logout
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Logout", x, y);
+        if (commandNum == 7) {
+            g2.drawString(">", x - 25, y);
+
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+                gp.changeLogin();
+            }
+        }
+
+        // SETTINGS
+        y += gp.tileSize;
+        g2.drawString("Settings", x, y);
+        if (commandNum == 8) {
+            g2.drawString(">", x - 25, y);
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+
+                commandNum = 0;
+                subState = 5;
+            }
+        }
+
+        pauseScreen_User_Input_Dir();
+    }
+    private void pauseScreen_User_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (8 < ++commandNum) {
+                commandNum = 8;
+            }
+        }
+    }
+
+    private void drawPause_Level() {
+
+        // Trying to load/delete a file from a blank list
+        if (gp.saveFiles.isEmpty() && !isSaving) return;
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize * 2;
+        int y = gp.tileSize * 2;
+        int width = gp.tileSize * 12;
+        int offset = isSaving ? 2 : 1;
+        int height = (int) ((gp.tileSize * 0.95) * (gp.saveFiles.size() + offset));
+        drawSubWindow(x, y, width, height);
+
+        x = gp.tileSize * 3;
+        y = gp.tileSize * 3;
+        int index = 0;
+
+        if (isSaving) {
+            drawPause_SaveLevel(x, y);
+            index++;
+            y += gp.tileSize;
+        }
+
+        drawPause_ListLevels(x, y, index);
+
+        pauseLevel_Input_Back();
+        pauseLevel_Input_Dir();
+    }
+    private void drawPause_SaveLevel(int x, int y) {
+
+        String text = "1)  NEW";
+        g2.drawString(text, x, y);
+
+        if (commandNum == 0) {
+            g2.drawString(">", x - 25, y);
+
+            if (gp.keyH.aPressed) {
+                gp.keyH.aPressed = false;
+                commandNum = 0;
+                subState = 3;
+            }
+        }
+    }
+    private void drawPause_ListLevels(int x, int y, int index) {
+
+        String text;
+        for (Map.Entry<String, String> entry : gp.saveFiles.entrySet()) {
+
+            text = index + 1 + ")  " + entry.getValue();
+            g2.drawString(text, x, y);
+
+            if (commandNum == index) {
+                g2.drawString(">", x - 25, y);
+
+                boolean aPressed = pauseLevel_Input_A(entry);
+                if (aPressed) break;
             }
 
-            dialogueCounter = 0;
-        }
-        else {
-            dialogueCounter++;
-        }
-
-        for (String line : currentDialogue.split("\n")) {
-            g2.drawString(line, x, y);
-            y += 40;
+            index++;
+            y += gp.tileSize;
         }
     }
-    private void handleFinishDialogue() {
-        if (!gp.keyH.aPressed || !canSkip) return;
+    private boolean pauseLevel_Input_A(Map.Entry<String, String> entry) {
+        if (!gp.keyH.aPressed) return false;
         gp.keyH.aPressed = false;
 
-        resetDialogue();
+        viewingUserLevels = false;
+        commandNum = 0;
+        subState = 0;
 
-        // If dialogue has reward, set reward dialogue
-        gp.player.showReward(dialogueReward);
+        if (isSaving) {
+            // Chop off date from level name
+            String lvlName = entry.getValue().contains(" [") ?
+                    entry.getValue().substring(0, entry.getValue().indexOf(" [")) :
+                    entry.getValue();
 
-        // Item gifted to player, show reward dialogue
-        if (dialogueReward != null) {
-            gp.player.receiveLoot(dialogueReward);
-            dialogueReward = null;
+            gp.saveLoad.save(lvlName);
         }
-        // No reward, continue to play state
+        else if (isLoading) {
+            gp.saveLoad.load(entry.getKey());
+        }
         else {
-            gp.GAME_STATE = gp.PLAY_STATE;
+            gp.saveLoad.delete(entry.getKey());
+        }
+
+        gp.saveFiles.clear();
+        return true;
+    }
+    private void pauseLevel_Input_Back() {
+        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
+        gp.keyH.bPressed = false;
+        gp.keyH.startPressed = false;
+
+        commandNum = 0;
+        subState = 1;
+
+        if (viewingUserLevels) {
+            viewingUserLevels = false;
+            subState = 4;
+        }
+
+        gp.saveFiles.clear();
+    }
+    private void pauseLevel_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            int maxSize = isSaving ? gp.saveFiles.size() : gp.saveFiles.size() - 1;
+            if (maxSize < ++commandNum) {
+                commandNum = maxSize;
+            }
         }
     }
 
-    private void resetDialogue() {
-        dialogue = "";
-        currentDialogue = "";
-        dialogueCounter = 0;
-        charIndex = 0;
-        combinedText = "";
-        canSkip = false;
-    }
+    private void drawPause_Users() {
 
-    public void setupDialogue(String dialogue, Entity reward) {
-        this.dialogue = dialogue;
-        this.dialogueReward = reward;
-        gp.GAME_STATE = gp.DIALOGUE_STATE;
+        if (usersList == null || usersList.isEmpty()) return;
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize * 2;
+        int y = gp.tileSize * 2;
+        int width = gp.tileSize * 12;
+        int height = (int) ((gp.tileSize * .95) * (usersList.size() + 1));
+        drawSubWindow(x, y, width, height);
+
+        x = gp.tileSize * 3;
+        y = gp.tileSize * 3;
+        String text;
+
+        int index = 0;
+
+        for (Map.Entry<String, String> entry : usersList.entrySet()) {
+
+            text = index + 1 + ")  " + entry.getValue();
+            g2.drawString(text, x, y);
+
+            if (commandNum == index) {
+                g2.drawString(">", x - 25, y);
+
+                if (gp.keyH.aPressed) {
+                    gp.keyH.aPressed = false;
+
+                    gp.saveFiles = gp.db.getUserWorlds(entry.getKey());
+
+                    viewingUserLevels = true;
+                    isSaving = false;
+                    isLoading = true;
+                    commandNum = 0;
+                    subState = 2;
+                }
+            }
+
+            index++;
+            y += gp.tileSize;
+        }
+
+        pauseUsers_Input_Back();
+        pauseUsers_Input_Dir();
+    }
+    private void pauseUsers_Input_Back() {
+        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
+        gp.keyH.bPressed = false;
+        gp.keyH.startPressed = false;
+
+        commandNum = 0;
+        subState = 0;
+    }
+    private void pauseUsers_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (usersList.size() < ++commandNum) {
+                commandNum = usersList.size();
+            }
+        }
     }
 
     /** EDITING */
@@ -1151,6 +1121,535 @@ public class UI {
     }
 
     /**
+     * DRAW HUD
+     * Draws the HUD during Play State
+     * called by draw()
+     */
+    private void drawPlayState() {
+        drawHUD();
+        drawDebug();
+    }
+
+    private void drawHUD() {
+        drawZTarget();
+        drawChargeBar();
+        drawPlayerHealth();
+        drawPlayerItem();
+        drawKeys();
+        drawBossKey();
+        drawRupeeCount();
+        drawAvailableAction();
+    }
+
+    /**
+     * DRAW PLAYER HEALTH
+     * Draws the current player's health in the top-left corner of the screen
+     * Called by drawHUD()
+     */
+    private void drawPlayerHealth() {
+
+        // Top-left corner of screen
+        int x = gp.tileSize / 2;
+        int y = gp.tileSize / 2;
+        int spacing = (int) (gp.tileSize / 1.7);
+
+        // Get count of whole hearts
+        int maxHearts = gp.player.getMaxHealth() / 4;
+        int currentHealth = gp.player.getHealth();
+
+        // Iterate through all whole hearts
+        for (int i = 0; i < maxHearts; i++) {
+
+            // 4 if currentHealth is above 4, otherwise currentHealth
+            int heartHealth = Math.min(4, currentHealth);
+
+            // Find which fraction heart to use
+            BufferedImage heart;
+            switch (heartHealth) {
+                case 4 -> heart = heart_4;
+                case 3 -> heart = heart_3;
+                case 2 -> heart = heart_2;
+                case 1 -> heart = heart_1;
+                default -> heart = heart_0;
+            }
+
+            g2.drawImage(heart, x, y, null);
+
+            // De-increment health
+            currentHealth -= 4;
+
+            // Move right for next heart
+            x += spacing;
+        }
+    }
+
+    /**
+     * DRAW PLAYER ITEM
+     * Draws the current player's item in the top-right corner of the screen
+     * Called by drawHUD()
+     */
+    private void drawPlayerItem() {
+
+        int x = gp.tileSize * 15;
+        int y = gp.tileSize / 3;
+        int width = gp.tileSize + 30;
+        int height = gp.tileSize + 30;
+
+        // DRAW ITEM CIRCLE
+        g2.setColor(itm_brown_1);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(itm_green);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(x, y, width, height);
+
+        if (gp.player.getItem() != null) {
+
+            x += 10;
+            y += 10;
+            g2.drawImage(gp.player.getItem().getSprite(), x, y, gp.tileSize + 10, gp.tileSize + 10, null);
+
+            // DRAW ARROW COUNT
+            x += 45;
+            y += 43;
+            if (gp.player.getItem().getName().equals(ITM_Bow.itmName)) {
+                drawItemCount(x, y, Integer.toString(gp.player.getArrows()));
+            }
+            // DRAW BOMB COUNT
+            else if (gp.player.getItem().getName().equals(ITM_Bomb.itmName)) {
+                drawItemCount(x, y, Integer.toString(gp.player.getBombs()));
+            }
+        }
+
+        // DRAW ITEM BUTTON
+        x = gp.tileSize * 16 + 8;
+        y = 10;
+        width = 35;
+        height = 35;
+        g2.setColor(itm_green);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
+        String text = KeyEvent.getKeyText(gp.keyH.btn_X);
+        x = getXForCenteredTextOnWidth(text, width, x);
+        y += 28;
+        g2.drawString(text, x, y);
+
+        g2.setStroke(new BasicStroke(1));
+    }
+    private void drawItemCount(int x, int y, String text) {
+
+        int width = 28;
+        int height = 28;
+        g2.setColor(itm_brown_2);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.BLACK);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 30F));
+        x = getXForCenteredTextOnWidth(text, width, x);
+        y += 24;
+        g2.drawString(text, x, y);
+    }
+
+    private void drawAvailableAction() {
+
+        String availableAction = gp.player.getAvailableAction(gp.player);
+
+        int x = gp.tileSize * 13;
+        int y = gp.tileSize / 3;
+        int width = gp.tileSize + 30;
+        int height = gp.tileSize + 30;
+
+        g2.setColor(Color.WHITE);
+        g2.fillOval(x, y, width, height);
+
+        g2.setStroke(new BasicStroke(4));
+        g2.drawOval(x, y, width, height);
+
+        g2.setColor(Color.BLUE);
+        g2.fillOval(x, y, width, height);
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.BOLD, 33F));
+        x = getXForCenteredTextOnWidth(availableAction, width, x);
+        y += gp.tileSize;
+        g2.drawString(availableAction, x + 2, y);
+
+        g2.setStroke(new BasicStroke(1));
+    }
+
+    private void drawKeys() {
+
+        // Draw key image
+        int x = gp.tileSize * 14 + 30;
+        int y = gp.tileSize * 10 + 20;
+        g2.drawImage(key, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+
+        x += gp.tileSize - 8;
+        y += gp.tileSize - 12;
+
+        // Draw key count
+        String keyCount = Integer.toString(gp.player.getKeys());
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+        g2.drawString(keyCount, x, y);
+    }
+    private void drawBossKey() {
+
+        if (!gp.player.getHasBossKey()) return;
+
+        // Draw boss key image
+        int x = gp.tileSize * 15 + 40;
+        int y = gp.tileSize * 10 + 20;
+        g2.drawImage(bossKey, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+    }
+
+    /**
+     * DRAW RUPEE COUNT
+     * Draws the current player's rupee count in the bottom-right corner of the screen
+     * Called by drawHUD()
+     */
+    private void drawRupeeCount() {
+
+        // Draw rupee image
+        int x = gp.tileSize * 14 + 30;
+        int y = gp.tileSize * 11 + 20;
+        g2.drawImage(rupee, x, y, gp.tileSize - 5, gp.tileSize - 5, null);
+
+        x += gp.tileSize - 8;
+        y += gp.tileSize - 12;
+
+        // Keep new rupees at maximum
+        if (rupeeChange >= gp.player.getMaxRupees()) {
+            rupeeChange = gp.player.getMaxRupees();
+        }
+
+        // Player adds rupees
+        if (gp.player.getRupees() < rupeeChange) {
+            modifyRupeeCount(1);
+        }
+        // Player loses rupees
+        else if (rupeeChange < gp.player.getRupees()) {
+            modifyRupeeCount(-1);
+        }
+
+        String formattedCount = formatRupeeCount();
+
+        // Draw rupee count
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 45F));
+        g2.drawString(formattedCount, x, y);
+    }
+
+    /**
+     * MODIFY RUPEE COUNT
+     * Changes player rupee count every 2 frames based on given value
+     * @param count Amount to add to player rupee count
+     */
+    private void modifyRupeeCount(int count) {
+        if (rupeeCounter == 2) {
+            gp.player.addRupees(count);
+            rupeeCounter = 0;
+        }
+        else {
+            rupeeCounter++;
+        }
+    }
+
+    /**
+     * FORMAT RUPEE COUNT
+     * Formats the player rupee count based on wallet size
+     * @return Formatted player rupee count
+     */
+    private String formatRupeeCount() {
+
+        String rupeeCount = "0";
+
+        if (gp.player.getMaxRupees() == 99) {
+            rupeeCount = String.format("%02d", gp.player.getRupees());
+        }
+        else if (gp.player.getMaxRupees() == 999) {
+            rupeeCount = String.format("%03d", gp.player.getRupees());
+        }
+        else if (gp.player.getMaxRupees() == 9999) {
+            rupeeCount = String.format("%04d", gp.player.getRupees());
+        }
+
+        return rupeeCount;
+    }
+    public void addRupees(int rupees) {
+        rupeeChange += rupees;
+    }
+    public void setRupeeChange(int rupees) {
+        rupeeChange = rupees;
+    }
+
+    /**
+     * DRAW CHARGE BAR
+     * Draws the spin attack charge bar
+     * Called by drawHUD()
+     */
+    private void drawChargeBar() {
+
+        // If player is charging spin attack
+        if (gp.player.charge > 0) {
+
+            // Position above player's head
+            int x = gp.player.getScreenPoint().x - 7;
+            int y = gp.player.getScreenPoint().y - 20;
+            int width = 62;
+            int height = 10;
+
+            // Draw black bar
+            Color barColor = Color.BLACK;
+            g2.setColor(barColor);
+            g2.fillRect(x, y, width, height);
+
+            // White outline if not ready, green fill if ready
+            int charge = gp.player.charge;
+            barColor = charge < 120 ? Color.WHITE : new Color(0, 240, 0);
+
+            g2.setColor(barColor);
+            g2.setStroke(new BasicStroke(2));
+            g2.drawRect(x, y, width, height);
+
+            barColor = getChargeColor(charge);
+            g2.setColor(barColor);
+
+            // Bar fill, slowly increase width
+            x++;
+            y++;
+            height -= 2;
+            width = charge / 2;
+            g2.fillRect(x, y, width, height);
+        }
+    }
+
+    /**
+     * GET CHARGE COLOR
+     * Gets the color of the spin attack charge bar based on charge
+     * Called by drawChargeBar()
+     * @param charge Current player charge value
+     * @return The new color of the charge bar
+     */
+    private Color getChargeColor(int charge) {
+        if (charge < 40) return new Color(0, 105, 0);
+        if (charge < 80) return new Color(0, 155, 0);
+        if (charge < 120) return new Color(0, 205, 0);
+
+        return new Color(0, 240, 0);
+    }
+
+    private void drawZTarget() {
+
+        Entity target = gp.player.getLockedOnTarget();
+
+        // No enemy locked on
+        if (target == null) {
+
+            // Find closest enemy
+            Entity newTarget = getNewTarget();
+
+            // Close enemy found, draw Z-target
+            if (newTarget != null) {
+                drawZTargetArrow(newTarget);
+            }
+        }
+        // Enemy locked on
+        else {
+            drawZTargetCircle(target);
+        }
+    }
+    private Entity getNewTarget() {
+
+        Entity newTarget = null;
+        int currentDistance = Entity.maxZTargetDistance;
+
+        for (Entity enemy : gp.enemies) {
+
+            if (enemy != null && enemy.canBeTargeted()) {
+
+                // Enemy distance from player
+                int enemyDistance = enemy.getAI().getTileDistance(gp.player);
+
+                // Find closest enemy distance within 8 tiles
+                if (enemyDistance < currentDistance) {
+                    currentDistance = enemyDistance;
+                    newTarget = enemy;
+                }
+            }
+        }
+
+        return newTarget;
+    }
+    private void drawZTargetArrow(Entity newTarget) {
+
+        if (zTargetCounter < 20 && zTargetDirection == 0) {
+            zTargetCounter++;
+        }
+        else if (zTargetCounter < 20 && zTargetDirection == 1) {
+            zTargetCounter--;
+        }
+        if (zTargetCounter == 20) {
+            zTargetCounter--;
+            zTargetDirection = 1;
+        }
+        else if (zTargetCounter == 0) {
+            zTargetCounter++;
+            zTargetDirection = 0;
+        }
+
+        Point screen = new Point();
+        gp.camera.worldToScreen(newTarget.getWorldPoint(), screen);
+
+        int x = screen.x - 10;
+        int y = screen.y - 30 + zTargetCounter;
+
+        g2.drawImage(zTarget_arrow, x, y, null);
+    }
+    private void drawZTargetCircle(Entity target) {
+
+        zTargetRotation += 3;
+        if (zTargetRotation >= 180) {
+            zTargetRotation = 0;
+        }
+
+        Point screen = new Point();
+        gp.camera.worldToScreen(target.getWorldPoint(), screen);
+
+        zTargetRotation += 3;
+        if (zTargetRotation >= 180) {
+            zTargetRotation = 0;
+        }
+
+        BufferedImage img = rotateImage(zTarget_circle, zTargetRotation);
+
+        g2.drawImage(img, screen.x - 10, screen.y - 10, null);
+    }
+    private BufferedImage rotateImage(BufferedImage img, int degrees) {
+
+        AffineTransform rotation = AffineTransform.getRotateInstance(
+                Math.toRadians(degrees), (double) img.getWidth() / 2, (double) img.getHeight() / 2
+        );
+
+        AffineTransformOp op = new AffineTransformOp(rotation, AffineTransformOp.TYPE_BICUBIC);
+
+        return op.filter(img, null);
+    }
+
+    /**
+     * DRAW DEBUG
+     * UI for debug information
+     * Called by drawHUD()
+     */
+    private void drawDebug() {
+        drawCoordinates();
+    }
+    private void drawCoordinates() {
+
+        int x = 10;
+        int y = gp.tileSize * 6;
+        int lineHeight = 20;
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+
+        g2.drawString("World X: " + gp.camera.getWorldPoint().x, x, y);
+        y += lineHeight;
+        g2.drawString("World Y: " + gp.camera.getWorldPoint().y, x, y);
+        y += lineHeight;
+        g2.drawString("Column: " + gp.camera.getWorldPoint().x / gp.tileSize, x, y);
+        y += lineHeight;
+        g2.drawString("Row: " + gp.camera.getWorldPoint().y / gp.tileSize, x, y);
+    }
+
+    /** DIALOGUE */
+    private void drawDialogueState() {
+        drawDialogueWindow();
+        handleFinishDialogue();
+    }
+    private void drawDialogueWindow() {
+
+        int x = gp.tileSize * 2;
+        int y = (gp.screenWidth / 2) - gp.tileSize;
+        int width = gp.screenWidth - (gp.tileSize * 4);
+        int height = gp.tileSize * 4;
+
+        // Black rectangle
+        g2.setColor(new Color(0, 0, 0, 220));
+        g2.fillRoundRect(x, y, width, height, 25, 25);
+
+        // White border
+        g2.setColor(new Color(255, 255, 255));
+        g2.setStroke(new BasicStroke(5));
+        g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 15, 15);
+
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 37F));
+        x += gp.tileSize;
+        y += gp.tileSize;
+
+        int textSpeed = 1;
+        if (dialogueCounter == textSpeed) {
+            char[] characters = dialogue.toCharArray();
+
+            if (charIndex < characters.length) {
+                String text = String.valueOf(characters[charIndex]);
+                combinedText += text;
+                currentDialogue = combinedText;
+                charIndex++;
+            }
+            else {
+                canSkip = true;
+            }
+
+            dialogueCounter = 0;
+        }
+        else {
+            dialogueCounter++;
+        }
+
+        for (String line : currentDialogue.split("\n")) {
+            g2.drawString(line, x, y);
+            y += 40;
+        }
+    }
+    private void handleFinishDialogue() {
+        if (!gp.keyH.aPressed || !canSkip) return;
+        gp.keyH.aPressed = false;
+
+        resetDialogue();
+
+        // If dialogue has reward, set reward dialogue
+        gp.player.showReward(dialogueReward);
+
+        // Item gifted to player, show reward dialogue
+        if (dialogueReward != null) {
+            gp.player.receiveLoot(dialogueReward);
+            dialogueReward = null;
+        }
+        // No reward, continue to play state
+        else {
+            gp.GAME_STATE = gp.PLAY_STATE;
+        }
+    }
+
+    private void resetDialogue() {
+        dialogue = "";
+        currentDialogue = "";
+        dialogueCounter = 0;
+        charIndex = 0;
+        combinedText = "";
+        canSkip = false;
+    }
+
+    public void setupDialogue(String dialogue, Entity reward) {
+        this.dialogue = dialogue;
+        this.dialogueReward = reward;
+        gp.GAME_STATE = gp.DIALOGUE_STATE;
+    }
+
+    /**
      * GET X FOR TEXT CENTERED
      * @param text Text being used
      * @param width Width of element to center text on
@@ -1214,5 +1713,19 @@ public class UI {
 
     public void setDialogue(String dialogue) {
         this.dialogue = dialogue;
+    }
+
+    private void drawSubWindow(int x, int y, int width, int height) {
+
+        // Black (RGB, Transparency)
+        Color c = new Color(0, 0, 0, 220);
+        g2.setColor(c);
+        g2.fillRoundRect(x, y, width, height, 25, 25);
+
+        // White (RGB)
+        c = new Color(255, 255, 255);
+        g2.setColor(c);
+        g2.setStroke(new BasicStroke(5));
+        g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 15, 15);
     }
 }

@@ -63,9 +63,6 @@ public class GamePanel extends JPanel implements Runnable {
     public int worldWidth = tileSize * maxWorldCol;
     public int worldHeight  = tileSize * maxWorldRow;
 
-    /** MAPS */
-    public final String mapFile = "map_default.txt";
-
     /** FULL SCREEN SETTINGS */
     public boolean fullScreenOn = false;
     private int screenWidth2 = screenWidth;
@@ -74,9 +71,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     /** GAME STATES */
     public int GAME_STATE;
-    public final int PLAY_STATE = 1;
-    public final int DIALOGUE_STATE = 2;
-    public final int EDIT_STATE = 3;
+    public final int PAUSE_STATE = 1;
+    public final int EDIT_STATE = 2;
+    public final int PLAY_STATE = 3;
+    public final int DIALOGUE_STATE = 4;
 
     /** HANDLERS */
     public TileManager tileM = new TileManager(this);
@@ -84,7 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
     public PathFinder pFinder = new PathFinder(this);
 
     /** DATA HANDLING */
-    private final SaveLoad saveLoad = new SaveLoad(this);
+    public final SaveLoad saveLoad = new SaveLoad(this);
     public DataStorage snapshot = new DataStorage();
     public Map<String, String> saveFiles = new LinkedHashMap<>();
     public final Firebase db = new Firebase(this);
@@ -122,7 +120,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     protected void setupGame() {
 
-        GAME_STATE = EDIT_STATE;
+        GAME_STATE = PAUSE_STATE;
 
         // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
@@ -131,12 +129,11 @@ public class GamePanel extends JPanel implements Runnable {
         // Connect to Firebase
         dbConnected = db.init();
 
-        tileM.loadMap();
-
         player.setDefaultValues();
         entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
 
         ui.cursor.setWorldPoint(player.getWorldPoint());
+        camera.follow(ui.cursor.getWorldPoint());
 
         if (fullScreenOn) setFullScreen();
     }
@@ -215,38 +212,35 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void update() {
 
-        if (GAME_STATE == PLAY_STATE) {
+        if (GAME_STATE == PAUSE_STATE || GAME_STATE == EDIT_STATE) {
+            camera.follow(ui.cursor.getWorldPoint());
+            handleStartPress();
+        }
+        else if (GAME_STATE == PLAY_STATE) {
 
             camera.follow(player.getWorldPoint());
 
             player.update();
             updateEntities();
 
-            handleStartPress(false);
-        }
-        else if (GAME_STATE == EDIT_STATE) {
-            camera.follow(ui.cursor.getWorldPoint());
-            handleStartPress(true);
+            handleStartPress();
         }
     }
 
-    private void handleStartPress(boolean save) {
+    private void handleStartPress() {
         if (!keyH.startPressed) return;
-        keyH.startPressed = false;
-
         keyH.stopAllKeys();
 
-        if (save) {
-            saveLoad.saveSnapshot();
-            GAME_STATE = PLAY_STATE;
-        }
-        else {
-            resetGame();
+        switch (GAME_STATE) {
+            case PAUSE_STATE -> GAME_STATE = EDIT_STATE;
+            case EDIT_STATE -> GAME_STATE = PAUSE_STATE;
+            case PLAY_STATE -> {
+                resetGame();
+                saveLoad.loadSnapshot();
+                ui.cursor.setWorldPoint(player.getWorldPoint());
 
-            saveLoad.loadSnapshot();
-            ui.cursor.setWorldPoint(player.getWorldPoint());
-
-            GAME_STATE = EDIT_STATE;
+                GAME_STATE = EDIT_STATE;
+            }
         }
     }
 
@@ -291,7 +285,7 @@ public class GamePanel extends JPanel implements Runnable {
         drawTiles();
         drawEntities();
 
-        if (GAME_STATE == EDIT_STATE) {
+        if (GAME_STATE == PAUSE_STATE ||  GAME_STATE == EDIT_STATE) {
             drawGrid();
         }
 

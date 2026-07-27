@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class TileManager {
 
@@ -36,42 +35,22 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
+        loadDefaultMap();
         loadTileData();
     }
 
+
+
     /**
-     * LOAD MAP
-     * Loads current map data
+     * LOAD DEFAULT MAP
+     * Fills map with grass tiles
      */
-    public void loadMap() {
+    private void loadDefaultMap() {
 
-        // Import current map
-        InputStream inputStream = getClass().getResourceAsStream("/maps/" + gp.mapFile);
-        int mapLength = 0;
-
-        try {
-            Scanner sc = new Scanner(Objects.requireNonNull(inputStream));
-
-            for (int row = 0; sc.hasNextLine(); row++) {
-                String line = sc.nextLine();
-                String[] numbers = line.split(" ");
-                mapLength = numbers.length;
-
-                for (int col = 0; col < numbers.length; col++) {
-                    int tileNum = Integer.parseInt(numbers[col]);
-                    mapTileNum[col][row] = tileNum;
-                }
+        for (int col = 0; col < gp.maxWorldCol; col++) {
+            for (int row = 0; row < gp.maxWorldRow; row++) {
+                mapTileNum[col][row] = 6;
             }
-
-            sc.close();
-
-            // Assign new world dimensions
-            gp.maxWorldCol = mapLength;
-            gp.maxWorldRow = mapLength;
-            gp.worldWidth = gp.tileSize * mapLength;
-            gp.worldHeight = gp.tileSize * mapLength;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
         }
     }
 
@@ -162,10 +141,7 @@ public class TileManager {
      */
     public void draw(Graphics2D g2) {
 
-        if (gp.GAME_STATE == gp.PLAY_STATE && --waterFrames <= 0) {
-            waterFrames = 60;
-            waterNum = waterNum == 1 ? 2 : 1;
-        }
+        cycleWaterSprites();
 
         int startCol = 0, endCol = -1;
         int startRow = 0, endRow = -1;
@@ -201,6 +177,14 @@ public class TileManager {
                     g2.fillRect(screenPoint.x, screenPoint.y, gp.tileSize, gp.tileSize);
                 }
             }
+        }
+    }
+
+    private void cycleWaterSprites() {
+
+        if (gp.GAME_STATE == gp.PLAY_STATE && --waterFrames <= 0) {
+            waterFrames = 60;
+            waterNum = waterNum == 1 ? 2 : 1;
         }
     }
 }
