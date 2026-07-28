@@ -648,6 +648,12 @@ public class Entity {
     }
     public void addItem(Item item) {
 
+        // User already has item
+        if (items.contains(item)) {
+            item.setAlive(false);
+            return;
+        }
+
         item.setUser(this);
         items.add(item);
 

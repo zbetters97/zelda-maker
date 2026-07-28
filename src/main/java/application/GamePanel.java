@@ -138,7 +138,7 @@ public class GamePanel extends JPanel implements Runnable {
         ui.cursor.setWorldPoint(player.getWorldPoint());
         camera.follow(ui.cursor.getWorldPoint());
 
-        playMusic(1);
+        // playMusic(1);
 
         if (fullScreenOn) setFullScreen();
     }

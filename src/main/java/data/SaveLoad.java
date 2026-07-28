@@ -94,6 +94,12 @@ public class SaveLoad {
         ds.objectDirections = new String[objectLength];
         ds.objectLoot = new String[objectLength];
 
+        // COLLECTABLES
+        int collectableLength = gp.collectables.size();
+        ds.collectableNames = new String[collectableLength];
+        ds.collectableWorldX = new int[collectableLength];
+        ds.collectableWorldY = new int[collectableLength];
+
         // TILES
         ds.tileNumbers = new int[gp.maxWorldCol * gp.maxWorldRow];
 
@@ -112,9 +118,7 @@ public class SaveLoad {
         for (int i = 0; i < gp.npcs.size(); i++) {
 
             NPC npc = gp.npcs.get(i);
-            if (npc == null) {
-                continue;
-            }
+            if (npc == null) continue;
 
             ds.npcNames[i] = npc.getName();
             ds.npcWorldX[i] = npc.getWorldPoint().x;
@@ -127,9 +131,7 @@ public class SaveLoad {
         for (int i = 0; i < gp.enemies.size(); i++) {
 
             Enemy enemy = gp.enemies.get(i);
-            if (enemy == null) {
-                continue;
-            }
+            if (enemy == null) continue;
 
             ds.enemyNames[i] = enemy.getName();
             ds.enemyWorldX[i] = enemy.getWorldPoint().x;
@@ -143,15 +145,24 @@ public class SaveLoad {
         for (int i = 0; i < gp.objects.size(); i++) {
 
             Object object = gp.objects.get(i);
-            if (object == null) {
-                continue;
-            }
+            if (object == null) continue;
 
             ds.objectNames[i] = object.getName();
             ds.objectWorldX[i] = object.getWorldPoint().x;
             ds.objectWorldY[i] = object.getWorldPoint().y;
             ds.objectDirections[i] = object.getDirection().toString();
             ds.objectLoot[i] = object.getLoot() == null ? "NULL" : object.getLoot().getName();
+        }
+
+        // COLLECTABLES AND ITEMS
+        for (int i = 0; i < gp.collectables.size(); i++) {
+
+            Entity collectable = gp.collectables.get(i);
+            if (collectable == null) continue;
+
+            ds.collectableNames[i] = collectable.getName();
+            ds.collectableWorldX[i] = collectable.getWorldPoint().x;
+            ds.collectableWorldY[i] = collectable.getWorldPoint().y;
         }
 
         gp.snapshot = ds;
@@ -232,15 +243,11 @@ public class SaveLoad {
         for (int i = 0; i < ds.items.length; i++) {
 
             String itemName = ds.items[i];
-            if (itemName == null) {
-                continue;
-            }
+            if (itemName == null) continue;
 
             // Entity found is not an Item
             Entity item = gp.eGenerator.getEntity(itemName);
-            if (!(item instanceof Item)) {
-                continue;
-            }
+            if (!(item instanceof Item)) continue;
 
             gp.player.addItem((Item) item);
 
@@ -266,17 +273,13 @@ public class SaveLoad {
         for (int i = 0; i < ds.npcNames.length; i++) {
 
             NPC npc = (NPC) gp.eGenerator.getEntity(ds.npcNames[i]);
-            if (npc == null) {
-                continue;
-            }
+            if (npc == null) continue;
 
             npc.setWorldPoint(new Point(ds.npcWorldX[i], ds.npcWorldY[i]));
             npc.setDirection(GamePanel.Direction.valueOf(ds.npcDirections[i]));
 
             Entity loot = gp.eGenerator.getEntity(ds.npcLoot[i]);
-            if (loot != null) {
-                npc.setLoot(loot);
-            }
+            if (loot != null) npc.setLoot(loot);
 
             gp.npcs.add(npc);
         }
@@ -285,18 +288,14 @@ public class SaveLoad {
         for (int i = 0; i < ds.enemyNames.length; i++) {
 
             Enemy enemy = (Enemy) gp.eGenerator.getEntity(ds.enemyNames[i]);
-            if (enemy == null) {
-                continue;
-            }
+            if (enemy == null) continue;
 
             enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
             enemy.setDirection(GamePanel.Direction.valueOf(ds.enemyDirections[i]));
             enemy.setHealth(ds.enemyHealth[i]);
 
             Entity loot = gp.eGenerator.getEntity(ds.enemyLoot[i]);
-            if (loot != null) {
-                enemy.setLoot(loot);
-            }
+            if (loot != null) enemy.setLoot(loot);
 
             gp.enemies.add(enemy);
         }
@@ -305,9 +304,7 @@ public class SaveLoad {
         for (int i = 0; i < ds.objectNames.length; i++) {
 
             Object object = (Object) gp.eGenerator.getEntity(ds.objectNames[i]);
-            if (object == null) {
-                continue;
-            }
+            if (object == null) continue;
 
             object.setWorldPoint(new Point(ds.objectWorldX[i], ds.objectWorldY[i]));
             object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
@@ -318,6 +315,17 @@ public class SaveLoad {
             }
 
             gp.objects.add(object);
+        }
+
+        // COLLECTABLES
+        for (int i = 0; i < ds.collectableNames.length; i++) {
+
+            Entity collectable = gp.eGenerator.getEntity(ds.collectableNames[i]);
+            if (collectable == null) continue;
+
+            collectable.setWorldPoint(new Point(ds.collectableWorldX[i], ds.collectableWorldY[i]));
+
+            gp.collectables.add(collectable);
         }
     }
 

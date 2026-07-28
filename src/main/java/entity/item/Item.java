@@ -22,4 +22,11 @@ public class Item extends Entity {
     protected void getSpriteImage() {
         image = sprite;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Item other)) return false;
+        return this.getName().equals(other.getName());
+    }
 }

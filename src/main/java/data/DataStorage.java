@@ -35,6 +35,10 @@ public class DataStorage implements Serializable {
     public String[] objectNames, objectDirections, objectLoot;
     public int[] objectWorldX, objectWorldY;
 
+    // COLLECTABLES
+    public String[] collectableNames;
+    public int[] collectableWorldX, collectableWorldY;
+
     public String toString() {
         return world_name + " [" + file_date + "]";
     }
