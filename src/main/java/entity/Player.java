@@ -14,6 +14,7 @@ import static entity.Entity.Action.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
@@ -339,6 +340,18 @@ public class Player extends Entity {
         defaultAttack = 2;
         attack = defaultAttack;
         knockbackPower = 1;
+
+        items.addAll(Arrays.asList(
+                new ITM_Bomb(gp, this),
+                new ITM_Boomerang(gp, this),
+                new ITM_Boots(gp, this),
+                new ITM_Bow(gp, this),
+                new ITM_Rod(gp, this),
+                new ITM_Cape(gp, this),
+                new ITM_Feather(gp, this),
+                new ITM_Shovel(gp, this),
+                new ITM_Hookshot(gp, this)
+        ));
     }
 
     /**
@@ -556,6 +569,7 @@ public class Player extends Entity {
             if (lockedOnTarget == null) {
                 lockedOnTarget = newTarget;
                 lockedOn = true;
+                playLockOn();
             }
             // Already locked on
             else {
@@ -954,16 +968,13 @@ public class Player extends Entity {
 
         // Activate guard when R is held down
         if (gp.keyH.rPressed) {
+            if (spriteCounter == 0) playLockOn();
+
             if (spriteCounter < 15) {
                 spriteCounter++;
             }
 
-            if (spriteCounter < 7) {
-                spriteNum = 1;
-            }
-            else {
-                spriteNum = 2;
-            }
+            spriteNum = spriteCounter < 7 ? 1 : 2;
         }
         // Release guard when player releases R
         else {
@@ -1023,7 +1034,7 @@ public class Player extends Entity {
         // Player holding B to charge
         if (gp.keyH.bPressed) {
             if (charge < 120) charge += 2;
-            if (charge == 24) playSpinCharge();
+            if (charge == 24) playCharge();
 
             speed = 2;
         }
@@ -1236,6 +1247,7 @@ public class Player extends Entity {
         if (gp.keyH.xPressed) {
             animationSpeed = 4;
             speed = 7;
+            if (spriteCounter == 0) playRun();
         }
         else {
             animationSpeed = 10;
@@ -1293,6 +1305,7 @@ public class Player extends Entity {
         }
         else if (28 <= jumpCounter) {
             if (action == SOARING) {
+                if (jumpNum == 3) playSoar();
                 jumpNum = 4;
                 soaring();
             }
@@ -1954,12 +1967,15 @@ public class Player extends Entity {
 
         previousGrunt = grunt;
     }
-    private void playSpinCharge() {
+    private void playCharge() {
         gp.playSE(3, 4);
     }
     private void playSpinGrunt() {
         int grunt = 1 + (int) (Math.random() * 2);
         gp.playSE(3, grunt + 4);
+    }
+    private void playLockOn() {
+        gp.playSE(3, 14);
     }
     private void playHurtGrunt() {
         int grunt = 1 + (int) (Math.random() * 3);
@@ -1973,6 +1989,12 @@ public class Player extends Entity {
     }
     private void playPullGrunt() {
         gp.playSE(3, 13);
+    }
+    private void playRun() {
+        gp.playSE(7, 6);
+    }
+    private void playSoar() {
+        gp.playSE(7, 8);
     }
 
     /** GETTERS */

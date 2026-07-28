@@ -18,7 +18,7 @@ public class OBJ_Bomb extends Object {
         health = maxHealth;
         opened = true;
 
-        defaultAttack = 6;
+        defaultAttack = 4;
         attack = defaultAttack;
         knockbackPower = 2;
 

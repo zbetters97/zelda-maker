@@ -16,11 +16,16 @@ public class Item extends Entity {
 
     public void use() {
         user.setAction(action);
+        playSoundEffect();
     }
 
     @Override
     protected void getSpriteImage() {
         image = sprite;
+    }
+
+    protected void playSoundEffect() {
+
     }
 
     @Override

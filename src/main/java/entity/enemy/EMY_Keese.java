@@ -2,6 +2,8 @@ package entity.enemy;
 
 import application.GamePanel;
 
+import java.util.Random;
+
 public class EMY_Keese extends Enemy {
 
     public static final String emyName = "Keese";
@@ -29,10 +31,18 @@ public class EMY_Keese extends Enemy {
     @Override
     protected void setAction() {
         setDirection(25);
+
+        // Squeak randomly every 2 seconds
+        int i = new Random().nextInt(120);
+        if (i == 0) playSqueak();
     }
 
     @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
+    }
+
+    private void playSqueak() {
+        gp.playSE(4, 7);
     }
 }

@@ -87,6 +87,8 @@ public class Projectile extends Entity {
         else {
             checkPlayerCollision();
         }
+
+        if (collisionOn) playHit();
     }
     protected boolean checkEnemyCollision() {
 
@@ -188,7 +190,6 @@ public class Projectile extends Entity {
 
     @Override
     protected void cycleSprites() {
-
         if (animationSpeed < ++spriteCounter) {
             if (spriteNum == 1) {
                 spriteNum = 2;
@@ -224,6 +225,8 @@ public class Projectile extends Entity {
     public void pickup(Entity user) {
 
     }
+
+    protected void playHit() {}
 
     @Override
     public DrawLayer getDrawLayer() {

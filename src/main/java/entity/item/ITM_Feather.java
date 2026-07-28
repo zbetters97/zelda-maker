@@ -23,4 +23,9 @@ public class ITM_Feather extends Item {
         super.use();
         user.setElevated(true);
     }
+
+    @Override
+    protected void playSoundEffect() {
+        gp.playSE(7, 7);
+    }
 }

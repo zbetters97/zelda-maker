@@ -37,4 +37,9 @@ public class PRJ_Bone extends Projectile {
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
     }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(7, 3);
+    }
 }

@@ -6,6 +6,7 @@ import entity.Entity;
 import entity.collectable.*;
 
 import java.awt.*;
+import java.util.Random;
 
 public class OBJ_Cucco extends Object {
 
@@ -13,6 +14,7 @@ public class OBJ_Cucco extends Object {
 
     private int directionRate = 60;
     private int aggressiveCounter = 0;
+    private int cluckCounter = 30;
 
     public OBJ_Cucco(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
@@ -88,7 +90,15 @@ public class OBJ_Cucco extends Object {
         }
         // If idle, move around
         else {
-            setDirection(directionRate);
+            // Cluck randomly every 3 seconds
+            if (grabbedBy == null) {
+                setDirection(directionRate);
+                cluckRandomly();
+            }
+            else {
+                direction = grabbedBy.getDirection();
+                cluckOften();
+            }
         }
     }
 
@@ -100,9 +110,29 @@ public class OBJ_Cucco extends Object {
         if (onPath && ai.playerWithinRange()) {
             chasePlayer();
             checkPlayerCollision();
+            cluckOften();
         }
         else {
             searchForPlayer();
+        }
+    }
+
+    private void cluckRandomly() {
+
+        if (cluckCounter < 30) {
+            cluckCounter++;
+        }
+
+        int i = new Random().nextInt(120);
+        if (i == 0 && cluckCounter == 30) {
+            playCluck();
+            cluckCounter = 0;
+        }
+    }
+    private void cluckOften() {
+        if (30 < ++cluckCounter) {
+            playCluck();
+            cluckCounter = 0;
         }
     }
 
@@ -173,8 +203,11 @@ public class OBJ_Cucco extends Object {
     protected void manageValues() {
         super.manageValues();
 
+        if (stunned) {
+            cluckOften();
+        }
         // No longer stunned, reset to defaults
-        if (!stunned) {
+        else {
             animationSpeed = 10;
             speed = defaultSpeed;
             directionRate = 60;
@@ -182,7 +215,6 @@ public class OBJ_Cucco extends Object {
 
         // Lost all health, increase speed and stay hostile for 999 frames
         if (health <= 0) {
-
             action = Action.ATTACKING;
             speed = 2;
 
@@ -199,6 +231,7 @@ public class OBJ_Cucco extends Object {
         health = maxHealth;
         directionRate = 60;
         aggressiveCounter = 0;
+        cluckCounter = 0;
 
         stunned = false;
         invincible = false;

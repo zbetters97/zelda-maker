@@ -32,8 +32,9 @@ public class ITM_Bow extends Item {
     @Override
     public void use() {
         if (user.getArrows() > 0) {
-            if (120 > user.charge) {
+            if (user.charge < 120) {
                 user.charge++;
+                if (user.charge == 12) playCharge();
             }
 
             super.use();
@@ -53,6 +54,7 @@ public class ITM_Bow extends Item {
         user.addArrows(-1);
         user.charge = 0;
         user.setAction(Action.IDLE);
+        playShoot();
     }
 
     private void setPower() {
@@ -68,5 +70,12 @@ public class ITM_Bow extends Item {
             projectile.modifySpeed(7);
             projectile.modifyAttack(3);
         }
+    }
+
+    private void playCharge() {
+        gp.playSE(3, 4);
+    }
+    private void playShoot() {
+        gp.playSE(7, 0);
     }
 }

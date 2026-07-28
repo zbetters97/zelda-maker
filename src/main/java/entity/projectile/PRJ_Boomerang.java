@@ -104,6 +104,15 @@ public class PRJ_Boomerang extends Projectile {
     }
 
     @Override
+    protected void cycleSprites() {
+        super.cycleSprites();
+
+        if (spriteCounter == 0 && spriteNum == 1) {
+            playSpin();
+        }
+    }
+
+    @Override
     protected void checkDeath() {
         if (!alive || (user != null && !user.isAvailable())) {
             resetValues();
@@ -121,5 +130,14 @@ public class PRJ_Boomerang extends Projectile {
     @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
+    }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(7, 3);
+    }
+
+    private void playSpin() {
+        gp.playSE(7, 2);
     }
 }

@@ -15,6 +15,7 @@ public class PRJ_Claw extends Projectile {
     private Entity grabbedEntity;
     private boolean returning = false, latched = false;
     private BufferedImage grabUp1, grabDown1, grabLeft1, grabRight1, chainHor, chainVer;
+    private int soundCounter = 0;
 
     public PRJ_Claw(GamePanel gp, Entity user) {
         super(gp, prjName);
@@ -123,6 +124,8 @@ public class PRJ_Claw extends Projectile {
         gp.cChecker.checkTile(this);
         gp.cChecker.checkMovementCollision(this, gp.npcs);
         checkObjectCollision();
+
+        if (collisionOn) playHit();
     }
 
     private void moveUser() {
@@ -189,6 +192,10 @@ public class PRJ_Claw extends Projectile {
         if (!alive || (user != null && !user.isAvailable())) {
             resetValues();
         }
+        else if (10 < ++soundCounter) {
+            playChain();
+            soundCounter = 0;
+        }
     }
 
     @Override
@@ -201,6 +208,7 @@ public class PRJ_Claw extends Projectile {
         user.resetCounters();
         user.setElevated(false);
         user.setAction(Action.IDLE);
+        soundCounter = 0;
 
         if (grabbedEntity != null) {
             grabbedEntity.setElevated(false);
@@ -254,5 +262,13 @@ public class PRJ_Claw extends Projectile {
         else {
             super.getSpriteImage();
         }
+    }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(7, 3);
+    }
+    private void playChain() {
+        gp.playSE(7, 4);
     }
 }

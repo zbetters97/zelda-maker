@@ -1036,9 +1036,12 @@ public class UI {
         if (gp.keyH.yPressed) {
             drawEditing_Menu();
         }
-        // User let go of Y when editing entities, run once
-        else if (wasYPressed && !editingTiles) {
-            editing_GetEntity();
+        // User let go of Y, run once
+        else if (wasYPressed) {
+            playMenuSelect();
+            if (!editingTiles) {
+                editing_GetEntity();
+            }
         }
         else {
             drawEditing_Map();
@@ -1165,6 +1168,7 @@ public class UI {
             if (entityIndex < 0) {
                 entityIndex = library.get(entityListIndex).size() - 1;
             }
+            playMenuCursor();
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
@@ -1173,6 +1177,7 @@ public class UI {
             if (entityIndex > library.get(entityListIndex).size() - 1) {
                 entityIndex = 0;
             }
+            playMenuCursor();
         }
         else if (gp.keyH.leftPressed) {
             gp.keyH.leftPressed = false;
@@ -1182,6 +1187,7 @@ public class UI {
             if (entityListIndex < 0) {
                 entityListIndex = library.size() - 1;
             }
+            playMenuCursor();
         }
         else if (gp.keyH.rightPressed) {
             gp.keyH.rightPressed = false;
@@ -1191,6 +1197,7 @@ public class UI {
             if (entityListIndex > library.size() - 1) {
                 entityListIndex = 0;
             }
+            playMenuCursor();
         }
     }
 
@@ -1224,6 +1231,8 @@ public class UI {
         else {
             editing_PlaceTile(tileNum);
         }
+
+        playMenuSelect();
     }
     private void editing_FillTiles(int tileNum) {
 
@@ -1299,6 +1308,10 @@ public class UI {
             else {
                 gp.removeEntity(mapEntity);
             }
+        }
+        // Trying to place selected entity on top of another
+        else {
+            playMenuError();
         }
     }
     private void editing_HandleEntityAPress(Entity entity) {

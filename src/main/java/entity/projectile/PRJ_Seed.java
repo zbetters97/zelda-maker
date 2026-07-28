@@ -32,4 +32,9 @@ public class PRJ_Seed extends Projectile {
     protected void getSpriteImage() {
         image = sprite;
     }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(7, 3);
+    }
 }

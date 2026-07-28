@@ -74,6 +74,7 @@ public class PRJ_Orb extends Projectile {
                 user.capture(target);
                 capturedEntity = target;
                 animationSpeed = 8;
+                playCapture();
 
                 return;
             }
@@ -114,5 +115,9 @@ public class PRJ_Orb extends Projectile {
     @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
+    }
+
+    private void playCapture() {
+        gp.playSE(7, 10);
     }
 }

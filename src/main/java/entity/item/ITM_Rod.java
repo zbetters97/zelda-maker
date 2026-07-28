@@ -37,4 +37,9 @@ public class ITM_Rod extends Item {
             super.use();
         }
     }
+
+    @Override
+    protected void playSoundEffect() {
+        gp.playSE(7, 9);
+    }
 }

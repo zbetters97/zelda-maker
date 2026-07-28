@@ -95,4 +95,9 @@ public class PRJ_Arrow extends Projectile {
         user.addArrows(1);
         resetValues();
     }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(7, 3);
+    }
 }

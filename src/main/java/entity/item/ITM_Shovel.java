@@ -17,4 +17,9 @@ public class ITM_Shovel extends Item {
     protected void getImages() {
         sprite = setupImage("/items/itm_shovel");
     }
+
+    @Override
+    protected void playSoundEffect() {
+        gp.playSE(7, 5);
+    }
 }
