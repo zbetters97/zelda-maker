@@ -1,205 +1,210 @@
 package application;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import java.net.URL;
+import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class SoundManager {
 
     // CLIP HOLDERS
     public Clip clip;
-    private final URL[][] sounds = new URL[10][];
-    public URL[] music = new URL[20];
-    public URL[] menu = new URL[20];
+    private final String[][] sounds = new String[7][];
+    private final int[][] loopStarts = new int[2][];
+    public int maxSongs = 0;
 
-    // VOLUME SLIDER
-    private FloatControl fc;
+    /* VOLUME SLIDER */
+    private FloatControl gainControl;
     public int volumeScale = 3;
     public float volume;
+    private volatile boolean isLooping = false;
 
     /**
      * CONSTRUCTOR
      * Imports all sound files
      */
     public SoundManager() {
+        sounds[0] = getSounds("00_music");
+        maxSongs = sounds[0].length - 1;
+        sounds[1] = getSounds("01_ui");
+        sounds[2] = getSounds("02_actions");
+        sounds[3] = getSounds("03_player");
+        sounds[4] = getSounds("04_enemies");
+        sounds[5] = getSounds("05_objects");
+        sounds[6] = getSounds("06_items");
 
-        // 0 - MUSIC
-        music[0] = getClass().getResource("/sound/MUSIC_MENU_MAIN.wav");
-        music[1] = getClass().getResource("/sound/MUSIC_WORLD_LIGHT.wav");
-        music[2] = getClass().getResource("/sound/MUSIC_WORLD_DARK.wav");
-        music[3] = getClass().getResource("/sound/MUSIC_SHOP.wav");
-        music[4] = getClass().getResource("/sound/MUSIC_DUNGEON_LIGHT.wav");
-        music[5] = getClass().getResource("/sound/MUSIC_DUNGEON_DARK.wav");
-        music[6] = getClass().getResource("/sound/MUSIC_BOSS.wav");
-        music[7] = getClass().getResource("/sound/MUSIC_BOSS_DEFEAT.wav");
-        music[8] = getClass().getResource("/sound/MUSIC_CREDITS.wav");
-
-        // 1 - MENU
-        menu[0] = getClass().getResource("/sound/MENU_CURSOR.wav");
-        menu[1] = getClass().getResource("/sound/MENU_SELECT.wav");
-        menu[2] = getClass().getResource("/sound/MENU_ERROR.wav");
-        menu[3] = getClass().getResource("/sound/MENU_OPEN.wav");
-        menu[4] = getClass().getResource("/sound/MENU_CLOSE.wav");
-        menu[5] = getClass().getResource("/sound/MENU_DIALOGUE.wav");
-        menu[6] = getClass().getResource("/sound/MENU_DIALOGUE_FINISH.wav");
-        menu[7] = getClass().getResource("/sound/MENU_MAP.wav");
-
-        // 2 - PLAYER
-        URL[] player = new URL[20];
-        player[0] = getClass().getResource("/sound/PLAYER_WALLET.wav");
-        player[1] = getClass().getResource("/sound/PLAYER_LOCKON.wav");
-        player[2] = getClass().getResource("/sound/PLAYER_GRUNT_1.wav");
-        player[3] = getClass().getResource("/sound/PLAYER_GRUNT_2.wav");
-        player[4] = getClass().getResource("/sound/PLAYER_GRUNT_3.wav");
-        player[5] = getClass().getResource("/sound/PLAYER_GRUNT_4.wav");
-        player[6] = getClass().getResource("/sound/PLAYER_HURT_1.wav");
-        player[7] = getClass().getResource("/sound/PLAYER_HURT_2.wav");
-        player[8] = getClass().getResource("/sound/PLAYER_HURT_3.wav");
-        player[9] = getClass().getResource("/sound/PLAYER_SPIN_1.wav");
-        player[10] = getClass().getResource("/sound/PLAYER_SPIN_2.wav");
-        player[11] = getClass().getResource("/sound/PLAYER_PULL.wav");
-        player[12] = getClass().getResource("/sound/PLAYER_PUSH.wav");
-        player[13] = getClass().getResource("/sound/PLAYER_SWIM.wav");
-        player[14] = getClass().getResource("/sound/PLAYER_DROWN.wav");
-        player[15] = getClass().getResource("/sound/PLAYER_FALL.wav");
-        player[16] = getClass().getResource("/sound/PLAYER_LOWHP.wav");
-        player[17] = getClass().getResource("/sound/PLAYER_DIE.wav");
-
-        // 3 - ENEMIES
-        URL[] enemies = new URL[20];
-        enemies[0] = getClass().getResource("/sound/ENEMY_SMALL_HIT.wav");
-        enemies[1] = getClass().getResource("/sound/ENEMY_NORMAL_HIT.wav");
-        enemies[2] = getClass().getResource("/sound/ENEMY_SMALL_DIE.wav");
-        enemies[3] = getClass().getResource("/sound/ENEMY_SWORD_LARGE.wav");
-        enemies[4] = getClass().getResource("/sound/BOSS_HIT.wav");
-        enemies[5] = getClass().getResource("/sound/BOSS_DIE.wav");
-        enemies[6] = getClass().getResource("/sound/ENEMY_SHOCK.wav");
-        enemies[7] = getClass().getResource("/sound/ENEMY_TELEPORT.wav");
-
-        // 4 - OBJECTS
-        URL[] objects = new URL[20];
-        objects[0] = getClass().getResource("/sound/OBJ_SWORD_SWING.wav");
-        objects[1] = getClass().getResource("/sound/OBJ_SWORD_SPIN_CHARGE.wav");
-        objects[2] = getClass().getResource("/sound/OBJ_SWORD_SPIN.wav");
-        objects[3] = getClass().getResource("/sound/OBJ_SWORD_BEAM.wav");
-        objects[4] = getClass().getResource("/sound/OBJ_TINK.wav");
-        objects[5] = getClass().getResource("/sound/OBJ_MOVE.wav");
-        objects[6] = getClass().getResource("/sound/OBJ_LIFT.wav");
-        objects[7] = getClass().getResource("/sound/OBJ_THROW.wav");
-        objects[8] = getClass().getResource("/sound/OBJ_FIREBALL.wav");
-        objects[9] = getClass().getResource("/sound/OBJ_POT.wav");
-        objects[10] = getClass().getResource("/sound/OBJ_CHEST_OPEN.wav");
-        objects[11] = getClass().getResource("/sound/OBJ_DOOR_OPEN.wav");
-        objects[12] = getClass().getResource("/sound/OBJ_DOOR_CLOSE.wav");
-        objects[13] = getClass().getResource("/sound/OBJ_DOOR_UNLOCK.wav");
-
-        // 5 - ITEMS
-        URL[] items = new URL[20];
-        items[0] = getClass().getResource("/sound/ITEM_GET.wav");
-        items[1] = getClass().getResource("/sound/ITEM_SHOVEL.wav");
-        items[2] = getClass().getResource("/sound/ITEM_BOOMERANG.wav");
-        items[3] = getClass().getResource("/sound/ITEM_BOOTS.wav");
-        items[4] = getClass().getResource("/sound/ITEM_BOMB_LAY.wav");
-        items[5] = getClass().getResource("/sound/ITEM_BOMB_EXPLODE.wav");
-        items[6] = getClass().getResource("/sound/ITEM_FEATHER.wav");
-        items[7] = getClass().getResource("/sound/ITEM_ARROW.wav");
-        items[8] = getClass().getResource("/sound/ITEM_HOOKSHOT.wav");
-        items[9] = getClass().getResource("/sound/ITEM_CAPE.wav");
-        items[10] = getClass().getResource("/sound/ITEM_ROD.wav");
-        items[11] = getClass().getResource("/sound/ITEM_ROD_CAPTURE.wav");
-
-        // 6 - MISC
-        URL[] misc = new URL[20];
-        misc[0] = getClass().getResource("/sound/MISC_BUTTON.wav");
-        misc[1] = getClass().getResource("/sound/MISC_RUPEE.wav");
-        misc[2] = getClass().getResource("/sound/MISC_HEART.wav");
-        misc[3] = getClass().getResource("/sound/MISC_FAIRY.wav");
-        misc[4] = getClass().getResource("/sound/MISC_STAIRS_UP.wav");
-        misc[5] = getClass().getResource("/sound/MISC_STAIRS_DOWN.wav");
-        misc[6] = getClass().getResource("/sound/MISC_SOLVE.wav");
-
-        // 7 - PLAYER VOICE
-        URL[] voice = new URL[20];
-        voice[0] = getClass().getResource("/sound/VOICE_SLASH1.wav");
-        voice[1] = getClass().getResource("/sound/VOICE_SLASH2.wav");
-        voice[2] = getClass().getResource("/sound/VOICE_ITEM.wav");
-        voice[3] = getClass().getResource("/sound/VOICE_HURT.wav");
-        voice[4] = getClass().getResource("/sound/VOICE_PUSH.wav");
-
-        // 8 - NPC
-        URL[] npc = new URL[20];
-        npc[0] = getClass().getResource("/sound/NPC_CUCCO.wav");
-
-        // 9 - INSTRUMENT
-        URL[] instrument = new URL[10];
-        instrument[0] = getClass().getResource("/sound/NOTES_A.wav");
-        instrument[1] = getClass().getResource("/sound/NOTES_D.wav");
-        instrument[2] = getClass().getResource("/sound/NOTES_R.wav");
-        instrument[3] = getClass().getResource("/sound/NOTES_L.wav");
-        instrument[4] = getClass().getResource("/sound/NOTES_U.wav");
-
-        sounds[0] = music;
-        sounds[1] = menu;
-        sounds[2] = player;
-        sounds[3] = enemies;
-        sounds[4] = objects;
-        sounds[5] = items;
-        sounds[6] = misc;
-        sounds[7] = voice;
-        sounds[8] = npc;
-        sounds[9] = instrument;
+        loopStarts[0] = new int[]{111, 7498, 182, 538, 32332, 7236, 4234};
     }
 
-    /**
-     * SET FILE
-     * Imports sound file and adds to player
-     * @param category
-     * @param record
-     */
-    public void setFile(int category, int record) {
+    private String[] getSounds(String library) {
+
+        List<String> sounds = new ArrayList<>();
+
         try {
-            AudioInputStream ais = AudioSystem.getAudioInputStream(sounds[category][record]);
+            boolean runningFromJar =
+                    Driver.class.getProtectionDomain()
+                            .getCodeSource()
+                            .getLocation()
+                            .getPath()
+                            .endsWith(".jar");
+
+            if (runningFromJar) {
+                String jarPath = new File(
+                        Driver.class.getProtectionDomain()
+                                .getCodeSource()
+                                .getLocation()
+                                .toURI()
+                ).getPath();
+
+                JarFile jarFile = new JarFile(jarPath);
+                Enumeration<JarEntry> entries = jarFile.entries();
+
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+
+                    if (entry.getName().startsWith("sound/" + library + "/") && !entry.isDirectory()) {
+                        sounds.add("/" + entry.getName());
+                    }
+                }
+
+                jarFile.close();
+            }
+            else {
+                File folder = new File(
+                        Objects.requireNonNull(
+                                getClass().getClassLoader()
+                                        .getResource("sound/" + library)
+                        ).toURI()
+                );
+
+                for (File f : Objects.requireNonNull(folder.listFiles())) {
+                    sounds.add("/sound/" + library + "/" + f.getName().toLowerCase());
+                }
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println("Error playing sound: " + e.getMessage());
+        }
+
+        return sounds.toArray(new String[0]);
+    }
+
+    public void setFile(int category, int record) {
+
+        try {
+            String path = sounds[category][record].substring(1);
+
+            InputStream is = getClass()
+                    .getClassLoader()
+                    .getResourceAsStream(path);
+
+            if (is == null) {
+                throw new RuntimeException("Sound not found: " + path);
+            }
+
+            BufferedInputStream bis = new BufferedInputStream(is);
+            AudioInputStream ais = AudioSystem.getAudioInputStream(bis);
+
             clip = AudioSystem.getClip();
             clip.open(ais);
 
-            fc = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             checkVolume();
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error loading sound: " + e.getMessage());
         }
     }
 
-    /**
-     * PLAY
-     * Plays the imported sound file
-     */
+    public int getLoopStart(int category, int record) {
+
+        // Invalid category or record
+        if (category < 0 || category > 9 || record < 0) {
+            return 0;
+        }
+
+        // PC / Multi Battle Music
+        if (category == 9) {
+            // Invalid record
+            if (record >= loopStarts[2].length) {
+                return 0;
+            }
+            else {
+                return loopStarts[2][record];
+            }
+        }
+        // Single Battle / World Music
+        else {
+            // Invalid record
+            if (record >= loopStarts[category].length) {
+                return 0;
+            }
+            else {
+                return loopStarts[category][record];
+            }
+        }
+    }
+
+    public void loop(int startTime) {
+
+        if (clip == null) {
+            return;
+        }
+
+        // Set looping flag to true
+        isLooping = true;
+
+        // Get audio format and calculate total frames
+        AudioFormat format = clip.getFormat();
+        float frameRate = format.getFrameRate();
+        int totalFrames = clip.getFrameLength();
+
+        // Convert start time to frames and ensure it's within bounds
+        int startFrame = Math.max(0, (int) (startTime * frameRate / 1000));
+
+        // Check for invalid start frame
+        if (startFrame >= totalFrames || startTime <= 0) {
+            clip.start();
+            return;
+        }
+
+        // Set up a line listener to handle the looping
+        clip.addLineListener(event -> {
+            if (event.getType() == LineEvent.Type.STOP) {
+                synchronized (clip) {
+                    // Only loop if still in looping mode and clip is open
+                    if (isLooping && clip.isOpen()) {
+                        clip.setFramePosition(startFrame);
+                        clip.start();
+                    }
+                }
+            }
+        });
+
+        // Start playing from the beginning
+        clip.setFramePosition(0);
+        clip.start();
+    }
+
     public void play() {
         clip.start();
     }
 
-    /**
-     * LOOP
-     * Loops the sound file that's playing
-     */
-    public void loop() {
-        clip.loop(Clip.LOOP_CONTINUOUSLY);
-    }
-
-    /**
-     * STOP
-     * Stops the sound file that's playing
-     */
     public void stop() {
-        clip.stop();
+        isLooping = false;
+
+        if (clip != null) {
+            clip.stop();
+        }
     }
 
-    /**
-     * CHECK VOLUME
-     * Adjusts the volume of the sound player
-     */
     public void checkVolume() {
 
         switch (volumeScale) {
@@ -223,6 +228,10 @@ public class SoundManager {
                 break;
         }
 
-        fc.setValue(volume);
+        setGain(volume);
+    }
+
+    private void setGain(float gain) {
+        gainControl.setValue(gain);
     }
 }

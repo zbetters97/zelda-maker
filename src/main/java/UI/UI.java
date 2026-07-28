@@ -33,6 +33,25 @@ public class UI {
     private Map<String, String> usersList = new HashMap<>();
     private boolean viewingUserLevels;
 
+    private final ArrayList<String> menuOptions = new ArrayList<>(Arrays.asList(
+            "Play",
+            "New",
+            "Browse",
+            "Login",
+            "Settings"
+    ));
+    private final ArrayList<String> menuAuthOptions = new ArrayList<>(Arrays.asList(
+            "Play",
+            "New",
+            "Load",
+            "Save",
+            "Delete",
+            "Upload",
+            "Browse",
+            "Logout",
+            "Settings"
+    ));
+
     /** SAVE/LOAD HANDLERS */
     private final Map<Integer, String> keyboard = new LinkedHashMap<>();
     private boolean capital = true;
@@ -208,13 +227,13 @@ public class UI {
 
         if (subState == 0) {
             if (gp.dbNotConnected() || !gp.auth.isLoggedIn()) {
-                drawPause_Screen();
+                drawPause_Menu();
             }
             else {
-                drawPause_Screen_Auth();
+                drawPause_Menu_Auth();
             }
 
-            pauseScreen_Input_Start();
+            pauseMenu_Input_Back();
         }
         else if (subState == 1) {
             drawPause_Users();
@@ -225,9 +244,12 @@ public class UI {
         else if (subState == 3) {
             drawPause_Name();
         }
+        else if (subState == 4) {
+            drawPause_Settings();
+        }
     }
 
-    private void drawPause_Screen() {
+    private void drawPause_Menu() {
 
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
@@ -235,85 +257,61 @@ public class UI {
         int x = gp.tileSize;
         int y = gp.tileSize;
         int width = gp.tileSize * 4;
-        int height = (int) (gp.tileSize * 6.5);
+        int height = (int) (gp.tileSize * 5.75);
         drawSubWindow(x, y, width, height);
 
         x = gp.tileSize * 2;
         y = gp.tileSize * 2;
+        int index = 0;
+
+        for (String option : menuOptions) {
+
+            g2.drawString(option, x, y);
+            if (commandNum == index) {
+                g2.drawString(">", x - 25, y);
+            }
+
+            y += gp.tileSize;
+            index++;
+        }
+
+        pauseMenu_Input_A();
+        pauseMenu_Input_Dir();
+    }
+    private void pauseMenu_Input_A() {
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
 
         // PLAY
-        g2.drawString("Play", x, y);
         if (commandNum == 0) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 0;
-                gp.saveLoad.saveSnapshot("temp");
-                gp.GAME_STATE = gp.PLAY_STATE;
-            }
+            gp.saveLoad.saveSnapshot("temp");
+            gp.GAME_STATE = gp.PLAY_STATE;
+            subState = 0;
         }
-
         // NEW
-        y += gp.tileSize;
-        g2.drawString("New", x, y);
-        if (commandNum == 1) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 0;
-            }
+        else if (commandNum == 1) {
+            subState = 0;
         }
+        // BROWSE
+        else if (commandNum == 2) {
+            usersList = gp.db.getAllUsers();
+            if (usersList == null || usersList.isEmpty()) return;
 
-        // ONLINE LEVELS
-        y += (int) (gp.tileSize * 1.5);
-        g2.drawString("Browse", x, y);
-        if (commandNum == 2) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                usersList = gp.db.getAllUsers();
-                if (usersList == null || usersList.isEmpty()) return;
-
-                commandNum = 0;
-                subState = 1;
-            }
+            subState = 1;
         }
-
         // LOGIN
-        y += (int) (gp.tileSize * 1.5);
-        g2.drawString("Login", x, y);
-        if (commandNum == 3) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-                gp.changeLogin();
-
-                commandNum = 0;
-                subState = 0;
-            }
+        else if (commandNum == 3) {
+            gp.changeLogin();
+            subState = 0;
         }
-
         // SETTINGS
-        y += gp.tileSize;
-        g2.drawString("Settings", x, y);
-        if (commandNum == 4) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 4;
-            }
+        else if (commandNum == 4) {
+            subState = 4;
         }
 
-        pauseScreen_Input_Dir();
+        commandNum = 0;
     }
-    private void pauseScreen_Input_Dir() {
+    private void pauseMenu_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
@@ -330,7 +328,7 @@ public class UI {
         }
     }
 
-    private void drawPause_Screen_Auth() {
+    private void drawPause_Menu_Auth() {
 
         g2.setColor(Color.WHITE);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
@@ -338,150 +336,91 @@ public class UI {
         int x = gp.tileSize;
         int y = gp.tileSize;
         int width = gp.tileSize * 4;
-        int height = (int) (gp.tileSize * 10.5);
+        int height = (int) (gp.tileSize * 9.75);
         drawSubWindow(x, y, width, height);
 
         x = gp.tileSize * 2;
         y = gp.tileSize * 2;
+        int index = 0;
+
+        for (String option : menuAuthOptions) {
+
+            g2.drawString(option, x, y);
+            if (commandNum == index) {
+                g2.drawString(">", x - 25, y);
+            }
+
+            y += gp.tileSize;
+            index++;
+        }
+
+        pauseMenu_Auth_Input_A();
+        pauseMenu_Auth_Input_Dir();
+    }
+    private void pauseMenu_Auth_Input_A() {
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
 
         // PLAY
-        g2.drawString("Play", x, y);
         if (commandNum == 0) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 0;
-                gp.saveLoad.saveSnapshot("temp");
-                gp.GAME_STATE = gp.PLAY_STATE;
-            }
+            gp.saveLoad.saveSnapshot("temp");
+            gp.GAME_STATE = gp.PLAY_STATE;
+            subState = 0;
         }
-
         // NEW
-        y += gp.tileSize;
-        g2.drawString("New", x, y);
-        if (commandNum == 1) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 0;
-            }
+        else  if (commandNum == 1) {
+            subState = 0;
         }
-
         // LOAD
-        y += gp.tileSize;
-        g2.drawString("Load", x, y);
-        if (commandNum == 2) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
+        else if (commandNum == 2) {
+            gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
 
-                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+            isSaving = false; isLoading = true;
 
-                isSaving = false; isLoading = true;
-                commandNum = 0;
-                subState = 2;
-            }
+            subState = 2;
         }
-
         // SAVE
-        y += gp.tileSize;
-        g2.drawString("Save", x, y);
-        if (commandNum == 3) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
+        else if (commandNum == 3) {
+            gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
 
-                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-                // if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+            isSaving = true; isLoading = false;
 
-                isSaving = true; isLoading = false;
-                commandNum = 0;
-                subState = 2;
-            }
+            subState = 2;
         }
-
         // DELETE
-        y += gp.tileSize;
-        g2.drawString("Delete", x, y);
-        if (commandNum == 4) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
+        else if (commandNum == 4) {
+            gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
+            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
 
-                gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-                if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+            isSaving = false; isLoading = false;
 
-                isSaving = false; isLoading = false;
-                commandNum = 0;
-                subState = 2;
-            }
+            subState = 2;
         }
-
         // UPLOAD
-        y += gp.tileSize;
-        g2.drawString("Upload", x, y);
-        if (commandNum == 5) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 3;
-            }
+        else if (commandNum == 5) {
+            subState = 3;
         }
+        // BROWSE
+        else if (commandNum == 6) {
+            usersList = gp.db.getAllUsers();
+            if (usersList == null || usersList.isEmpty()) return;
 
-        // ONLINE LEVELS
-        y += (int) (gp.tileSize * 1.5);
-        g2.drawString("Browse", x, y);
-        if (commandNum == 6) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                usersList = gp.db.getAllUsers();
-                if (usersList == null || usersList.isEmpty()) return;
-
-                commandNum = 0;
-                subState = 1;
-            }
+            subState = 1;
         }
-
-        // Logout
-        y += (int) (gp.tileSize * 1.5);
-        g2.drawString("Logout", x, y);
-        if (commandNum == 7) {
-            g2.drawString(">", x - 25, y);
-
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-                gp.changeLogin();
-
-                commandNum = 0;
-                subState = 0;
-            }
+        // LOGOUT
+        else if (commandNum == 7) {
+            gp.changeLogin();
+            subState = 0;
         }
-
         // SETTINGS
-        y += gp.tileSize;
-        g2.drawString("Settings", x, y);
-        if (commandNum == 8) {
-            g2.drawString(">", x - 25, y);
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
-
-                commandNum = 0;
-                subState = 4;
-            }
+        else if (commandNum == 8) {
+            subState = 4;
         }
 
-        pauseScreen_User_Input_Dir();
+        commandNum = 0;
     }
-    private void pauseScreen_User_Input_Dir() {
+    private void pauseMenu_Auth_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
@@ -498,9 +437,10 @@ public class UI {
         }
     }
 
-    private void pauseScreen_Input_Start() {
-        if (!gp.keyH.startPressed) return;
+    private void pauseMenu_Input_Back() {
+        if (!gp.keyH.startPressed && !gp.keyH.bPressed) return;
         gp.keyH.startPressed = false;
+        gp.keyH.bPressed = false;
 
         commandNum = 0;
         subState = 0;
@@ -891,6 +831,143 @@ public class UI {
 
             if (commandNum < keyboardLetters.length() + 3) {
                 commandNum++;
+            }
+        }
+    }
+
+    private void drawPause_Settings() {
+
+        g2.setColor(Color.WHITE);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+
+        int x = gp.tileSize * 2;
+        int y = gp.tileSize * 2;
+        int width = gp.tileSize * 9;
+        int height = (int) (gp.tileSize * 4.5);
+        drawSubWindow(x, y, width, height);
+
+        x = gp.tileSize * 3;
+        y = gp.tileSize * 3;
+
+        g2.drawString("Full Screen", x, y);
+        if (commandNum == 0) {
+            g2.drawString(">", x - 25, y);
+        }
+
+        y += gp.tileSize;
+        g2.drawString("Music", x, y);
+        if (commandNum == 1) {
+            g2.drawString(">", x - 25, y);
+        }
+
+        // SOUND EFFECTS VOLUME
+        y += gp.tileSize;
+        g2.drawString("Sound Effects", x, y);
+        if (commandNum == 2) {
+            g2.drawString(">", x - 25, y);
+        }
+
+        // LEVEL SONG
+        y += gp.tileSize;
+        g2.drawString("Music", x, y);
+        if (commandNum == 3) {
+            g2.drawString(">", x - 25, y);
+        }
+
+        // FULL SCREEN CHECK BOX
+        x = gp.tileSize * 8;
+        y = (int) (gp.tileSize * 2.5);
+        g2.setStroke(new BasicStroke(3));
+        g2.drawRect(x, y, 24, 24);
+        if (gp.fullScreenOn) {
+            g2.fillRect(x, y, 24, 24);
+        }
+
+        // MUSIC SLIDER
+        y += gp.tileSize;
+        g2.drawRect(x, y, 120, 24); // 120/5 = 24
+        int volumeWidth = 24 * gp.music.volumeScale;
+        g2.fillRect(x, y, volumeWidth, 24);
+
+        // SOUND EFFECTS SLIDER
+        y += gp.tileSize;
+        g2.drawRect(x, y, 120, 24);
+        g2.drawRect(x, y, 120, 24); // 120/5 = 24
+        volumeWidth = 24 * gp.se.volumeScale;
+        g2.fillRect(x, y, volumeWidth, 24);
+
+        // SONG NUMBER
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString(String.valueOf(gp.song + 1), x, y);
+
+        pauseSettings_Input_A();
+        pauseSettings_Input_Back();
+        pauseSettings_Input_Dir();
+    }
+    private void pauseSettings_Input_A() {
+        if (!gp.keyH.aPressed) return;
+        gp.keyH.aPressed = false;
+
+        // Toggle Fullscreen
+        if (commandNum == 0) {
+            gp.fullScreenOn = !gp.fullScreenOn;
+        }
+    }
+    private void pauseSettings_Input_Back() {
+        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
+        gp.keyH.bPressed = false;
+        gp.keyH.startPressed = false;
+
+        // gp.config.saveConfig();
+        commandNum = 0;
+        subState = 0;
+    }
+    private void pauseSettings_Input_Dir() {
+
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (--commandNum < 0) {
+                commandNum = 0;
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (3 < ++commandNum) {
+                commandNum = 3;
+            }
+        }
+        else if (gp.keyH.leftPressed) {
+            gp.keyH.leftPressed = false;
+
+            if (commandNum == 1 && 0 < gp.music.volumeScale) {
+                gp.music.volumeScale--;
+                gp.music.checkVolume();
+            }
+            else if (commandNum == 2 && gp.se.volumeScale > 0) {
+                gp.se.volumeScale--;
+                gp.music.checkVolume();
+            }
+            else if (commandNum == 3 && gp.song > 0) {
+                gp.song--;
+                gp.playMusic(gp.song);
+            }
+        }
+        else if (gp.keyH.rightPressed) {
+            gp.keyH.rightPressed = false;
+
+            if (commandNum == 1 && gp.music.volumeScale < 5) {
+                gp.music.volumeScale++;
+                gp.music.checkVolume();
+            }
+            else if (commandNum == 2 && gp.se.volumeScale < 5) {
+                gp.se.volumeScale++;
+                gp.music.checkVolume();
+            }
+            else if (commandNum == 3 && gp.song < gp.se.maxSongs) {
+                gp.song++;
+                gp.playMusic(gp.song);
             }
         }
     }

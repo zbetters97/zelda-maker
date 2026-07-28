@@ -36,6 +36,7 @@ public class SaveLoad {
         DataStorage ds = new DataStorage();
 
         ds.world_name = worldName;
+        ds.world_song = gp.song;
 
         // 01/31/2026 format
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -207,6 +208,8 @@ public class SaveLoad {
     public void loadSnapshot() {
 
         DataStorage ds = gp.snapshot;
+
+        gp.song = ds.world_song;
 
         // PLAYER DATA
         gp.player.setWorldPoint(new Point(ds.pWorldX, ds.pWorldY));

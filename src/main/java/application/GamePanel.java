@@ -80,6 +80,9 @@ public class GamePanel extends JPanel implements Runnable {
     public TileManager tileM = new TileManager(this);
     public CollisionChecker cChecker = new CollisionChecker(this);
     public PathFinder pFinder = new PathFinder(this);
+    public final SoundManager music = new SoundManager();
+    public final SoundManager se = new SoundManager();
+    public int song = 0;
 
     /** DATA HANDLING */
     public final SaveLoad saveLoad = new SaveLoad(this);
@@ -134,6 +137,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         ui.cursor.setWorldPoint(player.getWorldPoint());
         camera.follow(ui.cursor.getWorldPoint());
+
+        playMusic(1);
 
         if (fullScreenOn) setFullScreen();
     }
@@ -413,5 +418,19 @@ public class GamePanel extends JPanel implements Runnable {
 
     public boolean dbNotConnected() {
         return !dbConnected;
+    }
+
+    public void playSE(int category, int record) {
+        se.setFile(category, record);
+        se.play();
+    }
+    public void playMusic(int record) {
+        stopMusic();
+        int loopStart = music.getLoopStart(0, record);
+        music.setFile(0, record);
+        music.loop(loopStart);
+    }
+    public void stopMusic() {
+        music.stop();
     }
 }
