@@ -42,6 +42,10 @@ public class EMY_Buzzblob extends Enemy {
 
         if (action != Action.ATTACKING) {
             ai.setAttacking(180, gp.tileSize * 3, gp.tileSize * 3);
+
+            if (action == Action.ATTACKING) {
+                playShock();
+            }
         }
     }
 
@@ -122,5 +126,9 @@ public class EMY_Buzzblob extends Enemy {
             image = spriteNum == 1 ? up1 :
                     spriteNum == 2 ? up2 : up3;
         }
+    }
+
+    private void playShock() {
+        gp.playSE(4, 1);
     }
 }

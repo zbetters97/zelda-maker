@@ -34,6 +34,7 @@ public class Player extends Entity {
 
     /** ANIMATION HANDLERS */
     private int spinCharge = 0;
+    private int previousGrunt = 0;
     private int
             attackNum = 1, attackCounter = 0,
             digNum = 1, digCounter = 0,
@@ -439,6 +440,7 @@ public class Player extends Entity {
         // Swing sword
         else if (gp.keyH.bPressed) {
             action = ATTACKING;
+            playGrunt();
 
             if (capturedEntity != null) {
                 capturedEntity.setAction(ATTACKING);
@@ -500,6 +502,7 @@ public class Player extends Entity {
         spriteCounter = 0;
         lockonDirection = direction;
         actionLockCounter = 30;
+        playGrunt();
     }
 
     private void findInteraction() {
@@ -519,7 +522,6 @@ public class Player extends Entity {
     }
 
     private void placeObject() {
-
         gp.keyH.aPressed = false;
 
         if (grabbedObject == null) {
@@ -530,8 +532,8 @@ public class Player extends Entity {
         grabbedObject.place(this);
     }
     private void throwObject() {
-
         gp.keyH.aPressed = false;
+        playGrunt();
 
         if (grabbedObject == null) {
             action = THROWING;
@@ -1020,9 +1022,8 @@ public class Player extends Entity {
 
         // Player holding B to charge
         if (gp.keyH.bPressed) {
-            if (charge < 120) {
-                charge += 2;
-            }
+            if (charge < 120) charge += 2;
+            if (charge == 24) playSpinCharge();
 
             speed = 2;
         }
@@ -1035,6 +1036,7 @@ public class Player extends Entity {
             spriteNum = 0;
             speed = defaultSpeed;
             action = SPINNING;
+            playSpinGrunt();
         }
         // Player released B, charge not ready, reset to idle
         else {
@@ -1157,6 +1159,7 @@ public class Player extends Entity {
             grabCounter = 0;
             pickup(grabbedObject);
             gp.keyH.aPressed = false;
+            playPullGrunt();
         }
     }
     private void resetGrab() {
@@ -1359,6 +1362,17 @@ public class Player extends Entity {
         }
     }
 
+    public void startFall() {
+        action = FALLING;
+        shiftToCenter();
+        playFalling();
+    }
+    public void startDrown() {
+        action = DROWNING;
+        shiftToCenter();
+        playDrowning();
+    }
+
     private void takingDamage() {
 
         speed = 0;
@@ -1387,6 +1401,11 @@ public class Player extends Entity {
 
             resetHandlers();
         }
+    }
+
+    @Override
+    protected void reactToDamage() {
+        playHurtGrunt();
     }
 
     private void resetHandlers() {
@@ -1920,6 +1939,40 @@ public class Player extends Entity {
     }
     private BufferedImage getNewItemSprite() {
         return newItem instanceof Item ? itemGet2 : itemGet1;
+    }
+
+    /** Sound Effects */
+    private void playGrunt() {
+
+        int grunt;
+
+        // Randomize grunt, regenerate if grunt is previous grunt
+        do grunt = 1 + (int) (Math.random() * 4);
+        while (grunt == previousGrunt);
+
+        gp.playSE(3, grunt - 1);
+
+        previousGrunt = grunt;
+    }
+    private void playSpinCharge() {
+        gp.playSE(3, 4);
+    }
+    private void playSpinGrunt() {
+        int grunt = 1 + (int) (Math.random() * 2);
+        gp.playSE(3, grunt + 4);
+    }
+    private void playHurtGrunt() {
+        int grunt = 1 + (int) (Math.random() * 3);
+        gp.playSE(3, grunt + 6);
+    }
+    private void playFalling() {
+        gp.playSE(3, 10);
+    }
+    private void playDrowning() {
+        gp.playSE(3, 11);
+    }
+    private void playPullGrunt() {
+        gp.playSE(3, 13);
     }
 
     /** GETTERS */

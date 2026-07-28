@@ -138,7 +138,7 @@ public class GamePanel extends JPanel implements Runnable {
         ui.cursor.setWorldPoint(player.getWorldPoint());
         camera.follow(ui.cursor.getWorldPoint());
 
-        // playMusic(1);
+        playMusic(1);
 
         if (fullScreenOn) setFullScreen();
     }
@@ -237,7 +237,13 @@ public class GamePanel extends JPanel implements Runnable {
         keyH.stopAllKeys();
 
         if (GAME_STATE == EDIT_STATE) {
-            GAME_STATE = PAUSE_STATE;
+            if (ui.cursor.hasSelectedEntity()) {
+                ui.playMenuError();
+            }
+            else {
+                GAME_STATE = PAUSE_STATE;
+                ui.playMenuOpen();
+            }
         }
         else if (GAME_STATE == PLAY_STATE) {
             resetGame();
@@ -245,6 +251,7 @@ public class GamePanel extends JPanel implements Runnable {
             ui.cursor.setWorldPoint(player.getWorldPoint());
 
             GAME_STATE = EDIT_STATE;
+            ui.playMenuClose();
         }
     }
 
@@ -426,7 +433,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void playMusic(int record) {
         stopMusic();
-        int loopStart = music.getLoopStart(0, record);
+        int loopStart = music.getLoopStart(record);
         music.setFile(0, record);
         music.loop(loopStart);
     }

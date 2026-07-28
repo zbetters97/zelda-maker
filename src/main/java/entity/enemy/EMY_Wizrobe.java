@@ -104,6 +104,7 @@ public class EMY_Wizrobe extends Enemy {
                 teleporting = true;
                 interactable = false;
                 spriteNum = 2;
+                playTeleport();
             }
         }
     }
@@ -141,6 +142,7 @@ public class EMY_Wizrobe extends Enemy {
 
     @Override
     protected void reactToDamage() {
+        super.reactToDamage();
         spriteNum = 2;
         spriteCounter = 0;
         attackCounter = 0;
@@ -182,5 +184,9 @@ public class EMY_Wizrobe extends Enemy {
         else {
             image = down2;
         }
+    }
+
+    private void playTeleport() {
+        gp.playSE(4, 2);
     }
 }

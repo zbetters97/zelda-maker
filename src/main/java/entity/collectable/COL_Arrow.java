@@ -23,5 +23,10 @@ public class COL_Arrow extends Collectable {
     public void use(Entity user) {
         user.addArrows(value);
         alive = false;
+        playPickup();
+    }
+
+    private void playPickup() {
+        gp.playSE(6, 0);
     }
 }

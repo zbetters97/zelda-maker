@@ -58,6 +58,8 @@ public class Object extends Entity {
         if (collisionOn) {
             worldPoint.setLocation(user.getWorldPoint());
         }
+
+        playPlace();
     }
 
     public void toss(Entity user) {
@@ -66,6 +68,7 @@ public class Object extends Entity {
         tossed = true;
         canMove = false;
         elevated = true;
+        playThrow();
 
         // Start at user's location
         worldPoint.setLocation(user.getWorldPoint());
@@ -217,6 +220,14 @@ public class Object extends Entity {
         }
 
         super.draw(g2);
+    }
+
+    /** SOUND EFFECTS */
+    private void playPlace() {
+        gp.playSE(5, 2);
+    }
+    private void playThrow() {
+        gp.playSE(5, 3);
     }
 
     /** GETTERS AND SETTERS */

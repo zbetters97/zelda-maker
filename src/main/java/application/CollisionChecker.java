@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import static application.GamePanel.Direction;
-import static entity.Entity.Action.*;
 
 public record CollisionChecker(GamePanel gp) {
 
@@ -201,8 +200,7 @@ public record CollisionChecker(GamePanel gp) {
         if (entity.getElevated()) return;
 
         if (entity == gp.player) {
-            gp.player.setAction(FALLING);
-            gp.player.shiftToCenter();
+            gp.player.startFall();
         }
         else {
             entity.setAlive(false);
@@ -213,8 +211,7 @@ public record CollisionChecker(GamePanel gp) {
         if (entity.getElevated() || entity.getCanSwim()) return;
 
         if (entity == gp.player) {
-            gp.player.setAction(DROWNING);
-            gp.player.shiftToCenter();
+            gp.player.startDrown();
         }
         else {
             entity.setAlive(false);

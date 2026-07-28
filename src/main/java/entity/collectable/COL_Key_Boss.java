@@ -22,5 +22,10 @@ public class COL_Key_Boss extends Collectable {
     public void use(Entity user) {
         user.setHasBossKey(true);
         alive = false;
+        playPickup();
+    }
+
+    private void playPickup() {
+        gp.playSE(6, 4);
     }
 }

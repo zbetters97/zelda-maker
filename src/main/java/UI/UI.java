@@ -34,22 +34,10 @@ public class UI {
     private boolean viewingUserLevels;
 
     private final ArrayList<String> menuOptions = new ArrayList<>(Arrays.asList(
-            "Play",
-            "New",
-            "Browse",
-            "Login",
-            "Settings"
+            "Play", "New", "Browse", "Login", "Settings"
     ));
     private final ArrayList<String> menuAuthOptions = new ArrayList<>(Arrays.asList(
-            "Play",
-            "New",
-            "Load",
-            "Save",
-            "Delete",
-            "Upload",
-            "Browse",
-            "Logout",
-            "Settings"
+            "Play", "New", "Load", "Save", "Delete", "Upload", "Browse", "Logout", "Settings"
     ));
 
     /** SAVE/LOAD HANDLERS */
@@ -295,7 +283,10 @@ public class UI {
         // BROWSE
         else if (commandNum == 2) {
             usersList = gp.db.getAllUsers();
-            if (usersList == null || usersList.isEmpty()) return;
+            if (usersList == null || usersList.isEmpty()) {
+                playMenuError();
+                return;
+            }
 
             subState = 1;
         }
@@ -309,21 +300,27 @@ public class UI {
             subState = 4;
         }
 
+        if (0 < commandNum && commandNum < 5) {
+            playMenuSelect();
+        }
+
         commandNum = 0;
     }
     private void pauseMenu_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (4 < ++commandNum) {
-                commandNum = 4;
+            if (commandNum < 4) {
+                commandNum++;
+                playMenuCursor();
             }
         }
     }
@@ -374,7 +371,10 @@ public class UI {
         // LOAD
         else if (commandNum == 2) {
             gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) {
+                playMenuError();
+                return;
+            }
 
             isSaving = false; isLoading = true;
 
@@ -391,7 +391,10 @@ public class UI {
         // DELETE
         else if (commandNum == 4) {
             gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
-            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) return;
+            if (gp.saveFiles == null || gp.saveFiles.isEmpty()) {
+                playMenuError();
+                return;
+            }
 
             isSaving = false; isLoading = false;
 
@@ -404,7 +407,10 @@ public class UI {
         // BROWSE
         else if (commandNum == 6) {
             usersList = gp.db.getAllUsers();
-            if (usersList == null || usersList.isEmpty()) return;
+            if (usersList == null || usersList.isEmpty()) {
+                playMenuError();
+                return;
+            }
 
             subState = 1;
         }
@@ -418,21 +424,27 @@ public class UI {
             subState = 4;
         }
 
+        if (0 < commandNum && commandNum < 9) {
+            playMenuSelect();
+        }
+
         commandNum = 0;
     }
     private void pauseMenu_Auth_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (8 < ++commandNum) {
-                commandNum = 8;
+            if (commandNum < 8) {
+                commandNum++;
+                playMenuCursor();
             }
         }
     }
@@ -446,6 +458,7 @@ public class UI {
         subState = 0;
 
         gp.GAME_STATE = gp.EDIT_STATE;
+        playMenuClose();
     }
 
     private void drawPause_Users() {
@@ -495,10 +508,10 @@ public class UI {
         gp.saveFiles = gp.db.getUserWorlds(userId);
 
         viewingUserLevels = true;
-        isSaving = false;
-        isLoading = true;
+        isSaving = false; isLoading = true;
         commandNum = 0;
         subState = 2;
+        playMenuSelect();
 
         return true;
     }
@@ -508,20 +521,23 @@ public class UI {
 
         commandNum = 0;
         subState = 0;
+        playMenuClose();
     }
     private void pauseUsers_Input_Dir() {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (usersList.size() - 1< ++commandNum) {
-                commandNum = usersList.size() - 1;
+            if (commandNum < usersList.size() - 1) {
+                commandNum++;
+                playMenuCursor();
             }
         }
     }
@@ -617,6 +633,7 @@ public class UI {
         viewingUserLevels = false;
         commandNum = 0;
         subState = 0;
+        playMenuSelect();
 
         return true;
     }
@@ -626,6 +643,7 @@ public class UI {
 
         commandNum = 0;
         subState = 0;
+        playMenuClose();
 
         if (viewingUserLevels) {
             viewingUserLevels = false;
@@ -638,16 +656,18 @@ public class UI {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
             int maxSize = isSaving ? gp.saveFiles.size() : gp.saveFiles.size() - 1;
-            if (maxSize < ++commandNum) {
-                commandNum = maxSize;
+            if (commandNum < maxSize) {
+                commandNum++;
+                playMenuCursor();
             }
         }
     }
@@ -733,26 +753,37 @@ public class UI {
 
         // LETTER SELECT
         if (commandNum < keyboardLetters.length()) {
-            if (textInput.length() > MAX_WORLD_NAME) return;
+            if (textInput.length() > MAX_WORLD_NAME) {
+                playMenuError();
+                return;
+            }
 
             // SPACE BUTTON
             if (commandNum == keyboardLetters.length() - 1) {
                 textInput += " ";
+                playMenuSelect();
             }
             // LETTER
             else {
                 // Get char in map via corresponding key (EX: 0 -> Q, 10 -> A)
                 textInput += keyboard.get(commandNum);
+                playMenuSelect();
             }
         }
         // DEL BUTTON
         else if (commandNum == keyboardLetters.length()) {
-            if (textInput.isEmpty()) return;
+            if (textInput.isEmpty()) {
+                playMenuError();
+                return;
+            }
+
             textInput = textInput.substring(0, textInput.length() - 1);
+            playMenuSelect();
         }
         // CAPS BUTTON
         else if (commandNum == keyboardLetters.length() + 1) {
             capital = !capital;
+            playMenuSelect();
         }
         // BACK BUTTON
         else if (commandNum == keyboardLetters.length() + 2) {
@@ -760,10 +791,14 @@ public class UI {
             capital = true;
             commandNum = 0;
             subState = 0;
+            playMenuClose();
         }
         // SUBMIT BUTTON
         else if (commandNum == keyboardLetters.length() + 3) {
-            if (textInput.length() < 3 || textInput.length() > MAX_WORLD_NAME) return;
+            if (textInput.length() < 3 || textInput.length() > MAX_WORLD_NAME) {
+                playMenuError();
+                return;
+            }
 
             gp.saveLoad.save(textInput, "");
             commandNum = 0;
@@ -771,6 +806,7 @@ public class UI {
 
             textInput = "";
             capital = true;
+            playMenuSelect();
         }
     }
     private void pauseKeyboard_Input_B() {
@@ -778,52 +814,64 @@ public class UI {
         gp.keyH.bPressed = false;
 
         textInput = textInput.substring(0, textInput.length() - 1);
+        playMenuSelect();
     }
     private void pauseKeyboard_Input_Dir(String keyboardLetters) {
 
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (commandNum >= 10 && commandNum <= 18) {
+            if (10 <= commandNum && commandNum <= 18) {
                 commandNum -= 10;
+                playMenuSelect();
             }
-            else if (commandNum >= 19 && commandNum <= 25) {
+            else if (19 <= commandNum && commandNum <= 25) {
                 commandNum -= 9;
+                playMenuSelect();
             }
             else if (commandNum == 26) {
                 commandNum = 17;
+                playMenuSelect();
             }
             else if (commandNum == 27) {
                 commandNum = 18;
+                playMenuSelect();
             }
-            else if (commandNum >= 28) {
+            else if (28 <= commandNum) {
                 commandNum = 19;
+                playMenuSelect();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (commandNum >= 0 && commandNum <= 8) {
+            if (0 <= commandNum && commandNum <= 8) {
                 commandNum += 10;
+                playMenuSelect();
             }
-            else if (commandNum >= 9 && commandNum <= 17) {
+            else if (9 <= commandNum && commandNum <= 17) {
                 commandNum += 9;
+                playMenuSelect();
             }
             else if (commandNum == 18) {
                 commandNum += 9;
+                playMenuSelect();
             }
-            else if (commandNum >= 19 && commandNum <= keyboardLetters.length()) {
+            else if (19 <= commandNum && commandNum <= keyboardLetters.length()) {
                 commandNum = keyboardLetters.length() + 2;
+                playMenuSelect();
             }
             else if (commandNum < keyboardLetters.length() + 2) {
                 commandNum = keyboardLetters.length() + 2;
+                playMenuSelect();
             }
         }
         else if (gp.keyH.leftPressed) {
             gp.keyH.leftPressed = false;
 
-            if (commandNum > 0) {
+            if (0 < commandNum) {
                 commandNum--;
+                playMenuSelect();
             }
         }
         else if (gp.keyH.rightPressed) {
@@ -831,6 +879,7 @@ public class UI {
 
             if (commandNum < keyboardLetters.length() + 3) {
                 commandNum++;
+                playMenuSelect();
             }
         }
     }
@@ -911,6 +960,7 @@ public class UI {
         // Toggle Fullscreen
         if (commandNum == 0) {
             gp.fullScreenOn = !gp.fullScreenOn;
+            playMenuSelect();
         }
     }
     private void pauseSettings_Input_Back() {
@@ -921,21 +971,24 @@ public class UI {
         // gp.config.saveConfig();
         commandNum = 0;
         subState = 0;
+        playMenuClose();
     }
     private void pauseSettings_Input_Dir() {
 
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            if (--commandNum < 0) {
-                commandNum = 0;
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (3 < ++commandNum) {
-                commandNum = 3;
+            if (commandNum < 3) {
+                commandNum++;
+                playMenuCursor();
             }
         }
         else if (gp.keyH.leftPressed) {
@@ -945,11 +998,12 @@ public class UI {
                 gp.music.volumeScale--;
                 gp.music.checkVolume();
             }
-            else if (commandNum == 2 && gp.se.volumeScale > 0) {
+            else if (commandNum == 2 && 0 < gp.se.volumeScale) {
                 gp.se.volumeScale--;
                 gp.music.checkVolume();
+                playMenuCursor();
             }
-            else if (commandNum == 3 && gp.song > 0) {
+            else if (commandNum == 3 && 0 < gp.song) {
                 gp.song--;
                 gp.playMusic(gp.song);
             }
@@ -964,6 +1018,7 @@ public class UI {
             else if (commandNum == 2 && gp.se.volumeScale < 5) {
                 gp.se.volumeScale++;
                 gp.music.checkVolume();
+                playMenuCursor();
             }
             else if (commandNum == 3 && gp.song < gp.se.maxSongs) {
                 gp.song++;
@@ -1886,6 +1941,7 @@ public class UI {
                 combinedText += text;
                 currentDialogue = combinedText;
                 charIndex++;
+                playDialogueText();
             }
             else {
                 canSkip = true;
@@ -1907,6 +1963,7 @@ public class UI {
         gp.keyH.aPressed = false;
 
         resetDialogue();
+        playDialogueNext();
 
         // If dialogue has reward, set reward dialogue
         gp.player.showReward(dialogueReward);
@@ -2015,5 +2072,28 @@ public class UI {
         g2.setColor(c);
         g2.setStroke(new BasicStroke(5));
         g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 15, 15);
+    }
+
+    /** SOUND EFFECTS */
+    public void playMenuOpen() {
+        gp.playSE(1, 0);
+    }
+    private void playMenuCursor() {
+        gp.playSE(1, 1);
+    }
+    private void playMenuSelect() {
+        gp.playSE(1, 2);
+    }
+    public void playMenuError() {
+        gp.playSE(1, 3);
+    }
+    public void playMenuClose() {
+        gp.playSE(1, 4);
+    }
+    private void playDialogueText() {
+        gp.playSE(1, 5);
+    }
+    private void playDialogueNext() {
+        gp.playSE(1, 6);
     }
 }

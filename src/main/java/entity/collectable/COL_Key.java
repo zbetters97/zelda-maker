@@ -22,5 +22,10 @@ public class COL_Key extends Collectable {
     public void use(Entity user) {
         user.addKeys(1);
         alive = false;
+        playPickup();
+    }
+
+    private void playPickup() {
+        gp.playSE(6, 3);
     }
 }

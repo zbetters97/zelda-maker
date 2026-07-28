@@ -23,5 +23,10 @@ public class COL_Fairy extends Collectable {
         user.setHealth(user.getMaxHealth());
         user.setAlive(true);
         alive = false;
+        playPickup();
+    }
+
+    private void playPickup() {
+        gp.playSE(6, 2);
     }
 }

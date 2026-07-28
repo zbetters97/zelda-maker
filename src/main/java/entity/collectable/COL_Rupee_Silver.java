@@ -23,5 +23,10 @@ public class COL_Rupee_Silver extends Collectable {
     public void use(Entity user) {
         gp.ui.addRupees(value);
         alive = false;
+        playPickup();
+    }
+
+    private void playPickup() {
+        gp.playSE(6, 1);
     }
 }

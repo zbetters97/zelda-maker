@@ -48,8 +48,9 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode(); // key pressed by user
 
-        if (code == btn_START) {
+        if (code == btn_START && lock) {
             startPressed = true;
+            lock = false;
         }
         if (code == btn_UP) {
             upPressed = true;
@@ -97,6 +98,7 @@ public class KeyHandler implements KeyListener {
 
         if (code == btn_START) {
             startPressed = false;
+            lock = true;
         }
         if (code == btn_UP) {
             upPressed = false;

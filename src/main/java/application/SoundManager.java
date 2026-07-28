@@ -15,8 +15,8 @@ public class SoundManager {
 
     // CLIP HOLDERS
     public Clip clip;
-    private final String[][] sounds = new String[7][];
-    private final int[][] loopStarts = new int[2][];
+    private final String[][] sounds = new String[8][];
+    private final int[] loopStarts = {111, 7498, 182, 538, 32332, 7236, 4234};
     public int maxSongs = 0;
 
     /* VOLUME SLIDER */
@@ -37,9 +37,8 @@ public class SoundManager {
         sounds[3] = getSounds("03_player");
         sounds[4] = getSounds("04_enemies");
         sounds[5] = getSounds("05_objects");
-        sounds[6] = getSounds("06_items");
-
-        loopStarts[0] = new int[]{111, 7498, 182, 538, 32332, 7236, 4234};
+        sounds[6] = getSounds("06_collectables");
+        sounds[7] = getSounds("07_items");
     }
 
     private String[] getSounds(String library) {
@@ -123,32 +122,14 @@ public class SoundManager {
         }
     }
 
-    public int getLoopStart(int category, int record) {
+    public int getLoopStart(int record) {
 
-        // Invalid category or record
-        if (category < 0 || category > 9 || record < 0) {
+        // Invalid record
+        if (record >= loopStarts.length) {
             return 0;
         }
-
-        // PC / Multi Battle Music
-        if (category == 9) {
-            // Invalid record
-            if (record >= loopStarts[2].length) {
-                return 0;
-            }
-            else {
-                return loopStarts[2][record];
-            }
-        }
-        // Single Battle / World Music
         else {
-            // Invalid record
-            if (record >= loopStarts[category].length) {
-                return 0;
-            }
-            else {
-                return loopStarts[category][record];
-            }
+            return loopStarts[record];
         }
     }
 

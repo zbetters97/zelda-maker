@@ -83,6 +83,7 @@ public class OBJ_Pot extends Object {
         alive = false;
         dropLoot();
         createParticles();
+        playShatter();
     }
 
     @Override
@@ -105,6 +106,10 @@ public class OBJ_Pot extends Object {
     @Override
     protected void getSpriteImage() {
         image = sprite;
+    }
+
+    private void playShatter() {
+        gp.playSE(5, 4);
     }
 
     @Override

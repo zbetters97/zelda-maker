@@ -116,6 +116,7 @@ public class OBJ_Bomb extends Object {
         gp.cChecker.checkExplosion(this);
         createParticles();
         alive = false;
+        playExplode();
     }
 
     @Override
@@ -158,6 +159,10 @@ public class OBJ_Bomb extends Object {
     @Override
     protected void getSpriteImage() {
         image = spriteNum == 1 ? up1 : up2;
+    }
+
+    private void playExplode() {
+        gp.playSE(7, 1);
     }
 
     @Override

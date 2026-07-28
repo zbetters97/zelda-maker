@@ -545,6 +545,7 @@ public class Entity {
                 setKnockback(attacker.getDirection(), attacker.getKnockbackPower());
             }
 
+            playTink();
             return;
         }
 
@@ -558,9 +559,12 @@ public class Entity {
     }
     public void dealDamage(int damage, Direction direction, int knockbackPower) {
 
+        if (invincible) return;
+
         health -= damage;
         if (health <= 0) {
             dying = true;
+            reactToDeath();
         }
         else {
             invincible = true;
@@ -572,6 +576,7 @@ public class Entity {
     protected void reactToDamage() {
 
     }
+    protected void reactToDeath() {}
 
     protected boolean canBeDeflected(boolean usingShield) {
         return false;
@@ -668,6 +673,7 @@ public class Entity {
         if (newItem == null) return;
 
         gp.ui.setDialogue("You got " + newItem.getFormattedName() + "!\n" + newItem.getDescription());
+        playItemGet();
         gp.GAME_STATE = gp.DIALOGUE_STATE;
     }
 
@@ -795,6 +801,14 @@ public class Entity {
                 worldPoint.x + hitbox.x + hitbox.width / 2,
                 worldPoint.y + hitbox.y + hitbox.height / 2
         );
+    }
+
+    /** SOUND EFFECTS */
+    private void playTink() {
+        gp.playSE(5, 0);
+    }
+    private void playItemGet() {
+        gp.playSE(1, 7);
     }
 
     /** GETTERS AND SETTERS */

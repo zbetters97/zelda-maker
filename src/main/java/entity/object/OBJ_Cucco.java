@@ -142,6 +142,7 @@ public class OBJ_Cucco extends Object {
         // Can be picked up if not hostile
         if (gp.keyH.aPressed && action != Action.ATTACKING) {
             user.grab(this);
+            playCluck();
         }
     }
 
@@ -152,6 +153,7 @@ public class OBJ_Cucco extends Object {
         if (!invincible) {
             health -= 2;
             invincible = true;
+            playCluck();
         }
     }
 
@@ -247,6 +249,10 @@ public class OBJ_Cucco extends Object {
                 case RIGHT -> attackRight2;
             };
         }
+    }
+
+    private void playCluck() {
+        gp.playSE(5, 5);
     }
 
     @Override

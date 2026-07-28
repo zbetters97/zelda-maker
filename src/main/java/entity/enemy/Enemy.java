@@ -100,6 +100,15 @@ public class Enemy extends Entity {
     }
 
     @Override
+    protected void reactToDamage() {
+        playHurtGrunt();
+    }
+    @Override
+    protected void reactToDeath() {
+        playDeathGrunt();
+    }
+
+    @Override
     public boolean canHoldLoot(Entity loot) {
         return true;
     }
@@ -194,5 +203,13 @@ public class Enemy extends Entity {
                 case RIGHT -> attackRight2;
             };
         }
+    }
+
+    /** SOUND EFFECTS */
+    protected void playHurtGrunt() {
+        gp.playSE(4, 0);
+    }
+    protected void playDeathGrunt() {
+        gp.playSE(4, 4);
     }
 }
