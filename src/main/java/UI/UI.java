@@ -891,12 +891,21 @@ public class UI {
 
         int x = gp.tileSize * 2;
         int y = gp.tileSize * 2;
-        int width = gp.tileSize * 9;
+        int width = gp.tileSize * 11;
         int height = (int) (gp.tileSize * 4.5);
         drawSubWindow(x, y, width, height);
 
-        x = gp.tileSize * 3;
-        y = gp.tileSize * 3;
+        drawPause_Settings_Labels();
+        drawPause_Settings_Toggles();
+
+        pauseSettings_Input_A();
+        pauseSettings_Input_Back();
+        pauseSettings_Input_Dir();
+    }
+    private void drawPause_Settings_Labels() {
+
+        int x = gp.tileSize * 3;
+        int y = gp.tileSize * 3;
 
         g2.drawString("Full Screen", x, y);
         if (commandNum == 0) {
@@ -922,10 +931,13 @@ public class UI {
         if (commandNum == 3) {
             g2.drawString(">", x - 25, y);
         }
+    }
+    private void drawPause_Settings_Toggles() {
+
+        int x = gp.tileSize * 8;
+        int y = (int) (gp.tileSize * 2.5);
 
         // FULL SCREEN CHECK BOX
-        x = gp.tileSize * 8;
-        y = (int) (gp.tileSize * 2.5);
         g2.setStroke(new BasicStroke(3));
         g2.drawRect(x, y, 24, 24);
         if (gp.fullScreenOn) {
@@ -947,11 +959,7 @@ public class UI {
 
         // SONG NUMBER
         y += (int) (gp.tileSize * 1.5);
-        g2.drawString(String.valueOf(gp.song + 1), x, y);
-
-        pauseSettings_Input_A();
-        pauseSettings_Input_Back();
-        pauseSettings_Input_Dir();
+        g2.drawString(gp.se.getSongName(gp.song), x, y);
     }
     private void pauseSettings_Input_A() {
         if (!gp.keyH.aPressed) return;

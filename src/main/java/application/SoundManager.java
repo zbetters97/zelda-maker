@@ -4,10 +4,7 @@ import javax.sound.sampled.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -16,6 +13,7 @@ public class SoundManager {
     // CLIP HOLDERS
     public Clip clip;
     private final String[][] sounds = new String[8][];
+    private final Map<Integer, String> songs = new HashMap<>();
     private final int[] loopStarts = {111, 7498, 182, 538, 32332, 7236, 4234};
     public int maxSongs = 0;
 
@@ -30,7 +28,23 @@ public class SoundManager {
      * Imports all sound files
      */
     public SoundManager() {
+
         sounds[0] = getSounds("00_music");
+
+        int index = 0;
+        for (String song : sounds[0]) {
+
+            // Format song name, add to list of songs
+            song = song.replace("/sound/00_music/", "")
+                    .replaceFirst("^\\d+_", "")
+                    .replace(".wav", "")
+                    .replace("_", " ");
+
+            songs.put(index, capitalizeWords(song));
+
+            index++;
+        }
+
         maxSongs = sounds[0].length - 1;
         sounds[1] = getSounds("01_ui");
         sounds[2] = getSounds("02_actions");
@@ -39,7 +53,18 @@ public class SoundManager {
         sounds[5] = getSounds("05_objects");
         sounds[6] = getSounds("06_collectables");
         sounds[7] = getSounds("07_items");
-        volumeScale = 0;
+    }
+
+    private String capitalizeWords(String text) {
+        StringBuilder result = new StringBuilder();
+
+        for (String word : text.split(" ")) {
+            result.append(word.substring(0, 1).toUpperCase())
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+
+        return result.toString().trim();
     }
 
     private String[] getSounds(String library) {
@@ -94,6 +119,11 @@ public class SoundManager {
         }
 
         return sounds.toArray(new String[0]);
+    }
+
+    public String getSongName(Integer index) {
+        if (index < 0 || songs.size() < index) return songs.get(0);
+        return songs.get(index);
     }
 
     public void setFile(int category, int record) {
