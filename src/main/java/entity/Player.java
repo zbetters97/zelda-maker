@@ -1002,6 +1002,7 @@ public class Player extends Entity {
 
         if (++attackCounter <= swingSpeed1) {
             attackNum = 1;
+            if (attackCounter == 1) playSwordSwing();
         }
         else if (attackCounter <= swingSpeed2) {
             attackNum = 2;
@@ -1048,6 +1049,7 @@ public class Player extends Entity {
             speed = defaultSpeed;
             action = SPINNING;
             playSpinGrunt();
+            playSwordSpin();
         }
         // Player released B, charge not ready, reset to idle
         else {
@@ -1161,6 +1163,7 @@ public class Player extends Entity {
         }
         else if (grabCounter <= 18) {
             grabNum = 2;
+            if (grabCounter == 13) playLift();
         }
         else if (grabCounter <= 27) {
             grabNum = 3;
@@ -1244,7 +1247,7 @@ public class Player extends Entity {
     private void running() {
 
         // Must be holding the Item button to accelerate
-        if (gp.keyH.xPressed) {
+        if (gp.keyH.xPressed && moving) {
             animationSpeed = 4;
             speed = 7;
             if (spriteCounter == 0) playRun();
@@ -1977,6 +1980,12 @@ public class Player extends Entity {
     private void playLockOn() {
         gp.playSE(3, 14);
     }
+    private void playSwordSwing() {
+        gp.playSE(2, 0);
+    }
+    private void playSwordSpin() {
+        gp.playSE(2, 1);
+    }
     private void playHurtGrunt() {
         int grunt = 1 + (int) (Math.random() * 3);
         gp.playSE(3, grunt + 6);
@@ -1995,6 +2004,9 @@ public class Player extends Entity {
     }
     private void playSoar() {
         gp.playSE(7, 8);
+    }
+    private void playLift() {
+        gp.playSE(5, 11);
     }
 
     /** GETTERS */

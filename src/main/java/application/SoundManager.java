@@ -30,9 +30,22 @@ public class SoundManager {
     public SoundManager() {
 
         sounds[0] = getSounds("00_music");
+        maxSongs = sounds[0].length - 1;
+        fillSongNames(sounds[0]);
+
+        sounds[1] = getSounds("01_ui");
+        sounds[2] = getSounds("02_actions");
+        sounds[3] = getSounds("03_player");
+        sounds[4] = getSounds("04_enemies");
+        sounds[5] = getSounds("05_objects");
+        sounds[6] = getSounds("06_collectables");
+        sounds[7] = getSounds("07_items");
+    }
+
+    private void fillSongNames(String[] sounds) {
 
         int index = 0;
-        for (String song : sounds[0]) {
+        for (String song : sounds) {
 
             // Format song name, add to list of songs
             song = song.replace("/sound/00_music/", "")
@@ -44,17 +57,7 @@ public class SoundManager {
 
             index++;
         }
-
-        maxSongs = sounds[0].length - 1;
-        sounds[1] = getSounds("01_ui");
-        sounds[2] = getSounds("02_actions");
-        sounds[3] = getSounds("03_player");
-        sounds[4] = getSounds("04_enemies");
-        sounds[5] = getSounds("05_objects");
-        sounds[6] = getSounds("06_collectables");
-        sounds[7] = getSounds("07_items");
     }
-
     private String capitalizeWords(String text) {
         StringBuilder result = new StringBuilder();
 

@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -406,21 +407,26 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(auth::authorize);
+
         try {
-            // Attempt to log in via Google on the web browser
-            String idToken = auth.authorize();
+            // Attempt to log in via Google on the browser, timeout after 60 seconds
+            String idToken = future.get(60, TimeUnit.SECONDS);
             auth.login(idToken);
 
-            // Failed to log in
-            if (!auth.isLoggedIn()) {
-                throw new Exception("User not logged in");
+            if (auth.isLoggedIn()) {
+                filePath = "worlds/" + auth.getUserId() + "/";
             }
-
-            // Assign current user ID to world path
-            filePath = "worlds/" + auth.getUserId() + "/";
+        }
+        catch (TimeoutException e) {
+            future.cancel(true);
         }
         catch (Exception e) {
             System.out.println("Error logging in: " + e.getMessage());
+        }
+        finally {
+            executor.shutdownNow();
         }
     }
 

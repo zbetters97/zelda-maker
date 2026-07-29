@@ -2,10 +2,7 @@ package data;
 
 import application.GamePanel;
 import entity.Entity;
-import entity.enemy.Enemy;
 import entity.item.Item;
-import entity.npc.NPC;
-import entity.object.Object;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
@@ -15,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -114,58 +112,36 @@ public class SaveLoad {
             }
         }
 
-        // NPCs
-        for (int i = 0; i < gp.npcs.size(); i++) {
-
-            NPC npc = gp.npcs.get(i);
-            if (npc == null) continue;
-
-            ds.npcNames[i] = npc.getName();
-            ds.npcWorldX[i] = npc.getWorldPoint().x;
-            ds.npcWorldY[i] = npc.getWorldPoint().y;
-            ds.npcDirections[i] = npc.getDirection().toString();
-            ds.npcLoot[i] = npc.getLoot() == null ? "NULL" : npc.getLoot().getName();
-        }
-
-        // ENEMIES
-        for (int i = 0; i < gp.enemies.size(); i++) {
-
-            Enemy enemy = gp.enemies.get(i);
-            if (enemy == null) continue;
-
-            ds.enemyNames[i] = enemy.getName();
-            ds.enemyWorldX[i] = enemy.getWorldPoint().x;
-            ds.enemyWorldY[i] = enemy.getWorldPoint().y;
-            ds.enemyDirections[i] = enemy.getDirection().toString();
-            ds.enemyHealth[i] = enemy.getHealth();
-            ds.enemyLoot[i] = enemy.getLoot() == null ? "NULL" : enemy.getLoot().getName();
-        }
-
-        // OBJECTS
-        for (int i = 0; i < gp.objects.size(); i++) {
-
-            Object object = gp.objects.get(i);
-            if (object == null) continue;
-
-            ds.objectNames[i] = object.getName();
-            ds.objectWorldX[i] = object.getWorldPoint().x;
-            ds.objectWorldY[i] = object.getWorldPoint().y;
-            ds.objectDirections[i] = object.getDirection().toString();
-            ds.objectLoot[i] = object.getLoot() == null ? "NULL" : object.getLoot().getName();
-        }
-
-        // COLLECTABLES AND ITEMS
-        for (int i = 0; i < gp.collectables.size(); i++) {
-
-            Entity collectable = gp.collectables.get(i);
-            if (collectable == null) continue;
-
-            ds.collectableNames[i] = collectable.getName();
-            ds.collectableWorldX[i] = collectable.getWorldPoint().x;
-            ds.collectableWorldY[i] = collectable.getWorldPoint().y;
-        }
+        saveEntityList(gp.npcs, ds.npcNames, ds.npcWorldX, ds.npcWorldY, ds.npcDirections, null, ds.npcLoot);
+        saveEntityList(gp.enemies, ds.enemyNames, ds.enemyWorldX, ds.enemyWorldY, ds.enemyDirections, ds.enemyHealth, ds.enemyLoot);
+        saveEntityList(gp.objects, ds.objectNames, ds.objectWorldX, ds.objectWorldY, ds.objectDirections, null, ds.objectLoot);
+        saveEntityList(gp.collectables, ds.collectableNames, ds.collectableWorldX, ds.collectableWorldY, null, null, null);
 
         gp.snapshot = ds;
+    }
+    private void saveEntityList(ArrayList<? extends Entity> entities, String[] entityNames,
+                                int[] entityWorldX, int[] entityWorldY, String[] entityDirections,
+                                int[] entityHealth, String[] entityLoot) {
+
+        for (int i = 0; i < entities.size(); i++) {
+
+            Entity entity = entities.get(i);
+            if (entity == null) continue;
+
+            entityNames[i] = entity.getName();
+            entityWorldX[i] = entity.getWorldPoint().x;
+            entityWorldY[i] = entity.getWorldPoint().y;
+
+            if (entityDirections != null) {
+                entityDirections[i] = entity.getDirection().toString();
+            }
+            if (entityHealth != null) {
+                entityHealth[i] = entity.getHealth();
+            }
+            if (entityLoot != null) {
+                entityLoot[i] = entity.getLoot() == null ? "NULL" : entity.getLoot().getName();
+            }
+        }
     }
     private void saveToFile(String fileName) {
         if (gp.dbNotConnected()) return;
@@ -240,20 +216,22 @@ public class SaveLoad {
         gp.player.setCurrentItemSlot(ds.currentItemSlot);
 
         // PLAYER ITEMS
-        for (int i = 0; i < ds.items.length; i++) {
+        if (ds.items != null) {
+            for (int i = 0; i < ds.items.length; i++) {
 
-            String itemName = ds.items[i];
-            if (itemName == null) continue;
+                String itemName = ds.items[i];
+                if (itemName == null) continue;
 
-            // Entity found is not an Item
-            Entity item = gp.eGenerator.getEntity(itemName);
-            if (!(item instanceof Item)) continue;
+                // Entity found is not an Item
+                Entity item = gp.eGenerator.getEntity(itemName);
+                if (!(item instanceof Item)) continue;
 
-            gp.player.addItem((Item) item);
+                gp.player.addItem((Item) item);
 
-            // Equip item if current one
-            if (i == ds.currentItemSlot) {
-                gp.player.setItem((Item) item);
+                // Equip item if current one
+                if (i == ds.currentItemSlot) {
+                    gp.player.setItem((Item) item);
+                }
             }
         }
 
@@ -270,62 +248,45 @@ public class SaveLoad {
         }
 
         // NPCs
-        for (int i = 0; i < ds.npcNames.length; i++) {
-
-            NPC npc = (NPC) gp.eGenerator.getEntity(ds.npcNames[i]);
-            if (npc == null) continue;
-
-            npc.setWorldPoint(new Point(ds.npcWorldX[i], ds.npcWorldY[i]));
-            npc.setDirection(GamePanel.Direction.valueOf(ds.npcDirections[i]));
-
-            Entity loot = gp.eGenerator.getEntity(ds.npcLoot[i]);
-            if (loot != null) npc.setLoot(loot);
-
-            gp.npcs.add(npc);
+        if (ds.npcNames != null) {
+            loadEntityList(ds.npcNames, ds.npcWorldX, ds.npcWorldY, ds.npcDirections, null, ds.npcLoot);
         }
 
-        // ENEMIES
-        for (int i = 0; i < ds.enemyNames.length; i++) {
-
-            Enemy enemy = (Enemy) gp.eGenerator.getEntity(ds.enemyNames[i]);
-            if (enemy == null) continue;
-
-            enemy.setWorldPoint(new Point(ds.enemyWorldX[i], ds.enemyWorldY[i]));
-            enemy.setDirection(GamePanel.Direction.valueOf(ds.enemyDirections[i]));
-            enemy.setHealth(ds.enemyHealth[i]);
-
-            Entity loot = gp.eGenerator.getEntity(ds.enemyLoot[i]);
-            if (loot != null) enemy.setLoot(loot);
-
-            gp.enemies.add(enemy);
+        if (ds.enemyNames != null) {
+            loadEntityList(ds.enemyNames, ds.enemyWorldX, ds.enemyWorldY, ds.enemyDirections, ds.enemyHealth, ds.enemyLoot);
         }
 
-        // OBJECTS
-        for (int i = 0; i < ds.objectNames.length; i++) {
+        if (ds.objectNames != null) {
+            loadEntityList(ds.objectNames, ds.objectWorldX, ds.objectWorldY, ds.objectDirections, null, ds.objectLoot);
+        }
 
-            Object object = (Object) gp.eGenerator.getEntity(ds.objectNames[i]);
-            if (object == null) continue;
+        if (ds.collectableNames != null) {
+            loadEntityList(ds.collectableNames, ds.collectableWorldX, ds.collectableWorldY, null, null, null);
+        }
+    }
+    private void loadEntityList(String[] names, int[] worldX, int[] worldY,
+                                String[] directions, int[] health, String[] loots) {
+        for (int i = 0; i < names.length; i++) {
 
-            object.setWorldPoint(new Point(ds.objectWorldX[i], ds.objectWorldY[i]));
-            object.setDirection(GamePanel.Direction.valueOf(ds.objectDirections[i]));
+            Entity entity =  gp.eGenerator.getEntity(names[i]);
+            if (entity == null) continue;
 
-            Entity loot = gp.eGenerator.getEntity(ds.objectLoot[i]);
-            if (loot != null) {
-                object.setLoot(loot);
+            entity.setWorldPoint(new Point(worldX[i], worldY[i]));
+
+            if (directions != null) {
+                entity.setDirection(GamePanel.Direction.valueOf(directions[i]));
             }
 
-            gp.objects.add(object);
-        }
+            if (health != null) {
+                entity.setHealth(health[i]);
+            }
 
-        // COLLECTABLES
-        for (int i = 0; i < ds.collectableNames.length; i++) {
+            if (loots != null) {
+                Entity loot = gp.eGenerator.getEntity(loots[i]);
+                if (loot != null) entity.setLoot(loot);
+            }
 
-            Entity collectable = gp.eGenerator.getEntity(ds.collectableNames[i]);
-            if (collectable == null) continue;
-
-            collectable.setWorldPoint(new Point(ds.collectableWorldX[i], ds.collectableWorldY[i]));
-
-            gp.collectables.add(collectable);
+            gp.addEntity(entity);
         }
     }
 
