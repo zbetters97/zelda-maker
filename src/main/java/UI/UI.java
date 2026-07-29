@@ -27,6 +27,11 @@ public class UI {
     private Graphics2D g2;
     private Font PK_DS;
 
+    /** PAUSE COLORS */
+    private final Color pause_brown_1 = new Color(62, 42, 19, 255);
+    private final Color pause_brown_2 = new Color(62, 42, 19, 205);
+    private final Color pause_text =  new Color(239, 231, 207, 255);
+
     /** PAUSE HANDLERS */
     private int subState = 0;
     private int commandNum = 0;
@@ -239,15 +244,19 @@ public class UI {
 
     private void drawPause_Menu() {
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-
         int x = gp.tileSize;
         int y = gp.tileSize;
         int width = gp.tileSize * 4;
         int height = (int) (gp.tileSize * 5.75);
-        drawSubWindow(x, y, width, height);
+        g2.setColor(pause_brown_1);
+        g2.fillRoundRect(x, y, width, height, 25, 10);
 
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(x, y, width, height, 25, 10);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
         x = gp.tileSize * 2;
         y = gp.tileSize * 2;
         int index = 0;
@@ -327,15 +336,19 @@ public class UI {
 
     private void drawPause_Menu_Auth() {
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-
         int x = gp.tileSize;
         int y = gp.tileSize;
         int width = gp.tileSize * 4;
         int height = (int) (gp.tileSize * 9.75);
-        drawSubWindow(x, y, width, height);
+        g2.setColor(pause_brown_1);
+        g2.fillRoundRect(x, y, width, height, 25, 10);
 
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(x, y, width, height, 25, 10);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
         x = gp.tileSize * 2;
         y = gp.tileSize * 2;
         int index = 0;
@@ -464,15 +477,19 @@ public class UI {
     private void drawPause_Users() {
         if (usersList == null || usersList.isEmpty()) return;
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-
         int x = gp.tileSize * 2;
         int y = gp.tileSize * 2;
         int width = gp.tileSize * 12;
         int height = (int) ((gp.tileSize * .95) * (usersList.size() + 1));
-        drawSubWindow(x, y, width, height);
+        g2.setColor(pause_brown_1);
+        g2.fillRoundRect(x, y, width, height, 25, 10);
 
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(x, y, width, height, 25, 10);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
         drawPause_UsersList();
 
         pauseUsers_Input_B();
@@ -547,16 +564,20 @@ public class UI {
         // Trying to load/delete a file from a blank list
         if (gp.saveFiles.isEmpty() && !isSaving) return;
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-
         int x = gp.tileSize * 2;
         int y = gp.tileSize * 2;
         int width = gp.tileSize * 12;
         int offset = isSaving ? 2 : 1;
         int height = (int) ((gp.tileSize * 0.95) * (gp.saveFiles.size() + offset));
-        drawSubWindow(x, y, width, height);
+        g2.setColor(pause_brown_1);
+        g2.fillRoundRect(x, y, width, height, 25, 10);
 
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(x, y, width, height, 25, 10);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
         x = gp.tileSize * 3;
         y = gp.tileSize * 3;
         int index = 0;
@@ -886,15 +907,19 @@ public class UI {
 
     private void drawPause_Settings() {
 
-        g2.setColor(Color.WHITE);
-        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-
         int x = gp.tileSize * 2;
         int y = gp.tileSize * 2;
         int width = gp.tileSize * 11;
         int height = (int) (gp.tileSize * 4.5);
-        drawSubWindow(x, y, width, height);
+        g2.setColor(pause_brown_1);
+        g2.fillRoundRect(x, y, width, height, 25, 10);
 
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(x, y, width, height, 25, 10);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
         drawPause_Settings_Labels();
         drawPause_Settings_Toggles();
 
@@ -1123,7 +1148,7 @@ public class UI {
         int height = gp.tileSize * 2;
         int baseX = (gp.screenWidth - width) / 2;
         int baseY = gp.tileSize * 5;
-        g2.setColor(new Color(0, 0, 0, 235));
+        g2.setColor(pause_brown_1);
         g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
 
         int cursorX = baseX + (entityListIndex * listSpacingX + padding);
@@ -1154,7 +1179,7 @@ public class UI {
                 }
 
                 if (i == entityListIndex && c != entityIndex) {
-                    g2.setColor(new Color(28, 28, 28, 200));
+                    g2.setColor(pause_brown_2);
                     g2.fillRoundRect(x - 10, y - 10,gp.tileSize + 20, gp.tileSize + 20,0, 0);
                 }
 
