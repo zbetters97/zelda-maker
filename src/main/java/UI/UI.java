@@ -968,7 +968,7 @@ public class UI {
         gp.keyH.bPressed = false;
         gp.keyH.startPressed = false;
 
-        // gp.config.saveConfig();
+        gp.config.saveConfig();
         commandNum = 0;
         subState = 0;
         playMenuClose();

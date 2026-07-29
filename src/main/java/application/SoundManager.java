@@ -39,6 +39,7 @@ public class SoundManager {
         sounds[5] = getSounds("05_objects");
         sounds[6] = getSounds("06_collectables");
         sounds[7] = getSounds("07_items");
+        volumeScale = 0;
     }
 
     private String[] getSounds(String library) {
@@ -123,14 +124,7 @@ public class SoundManager {
     }
 
     public int getLoopStart(int record) {
-
-        // Invalid record
-        if (record >= loopStarts.length) {
-            return 0;
-        }
-        else {
-            return loopStarts[record];
-        }
+        return record >= loopStarts.length ? 0 : loopStarts[record];
     }
 
     public void loop(int startTime) {
@@ -213,6 +207,7 @@ public class SoundManager {
     }
 
     private void setGain(float gain) {
+        if (gainControl == null) return;
         gainControl.setValue(gain);
     }
 }

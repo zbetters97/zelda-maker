@@ -85,6 +85,7 @@ public class GamePanel extends JPanel implements Runnable {
     public int song = 0;
 
     /** DATA HANDLING */
+    public final ConfigManager config = new ConfigManager(this);
     public final SaveLoad saveLoad = new SaveLoad(this);
     public DataStorage snapshot = new DataStorage();
     public Map<String, String> saveFiles = new LinkedHashMap<>();
@@ -132,13 +133,13 @@ public class GamePanel extends JPanel implements Runnable {
         // Connect to Firebase
         dbConnected = db.init();
 
+        // Setup Entities
         player.setDefaultValues();
         entities.addAll(Arrays.asList(npcs, enemies, objects, projectiles, collectables, particles));
 
+        // Setup camera
         ui.cursor.setWorldPoint(player.getWorldPoint());
         camera.follow(ui.cursor.getWorldPoint());
-
-        playMusic(1);
 
         if (fullScreenOn) setFullScreen();
     }
