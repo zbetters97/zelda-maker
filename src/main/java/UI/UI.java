@@ -241,13 +241,13 @@ public class UI {
             drawPause_Levels();
         }
         else if (subState == 3) {
-            drawPause_Name();
+            drawPause_Auth();
         }
         else if (subState == 4) {
-            drawPause_Settings();
+            drawPause_Name();
         }
         else if (subState == 5) {
-            drawPause_Auth();
+            drawPause_Settings();
         }
         else if (subState == 6) {
             drawPause_Controls();
@@ -308,11 +308,11 @@ public class UI {
         }
         // LOGIN
         else if (commandNum == 3) {
-            subState = 5;
+            subState = 3;
         }
         // SETTINGS
         else if (commandNum == 4) {
-            subState = 4;
+            subState = 5;
         }
 
         if (0 < commandNum && commandNum < 5) {
@@ -417,7 +417,6 @@ public class UI {
             }
 
             isSaving = false; isLoading = true;
-
             subState = 2;
         }
         // SAVE
@@ -425,7 +424,6 @@ public class UI {
             gp.saveFiles = gp.db.getUserWorlds(gp.auth.getUserId());
 
             isSaving = true; isLoading = false;
-
             subState = 2;
         }
         // DELETE
@@ -437,12 +435,11 @@ public class UI {
             }
 
             isSaving = false; isLoading = false;
-
             subState = 2;
         }
         // UPLOAD
         else if (commandNum == 5) {
-            subState = 3;
+            subState = 4;
         }
         // BROWSE
         else if (commandNum == 6) {
@@ -461,7 +458,7 @@ public class UI {
         }
         // SETTINGS
         else if (commandNum == 8) {
-            subState = 4;
+            subState = 5;
         }
 
         if (0 < commandNum && commandNum < 9) {
@@ -586,17 +583,17 @@ public class UI {
         // Trying to load/delete a file from a blank list
         if (gp.saveFiles.isEmpty() && !isSaving) return;
 
-        int x = gp.tileSize * 2;
+        int x = gp.tileSize * 3;
         int y = gp.tileSize * 2;
-        int width = gp.tileSize * 12;
+        int width = gp.tileSize * 11;
         int offset = isSaving ? 2 : 1;
         int height = (int) ((gp.tileSize * 0.95) * (gp.saveFiles.size() + offset));
         drawPauseWindow(x, y, width, height);
 
         g2.setColor(pause_text);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-        x = gp.tileSize * 3;
-        y = gp.tileSize * 3;
+        x += gp.tileSize;
+        y += gp.tileSize;
         int index = 0;
 
         if (isSaving) {
@@ -621,7 +618,7 @@ public class UI {
             if (gp.keyH.uiAPressed) {
                 gp.keyH.uiAPressed = false;
                 commandNum = 0;
-                subState = 3;
+                subState = 4;
             }
         }
     }
@@ -1193,6 +1190,7 @@ public class UI {
         controlToEdit = -1;
         buffer = 0;
         gp.keyH.stopAllKeys();
+        playMenuSelect();
     }
     private void pauseControls_Input_A() {
         if (!gp.keyH.uiAPressed) return;
@@ -1211,7 +1209,8 @@ public class UI {
         // Back
         else if (commandNum == controls.size() + 1) {
             commandNum = 0;
-            subState = 4;
+            subState = 5;
+            gp.config.saveConfig();
             playMenuClose();
         }
     }
@@ -1220,7 +1219,8 @@ public class UI {
         gp.keyH.uiBPressed = false;
 
         commandNum = 0;
-        subState = 4;
+        subState = 5;
+        gp.config.saveConfig();
         playMenuClose();
     }
     private void pauseControls_Input_Dir() {

@@ -79,20 +79,14 @@ public class KeyHandler implements KeyListener {
         if (code == btn_RIGHT) {
             rightPressed = true;
         }
-        if (code == btn_UI_A && lock) {
-            uiAPressed = true;
+        if ((code == btn_UI_A || code == btn_A) && lock) {
+            if (code == btn_UI_A) uiAPressed = true;
+            if (code == btn_A) aPressed = true;
             lock = false;
         }
-        if (code == btn_UI_B && lock) {
-            uiBPressed = true;
-            lock = false;
-        }
-        if (code == btn_A && lock) {
-            aPressed = true;
-            lock = false;
-        }
-        if (code == btn_B && lock) {
-            bPressed = true;
+        if ((code == btn_UI_B || code == btn_B) && lock) {
+            if (code == btn_UI_B) uiBPressed = true;
+            if (code == btn_B) bPressed = true;
             lock = false;
         }
         if (code == btn_X && lock) {

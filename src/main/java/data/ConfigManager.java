@@ -32,6 +32,20 @@ public class ConfigManager {
             bw.write("SE VOLUME\n" + gp.se.volumeScale);
             bw.newLine();
 
+            // CONTROLS
+            bw.write("BTN_A\n" + gp.keyH.btn_A);
+            bw.newLine();
+            bw.write("BTN_B\n" + gp.keyH.btn_B);
+            bw.newLine();
+            bw.write("BTN_X\n" + gp.keyH.btn_X);
+            bw.newLine();
+            bw.write("BTN_Y\n" + gp.keyH.btn_Y);
+            bw.newLine();
+            bw.write("BTN_L\n" + gp.keyH.btn_L);
+            bw.newLine();
+            bw.write("BTN_R\n" + gp.keyH.btn_R);
+            bw.newLine();
+
             // CLOSE FILE
             bw.close();
         }
@@ -61,6 +75,26 @@ public class ConfigManager {
             // SOUND EFFECTS VOLUME
             s = br.readLine();
             gp.se.volumeScale = Integer.parseInt(s);
+            br.readLine();
+
+            // CONTROLS
+            s = br.readLine();
+            gp.keyH.btn_A = Integer.parseInt(s);
+            br.readLine();
+            s = br.readLine();
+            gp.keyH.btn_B = Integer.parseInt(s);
+            br.readLine();
+            s = br.readLine();
+            gp.keyH.btn_X = Integer.parseInt(s);
+            br.readLine();
+            s = br.readLine();
+            gp.keyH.btn_Y = Integer.parseInt(s);
+            br.readLine();
+            s = br.readLine();
+            gp.keyH.btn_L = Integer.parseInt(s);
+            br.readLine();
+            s = br.readLine();
+            gp.keyH.btn_R = Integer.parseInt(s);
             br.readLine();
 
             br.close();

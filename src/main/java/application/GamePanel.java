@@ -410,23 +410,33 @@ public class GamePanel extends JPanel implements Runnable {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(auth::authorize);
 
-        try {
-            // Attempt to log in via Google on the browser, timeout after 60 seconds
-            String idToken = future.get(60, TimeUnit.SECONDS);
-            auth.login(idToken);
+        while (true) {
+            try {
+                // Open browser to login to Google account, timeout every 100ms
+                String idToken = future.get(100, TimeUnit.MILLISECONDS);
+                auth.login(idToken);
 
-            if (auth.isLoggedIn()) {
-                filePath = "worlds/" + auth.getUserId() + "/";
+                if (auth.isLoggedIn()) {
+                    filePath = "worlds/" + auth.getUserId() + "/";
+                }
+
+                break;
             }
-        }
-        catch (TimeoutException e) {
-            future.cancel(true);
-        }
-        catch (Exception e) {
-            System.out.println("Error logging in: " + e.getMessage());
-        }
-        finally {
-            executor.shutdownNow();
+            catch (TimeoutException e) {
+
+                // User cancels auth attempt
+                if (keyH.uiBPressed) {
+                    keyH.uiBPressed = false;
+                    future.cancel(true);
+                    break;
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Error logging in: " + e.getMessage());
+            }
+            finally {
+                executor.shutdownNow();
+            }
         }
     }
 
