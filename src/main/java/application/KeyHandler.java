@@ -97,11 +97,13 @@ public class KeyHandler implements KeyListener {
             yPressed = true;
             lock = false;
         }
-        if (code == btn_R) {
+        if (code == btn_R && lock) {
             rPressed = true;
+            lock = false;
         }
-        if (code == btn_L) {
+        if (code == btn_L && lock) {
             lPressed = true;
+            lock = false;
         }
     }
 
@@ -178,15 +180,8 @@ public class KeyHandler implements KeyListener {
         else if (btn_R == oldKey) btn_R = newKey;
     }
 
-    public int getButtonFromKey(int key) {
-        if (btn_A == key) return btn_A;
-        else if (btn_B == key) return btn_B;
-        else if (btn_X == key) return btn_X;
-        else if (btn_Y == key) return btn_Y;
-        else if (btn_L == key) return btn_L;
-        else if (btn_R == key) return btn_R;
-
-        return -1;
+    public boolean isExistingButton(int key) {
+        return btn_A == key || btn_B == key || btn_X == key || btn_Y == key || btn_L == key || btn_R == key;
     }
 
     public void stopAllKeys() {

@@ -1177,15 +1177,19 @@ public class UI {
         // User didn't press a new key
         if (newKey == -1) return;
 
-        // Capture potential duplicate control and current key for swapping
-        int existingControl = gp.keyH.getButtonFromKey(newKey);
-        int currentKey = gp.keyH.getButtonFromKey(controlToEdit);
+        boolean isExistingControl = gp.keyH.isExistingButton(newKey);
 
+        // New key entered is already mapped, swap mappings with new control
+        // Must use -1 as placeholder when swapping
+        if (isExistingControl) {
+            gp.keyH.updateButton(controlToEdit, -1);
+            gp.keyH.updateButton(newKey, controlToEdit);
+            gp.keyH.updateButton(-1, newKey);
+        }
         // Replace selected control with new key
-        gp.keyH.updateButton(controlToEdit, newKey);
-
-        // Replace duplicate control with current key (if applicable)
-        gp.keyH.updateButton(existingControl, currentKey);
+        else {
+            gp.keyH.updateButton(controlToEdit, newKey);
+        }
 
         controlToEdit = -1;
         buffer = 0;
@@ -1266,8 +1270,13 @@ public class UI {
         wasYPressed = gp.keyH.yPressed;
 
         // Switch tile editing on/off (prevent when grabbing entity)
-        if (gp.keyH.lPressed && !cursor.hasSelectedEntity()) {
+        if (gp.keyH.lPressed) {
             gp.keyH.lPressed = false;
+
+            if (cursor.hasSelectedEntity()) {
+                playMenuError();
+                return;
+            }
 
             editingTiles = !editingTiles;
 
