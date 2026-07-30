@@ -9,21 +9,35 @@ public class KeyHandler implements KeyListener {
     private boolean lock = true;
 
     /* BUTTON MAPPING */
-    public final int btn_UP = KeyEvent.VK_UP;
-    public final int btn_DOWN = KeyEvent.VK_DOWN;
-    public final int btn_LEFT = KeyEvent.VK_LEFT;
-    public final int btn_RIGHT = KeyEvent.VK_RIGHT;
-    public final int btn_A = KeyEvent.VK_A;
-    public final int btn_B = KeyEvent.VK_S;
-    public final int btn_X = KeyEvent.VK_D;
-    public final int btn_Y = KeyEvent.VK_F;
-    public final int btn_R = KeyEvent.VK_E;
-    public final int btn_L = KeyEvent.VK_W;
-    public final int btn_START = KeyEvent.VK_SPACE;
+    public int btn_UP = KeyEvent.VK_UP;
+    public int btn_DOWN = KeyEvent.VK_DOWN;
+    public int btn_LEFT = KeyEvent.VK_LEFT;
+    public int btn_RIGHT = KeyEvent.VK_RIGHT;
+
+    public int btn_START = KeyEvent.VK_SPACE;
+
+    public int btn_UI_A = KeyEvent.VK_A;
+    public int btn_UI_B = KeyEvent.VK_S;
+
+    public int btn_A_DEF = KeyEvent.VK_A;
+    public int btn_B_DEF = KeyEvent.VK_S;
+    public int btn_X_DEF = KeyEvent.VK_D;
+    public int btn_Y_DEF = KeyEvent.VK_F;
+    public int btn_R_DEF = KeyEvent.VK_E;
+    public int btn_L_DEF = KeyEvent.VK_W;
+
+    public int btn_A = btn_A_DEF;
+    public int btn_B = btn_B_DEF;
+    public int btn_X = btn_X_DEF;
+    public int btn_Y = btn_Y_DEF;
+    public int btn_L = btn_L_DEF;
+    public int btn_R = btn_R_DEF;
 
     /* CONFIG VALUES */
     public boolean startPressed, upPressed, downPressed, leftPressed, rightPressed,
-            aPressed, bPressed, xPressed, yPressed, rPressed, lPressed;
+            uiAPressed, uiBPressed, aPressed, bPressed, xPressed, yPressed, rPressed, lPressed;
+
+    private int lastKeyPressed = -1;
 
     /**
      * CONSTRUCTOR
@@ -46,7 +60,8 @@ public class KeyHandler implements KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode(); // key pressed by user
+        int code = e.getKeyCode();
+        lastKeyPressed = code;
 
         if (code == btn_START && lock) {
             startPressed = true;
@@ -63,6 +78,14 @@ public class KeyHandler implements KeyListener {
         }
         if (code == btn_RIGHT) {
             rightPressed = true;
+        }
+        if (code == btn_UI_A && lock) {
+            uiAPressed = true;
+            lock = false;
+        }
+        if (code == btn_UI_B && lock) {
+            uiBPressed = true;
+            lock = false;
         }
         if (code == btn_A && lock) {
             aPressed = true;
@@ -112,6 +135,14 @@ public class KeyHandler implements KeyListener {
         if (code == btn_RIGHT) {
             rightPressed = false;
         }
+        if (code == btn_UI_A) {
+            uiAPressed = false;
+            lock = true;
+        }
+        if (code == btn_UI_B) {
+            uiBPressed = false;
+            lock = true;
+        }
         if (code == btn_A) {
             aPressed = false;
             lock = true;
@@ -138,6 +169,32 @@ public class KeyHandler implements KeyListener {
         }
     }
 
+    public int getLastKeyPressed() {
+        int key = lastKeyPressed;
+        lastKeyPressed = -1;
+        return key;
+    }
+
+    public void updateButton(int oldKey, int newKey) {
+        if (btn_A == oldKey) btn_A = newKey;
+        else if (btn_B == oldKey) btn_B = newKey;
+        else if (btn_X == oldKey) btn_X = newKey;
+        else if (btn_Y == oldKey) btn_Y = newKey;
+        else if (btn_L == oldKey) btn_L = newKey;
+        else if (btn_R == oldKey) btn_R = newKey;
+    }
+
+    public int getButtonFromKey(int key) {
+        if (btn_A == key) return btn_A;
+        else if (btn_B == key) return btn_B;
+        else if (btn_X == key) return btn_X;
+        else if (btn_Y == key) return btn_Y;
+        else if (btn_L == key) return btn_L;
+        else if (btn_R == key) return btn_R;
+
+        return -1;
+    }
+
     public void stopAllKeys() {
         upPressed = false;
         downPressed = false;
@@ -146,9 +203,21 @@ public class KeyHandler implements KeyListener {
 
         startPressed = false;
 
+        uiAPressed = false;
+        uiBPressed = false;
+
         aPressed = false;
         bPressed = false;
         yPressed = false;
         xPressed = false;
+    }
+
+    public void resetDefaults() {
+        btn_A = btn_A_DEF;
+        btn_B = btn_B_DEF;
+        btn_X = btn_X_DEF;
+        btn_Y = btn_Y_DEF;
+        btn_L = btn_L_DEF;
+        btn_R = btn_R_DEF;
     }
 }

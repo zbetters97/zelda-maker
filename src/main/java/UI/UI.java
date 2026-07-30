@@ -45,6 +45,12 @@ public class UI {
             "Play", "New", "Load", "Save", "Delete", "Upload", "Browse", "Logout", "Settings"
     ));
 
+    private final ArrayList<String> controls = new ArrayList<>(Arrays.asList(
+            "Action", "Attack", "Use Item", "Cycle Items", "Z-Target", "Shield"
+    ));
+    private int controlToEdit = -1;
+    private int buffer;
+
     /** SAVE/LOAD HANDLERS */
     private final Map<Integer, String> keyboard = new LinkedHashMap<>();
     private boolean capital = true;
@@ -243,6 +249,9 @@ public class UI {
         else if (subState == 5) {
             drawPause_Auth();
         }
+        else if (subState == 6) {
+            drawPause_Controls();
+        }
     }
 
     private void drawPause_Menu() {
@@ -274,8 +283,8 @@ public class UI {
         pauseMenu_Input_Dir();
     }
     private void pauseMenu_Input_A() {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         // PLAY
         if (commandNum == 0) {
@@ -331,6 +340,32 @@ public class UI {
         }
     }
 
+    private void drawPause_Auth() {
+
+        int width = (int) (gp.tileSize * 11.5);
+        int height = gp.tileSize * 3;
+        int x = (gp.screenWidth - width) / 2;
+        int y = (int) (gp.tileSize * 4.5);
+        drawPauseWindow(x, y, width, height);
+
+        g2.setColor(pause_text);
+        g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
+        String text = "Please login from your browser to continue...";
+        x = getXForCenteredTextOnWidth(text, width, x);
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString(text, x, y);
+
+        // Run one frame to freeze window into place
+        if (commandNum == 1) gp.changeLogin();
+        commandNum++;
+
+        // User logged in or timed out, return to screen
+        if (commandNum == 2) {
+            commandNum = 0;
+            subState = 0;
+        }
+    }
+
     private void drawPause_Menu_Auth() {
 
         int x = gp.tileSize;
@@ -360,8 +395,8 @@ public class UI {
         pauseMenu_Auth_Input_Dir();
     }
     private void pauseMenu_Auth_Input_A() {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         // PLAY
         if (commandNum == 0) {
@@ -455,9 +490,9 @@ public class UI {
     }
 
     private void pauseMenu_Input_Back() {
-        if (!gp.keyH.startPressed && !gp.keyH.bPressed) return;
+        if (!gp.keyH.startPressed && !gp.keyH.uiBPressed) return;
         gp.keyH.startPressed = false;
-        gp.keyH.bPressed = false;
+        gp.keyH.uiBPressed = false;
 
         commandNum = 0;
         subState = 0;
@@ -469,9 +504,9 @@ public class UI {
     private void drawPause_Users() {
         if (usersList == null || usersList.isEmpty()) return;
 
-        int x = gp.tileSize * 2;
+        int x = gp.tileSize * 3;
         int y = gp.tileSize * 2;
-        int width = gp.tileSize * 12;
+        int width = gp.tileSize * 11;
         int height = (int) ((gp.tileSize * .95) * (usersList.size() + 1));
         drawPauseWindow(x, y, width, height);
 
@@ -487,7 +522,7 @@ public class UI {
         String text;
         int index = 0;
 
-        int x = gp.tileSize * 3;
+        int x = gp.tileSize * 4;
         int y = gp.tileSize * 3;
 
         for (Map.Entry<String, String> entry : usersList.entrySet()) {
@@ -497,8 +532,8 @@ public class UI {
 
             if (commandNum == index) {
                 g2.drawString(">", x - 25, y);
-                boolean aPressed = pauseUsers_Input_A(entry.getKey());
-                if (aPressed) break;
+                boolean uiAPressed = pauseUsers_Input_A(entry.getKey());
+                if (uiAPressed) break;
             }
 
             index++;
@@ -506,8 +541,8 @@ public class UI {
         }
     }
     private boolean pauseUsers_Input_A(String userId) {
-        if (!gp.keyH.aPressed) return false;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return false;
+        gp.keyH.uiAPressed = false;
 
         gp.saveFiles = gp.db.getUserWorlds(userId);
 
@@ -520,8 +555,8 @@ public class UI {
         return true;
     }
     private void pauseUsers_Input_B() {
-        if (!gp.keyH.bPressed) return;
-        gp.keyH.bPressed = false;
+        if (!gp.keyH.uiBPressed) return;
+        gp.keyH.uiBPressed = false;
 
         commandNum = 0;
         subState = 0;
@@ -583,8 +618,8 @@ public class UI {
         if (commandNum == 0) {
             g2.drawString(">", x - 25, y);
 
-            if (gp.keyH.aPressed) {
-                gp.keyH.aPressed = false;
+            if (gp.keyH.uiAPressed) {
+                gp.keyH.uiAPressed = false;
                 commandNum = 0;
                 subState = 3;
             }
@@ -600,8 +635,8 @@ public class UI {
 
             if (commandNum == index) {
                 g2.drawString(">", x - 25, y);
-                boolean aPressed = pauseLevel_Input_A(entry.getKey(), entry.getValue());
-                if (aPressed) break;
+                boolean uiAPressed = pauseLevel_Input_A(entry.getKey(), entry.getValue());
+                if (uiAPressed) break;
             }
 
             index++;
@@ -609,8 +644,8 @@ public class UI {
         }
     }
     private boolean pauseLevel_Input_A(String fileName, String levelName) {
-        if (!gp.keyH.aPressed) return false;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return false;
+        gp.keyH.uiAPressed = false;
 
         if (isSaving) {
             // Chop off date from level name
@@ -641,8 +676,8 @@ public class UI {
         return true;
     }
     private void pauseLevel_Input_B() {
-        if (!gp.keyH.bPressed) return;
-        gp.keyH.bPressed = false;
+        if (!gp.keyH.uiBPressed) return;
+        gp.keyH.uiBPressed = false;
 
         commandNum = 0;
         subState = 0;
@@ -749,8 +784,8 @@ public class UI {
         pauseKeyboard_Input_Dir(keyboardLetters);
     }
     private void pauseKeyboard_Input_A(String keyboardLetters) {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         int MAX_WORLD_NAME = 20;
 
@@ -813,8 +848,8 @@ public class UI {
         }
     }
     private void pauseKeyboard_Input_B() {
-        if (!gp.keyH.bPressed || textInput.isEmpty()) return;
-        gp.keyH.bPressed = false;
+        if (!gp.keyH.uiBPressed || textInput.isEmpty()) return;
+        gp.keyH.uiBPressed = false;
 
         textInput = textInput.substring(0, textInput.length() - 1);
         playMenuSelect();
@@ -889,25 +924,27 @@ public class UI {
 
     private void drawPause_Settings() {
 
-        int x = gp.tileSize * 2;
-        int y = gp.tileSize * 2;
-        int width = (int) (gp.tileSize * 9.5);
-        int height = (int) (gp.tileSize * 4.5);
+        int x = gp.tileSize;
+        int y = gp.tileSize;
+        int width = (int) (gp.tileSize * 8.75);
+        int height = gp.tileSize * 7;
         drawPauseWindow(x, y, width, height);
 
+        x += gp.tileSize;
+        y += gp.tileSize;
         g2.setColor(pause_text);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-        drawPause_Settings_Labels();
-        drawPause_Settings_Toggles();
+        drawPause_Settings_Labels(x, y);
+
+        x += (int) (gp.tileSize * 4.5);
+        y -= (int) (gp.tileSize * 0.4);
+        drawPause_Settings_Toggles(x, y);
 
         pauseSettings_Input_A();
         pauseSettings_Input_Back();
         pauseSettings_Input_Dir();
     }
-    private void drawPause_Settings_Labels() {
-
-        int x = gp.tileSize * 3;
-        int y = gp.tileSize * 3;
+    private void drawPause_Settings_Labels(int x, int y) {
 
         g2.drawString("Full Screen", x, y);
         if (commandNum == 0) {
@@ -933,11 +970,21 @@ public class UI {
         if (commandNum == 3) {
             g2.drawString(">", x - 25, y);
         }
-    }
-    private void drawPause_Settings_Toggles() {
 
-        int x = gp.tileSize * 8;
-        int y = (int) (gp.tileSize * 2.5);
+        // CONTROLS
+        y += gp.tileSize;
+        g2.drawString("Controls", x, y);
+        if (commandNum == 4) {
+            g2.drawString(">", x - 25, y);
+        }
+
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Back", x, y);
+        if (commandNum == 5) {
+            g2.drawString(">", x - 25, y);
+        }
+    }
+    private void drawPause_Settings_Toggles(int x, int y) {
 
         // FULL SCREEN CHECK BOX
         g2.setStroke(new BasicStroke(3));
@@ -964,18 +1011,31 @@ public class UI {
         g2.drawString(gp.se.getSongName(gp.song), x, y);
     }
     private void pauseSettings_Input_A() {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         // Toggle Fullscreen
         if (commandNum == 0) {
             gp.fullScreenOn = !gp.fullScreenOn;
             playMenuSelect();
         }
+        // Controls
+        else if (commandNum == 4) {
+            commandNum = 0;
+            subState = 6;
+            playMenuSelect();
+        }
+        // Back
+        else if (commandNum == 5) {
+            gp.config.saveConfig();
+            commandNum = 0;
+            subState = 0;
+            playMenuClose();
+        }
     }
     private void pauseSettings_Input_Back() {
-        if (!gp.keyH.bPressed && !gp.keyH.startPressed) return;
-        gp.keyH.bPressed = false;
+        if (!gp.keyH.uiBPressed && !gp.keyH.startPressed) return;
+        gp.keyH.uiBPressed = false;
         gp.keyH.startPressed = false;
 
         gp.config.saveConfig();
@@ -996,7 +1056,7 @@ public class UI {
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            if (commandNum < 3) {
+            if (commandNum < 5) {
                 commandNum++;
                 playMenuCursor();
             }
@@ -1037,31 +1097,151 @@ public class UI {
         }
     }
 
-    private void drawPause_Auth() {
+    private void drawPause_Controls() {
 
-        int width = (int) (gp.tileSize * 11.5);
-        int height = gp.tileSize * 3;
-        int x = (gp.screenWidth - width) / 2;
-        int y = (int) (gp.tileSize * 4.5);
+        int x = gp.tileSize;
+        int y = gp.tileSize;
+        int width = gp.tileSize * 8;
+        int height = (int) (gp.tileSize * 10.5);
         drawPauseWindow(x, y, width, height);
 
+        x += gp.tileSize;
+        y += gp.tileSize;
         g2.setColor(pause_text);
         g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 32F));
-        String text = "Please login from your browser to continue...";
-        x = getXForCenteredTextOnWidth(text, width, x);
-        y += (int) (gp.tileSize * 1.5);
-        g2.drawString(text, x, y);
+        drawPause_Controls_Labels(x, y);
 
-        // Run one frame to freeze window into place
-        if (commandNum == 1) gp.changeLogin();
-        commandNum++;
+        pauseControls_Input_New();
 
-        // User logged in or timed out, return to screen
-        if (commandNum == 2) {
-            commandNum = 0;
-            subState = 0;
+        if (controlToEdit == -1) {
+            pauseControls_Input_A();
+            pauseControls_Input_B();
+            pauseControls_Input_Dir();
         }
     }
+    private void drawPause_Controls_Labels(int labelX, int y) {
+
+        int inputX = labelX + (gp.tileSize * 5);
+
+        g2.drawString("COMMAND", labelX, y);
+        g2.drawString("INPUT", inputX, y);
+        y += (int) (gp.tileSize * 1.25);
+        inputX += (int) (gp.tileSize * 0.5);
+
+        int index = 0;
+        for (String label : controls) {
+
+            int key = getKeyFromIndex(index);
+
+            g2.drawString(label, labelX, y);
+            if (commandNum == index) {
+                g2.drawString(">", labelX - 25, y);
+            }
+
+            String input = controlToEdit == key ? "[]" : KeyEvent.getKeyText(key);
+            g2.drawString(input, inputX, y);
+
+            y += gp.tileSize;
+            index++;
+        }
+
+        g2.drawString("Restore Defaults", labelX, y);
+        if (commandNum == index) {
+            g2.drawString(">", labelX - 25, y);
+        }
+
+        y += (int) (gp.tileSize * 1.5);
+        g2.drawString("Back", labelX, y);
+        if (commandNum == index + 1) {
+            g2.drawString(">", labelX - 25, y);
+        }
+    }
+    private int getKeyFromIndex(int index) {
+
+        if (index == 0) return gp.keyH.btn_A;
+        else if (index == 1) return gp.keyH.btn_B;
+        else if (index == 2) return gp.keyH.btn_X;
+        else if (index == 3) return gp.keyH.btn_Y;
+        else if (index == 4) return gp.keyH.btn_L;
+        else if (index == 5) return gp.keyH.btn_R;
+
+        return 0;
+    }
+    private void pauseControls_Input_New() {
+        if (controlToEdit == -1) return;
+
+        // Get user's most recent key press
+        int newKey = gp.keyH.getLastKeyPressed();
+
+        // Skip one frame for buffer
+        buffer++;
+        if (buffer == 1) return;
+
+        // User didn't press a new key
+        if (newKey == -1) return;
+
+        // Capture potential duplicate control and current key for swapping
+        int existingControl = gp.keyH.getButtonFromKey(newKey);
+        int currentKey = gp.keyH.getButtonFromKey(controlToEdit);
+
+        // Replace selected control with new key
+        gp.keyH.updateButton(controlToEdit, newKey);
+
+        // Replace duplicate control with current key (if applicable)
+        gp.keyH.updateButton(existingControl, currentKey);
+
+        controlToEdit = -1;
+        buffer = 0;
+        gp.keyH.stopAllKeys();
+    }
+    private void pauseControls_Input_A() {
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
+
+        // Select key to edit
+        if (0 <= commandNum && commandNum < controls.size()) {
+            controlToEdit = getKeyFromIndex(commandNum);
+            playMenuSelect();
+        }
+        // Restore keys to defaults
+        else if (commandNum == controls.size()) {
+            gp.keyH.resetDefaults();
+            playMenuSelect();
+        }
+        // Back
+        else if (commandNum == controls.size() + 1) {
+            commandNum = 0;
+            subState = 4;
+            playMenuClose();
+        }
+    }
+    private void pauseControls_Input_B() {
+        if (!gp.keyH.uiBPressed) return;
+        gp.keyH.uiBPressed = false;
+
+        commandNum = 0;
+        subState = 4;
+        playMenuClose();
+    }
+    private void pauseControls_Input_Dir() {
+        if (gp.keyH.upPressed) {
+            gp.keyH.upPressed = false;
+
+            if (0 < commandNum) {
+                commandNum--;
+                playMenuCursor();
+            }
+        }
+        else if (gp.keyH.downPressed) {
+            gp.keyH.downPressed = false;
+
+            if (commandNum < controls.size() + 1) {
+                commandNum++;
+                playMenuCursor();
+            }
+        }
+    }
+
     /** EDITING */
     private void drawEditState() {
 
@@ -1073,7 +1253,6 @@ public class UI {
         }
         // User let go of Y, run once
         else if (wasYPressed) {
-            playMenuSelect();
             if (!editingTiles) {
                 editing_GetEntity();
             }
@@ -1254,8 +1433,8 @@ public class UI {
     }
 
     private void editing_Map_Tile_Input_A() {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         UIEntity currentTile = tileLibrary.get(entityListIndex).get(entityIndex);
         int tileNum = Integer.parseInt(currentTile.getName());
@@ -1266,8 +1445,6 @@ public class UI {
         else {
             editing_PlaceTile(tileNum);
         }
-
-        playMenuSelect();
     }
     private void editing_FillTiles(int tileNum) {
 
@@ -1298,8 +1475,8 @@ public class UI {
     }
 
     private void editing_Map_Entity_Input_A() {
-        if (!gp.keyH.aPressed) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed) return;
+        gp.keyH.uiAPressed = false;
 
         editing_GetEntity();
 
@@ -1430,8 +1607,8 @@ public class UI {
     }
 
     private void editing_Map_Entity_Input_B() {
-        if (!gp.keyH.bPressed) return;
-        gp.keyH.bPressed = false;
+        if (!gp.keyH.uiBPressed) return;
+        gp.keyH.uiBPressed = false;
 
         editing_RemoveEntity();
     }
@@ -2008,8 +2185,8 @@ public class UI {
         }
     }
     private void handleFinishDialogue() {
-        if (!gp.keyH.aPressed || !canSkip) return;
-        gp.keyH.aPressed = false;
+        if (!gp.keyH.uiAPressed || !canSkip) return;
+        gp.keyH.uiAPressed = false;
 
         resetDialogue();
         playDialogueNext();
