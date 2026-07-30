@@ -189,4 +189,8 @@ public class EMY_Wizrobe extends Enemy {
     private void playTeleport() {
         gp.playSE(4, 2);
     }
+    @Override
+    protected void playProjectile() {
+        gp.playSE(4, 8);
+    }
 }

@@ -7,6 +7,9 @@ import entity.projectile.PRJ_Fireball;
 import java.awt.*;
 import java.util.Random;
 
+import static application.GamePanel.Direction.*;
+import static application.GamePanel.Direction.UP;
+
 public class EMY_Zora extends Enemy {
 
     public static final String emyName = "Zora";
@@ -68,10 +71,34 @@ public class EMY_Zora extends Enemy {
         interactable = true;
 
         if (action == Action.IDLE) {
+            lookAtPlayer();
             prepareAttack();
         }
         else {
             attack();
+        }
+    }
+
+    private void lookAtPlayer() {
+
+        if (ai.getTileDistance(gp.player) > maxTileDistanceToPlayer) {
+            return;
+        }
+
+        int dx = gp.player.getWorldPoint().x - worldPoint.x;
+        int dy = gp.player.getWorldPoint().y - worldPoint.y;
+
+        if (dy < 0 && Math.abs(dx) <= gp.tileSize) {
+            direction = UP;
+        }
+        else if (dy > 0 && Math.abs(dx) <= gp.tileSize) {
+            direction = DOWN;
+        }
+        else if (dx < 0 && Math.abs(dy) <= gp.tileSize) {
+            direction = LEFT;
+        }
+        else if (dx > 0 && Math.abs(dy) <= gp.tileSize) {
+            direction = RIGHT;
         }
     }
 
@@ -142,5 +169,10 @@ public class EMY_Zora extends Enemy {
         else {
             image = spriteNum == 1 ? up1 : up2;
         }
+    }
+
+    @Override
+    protected void playProjectile() {
+        gp.playSE(4, 8);
     }
 }

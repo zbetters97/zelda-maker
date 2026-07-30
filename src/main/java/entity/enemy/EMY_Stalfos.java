@@ -69,13 +69,14 @@ public class EMY_Stalfos extends Enemy {
         boolean playerInRange = ai.getTileDistance(gp.player) < 2;
         boolean playerIsFacing = direction == getOppositeDirection(gp.player.getDirection());
 
-        // Player swings sword towards Stalfos, jump out of the way
+        // Player swings sword towards self, jump out of the way
         return playerAttacking && playerInRange && playerIsFacing;
     }
 
     private void jumpAway() {
         action = Action.JUMPING;
         direction = gp.player.getDirection();
+        playJump();
     }
 
     @Override
@@ -94,6 +95,7 @@ public class EMY_Stalfos extends Enemy {
 
         if (action == Action.ATTACKING) {
             useProjectile(projectile);
+            playProjectile();
             action = Action.IDLE;
         }
     }
@@ -142,5 +144,9 @@ public class EMY_Stalfos extends Enemy {
         else {
             image = spriteNum == 1 ? up1 : up2;
         }
+    }
+
+    private void playJump() {
+        gp.playSE(4, 11);
     }
 }

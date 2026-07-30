@@ -42,6 +42,8 @@ public class OBJ_Door_Locked extends Object {
         if (userFacing && userHasKey) {
             user.addKeys(-1);
             opened = true;
+            playUnlock();
+            playOpen();
         }
     }
 
@@ -59,5 +61,12 @@ public class OBJ_Door_Locked extends Object {
 
             spriteCounter = 0;
         }
+    }
+
+    private void playUnlock() {
+        gp.playSE(5, 6);
+    }
+    private void playOpen() {
+        gp.playSE(5, 7);
     }
 }

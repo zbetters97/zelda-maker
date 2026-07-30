@@ -33,7 +33,10 @@ public class OBJ_Door_Closed extends Object {
 
     @Override
     public void interact(Entity user) {
-        opened = true;
+        if (!opened) {
+            opened = true;
+            playOpen();
+        }
     }
 
     @Override
@@ -50,5 +53,9 @@ public class OBJ_Door_Closed extends Object {
 
             spriteCounter = 0;
         }
+    }
+
+    private void playOpen() {
+        gp.playSE(5, 7);
     }
 }

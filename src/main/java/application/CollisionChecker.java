@@ -4,6 +4,7 @@ import entity.Entity;
 import entity.npc.NPC;
 import entity.object.OBJ_DigSpot;
 import entity.object.Object;
+import entity.projectile.Projectile;
 import tile.Tile;
 import tile.TileManager;
 
@@ -107,6 +108,10 @@ public record CollisionChecker(GamePanel gp) {
      * @param tile Tile to check collision on
      */
     private void setEntityTileCollision(Entity entity, Tile tile) {
+
+        if (entity instanceof Projectile && !tile.hasCollision()) {
+            return;
+        }
 
         // Bottomless pits
         if (tile.isPit()) {

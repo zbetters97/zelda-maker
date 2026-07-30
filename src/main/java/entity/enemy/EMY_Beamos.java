@@ -127,4 +127,10 @@ public class EMY_Beamos extends Enemy {
         super.resetValues();
         playerFound = false;
     }
+
+
+    @Override
+    protected void playProjectile() {
+        gp.playSE(4, 8);
+    }
 }

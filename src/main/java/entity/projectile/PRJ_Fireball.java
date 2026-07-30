@@ -32,14 +32,12 @@ public class PRJ_Fireball extends Projectile {
     }
 
     @Override
-    protected boolean canBeDeflected(boolean usingShield) {
-
-        // Can only be deflected with a shield
-        return usingShield;
+    protected void getSpriteImage() {
+        image = spriteNum == 1 ? up1 : up2;
     }
 
     @Override
-    protected void getSpriteImage() {
-        image = spriteNum == 1 ? up1 : up2;
+    protected void playHit() {
+        gp.playSE(7, 3);
     }
 }

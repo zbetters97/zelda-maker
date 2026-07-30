@@ -4,6 +4,8 @@ import application.GamePanel;
 
 import java.awt.*;
 
+import static application.GamePanel.Direction.*;
+
 public class EMY_Blade extends Enemy {
 
     public static final String emyName = "Blade";
@@ -112,16 +114,16 @@ public class EMY_Blade extends Enemy {
 
         // Find if player is within cross-hairs, determine which direction
         if (dy < 0 && Math.abs(dx) <= gp.tileSize) {
-            direction = GamePanel.Direction.UP;
+            direction = UP;
         }
         else if (dy > 0 && Math.abs(dx) <= gp.tileSize) {
-            direction = GamePanel.Direction.DOWN;
+            direction = DOWN;
         }
         else if (dx < 0 && Math.abs(dy) <= gp.tileSize) {
-            direction = GamePanel.Direction.LEFT;
+            direction = LEFT;
         }
         else if (dx > 0 && Math.abs(dy) <= gp.tileSize) {
-            direction = GamePanel.Direction.RIGHT;
+            direction = RIGHT;
         }
         else {
             return;

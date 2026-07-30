@@ -15,7 +15,6 @@ import static entity.Entity.Action.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.Objects;
 
 import static application.GamePanel.Direction.*;
 
@@ -445,11 +444,6 @@ public class Player extends Entity {
         if (gp.keyH.aPressed) {
             startAction();
         }
-        // Z-target
-        else if (gp.keyH.lPressed) {
-            gp.keyH.lPressed = false;
-            startZTarget();
-        }
         // Swing sword
         else if (gp.keyH.bPressed) {
             action = ATTACKING;
@@ -459,12 +453,6 @@ public class Player extends Entity {
                 capturedEntity.setAction(ATTACKING);
             }
         }
-        // Shield guard
-        else if (gp.keyH.rPressed) {
-            action = GUARDING;
-            spriteNum = 1;
-            spriteCounter = 0;
-        }
         // Use item
         else if (gp.keyH.xPressed) {
             useItem();
@@ -473,6 +461,17 @@ public class Player extends Entity {
         else if (gp.keyH.yPressed) {
             gp.keyH.yPressed = false;
             switchItem();
+        }
+        // Z-target
+        else if (gp.keyH.lPressed) {
+            gp.keyH.lPressed = false;
+            startZTarget();
+        }
+        // Shield guard
+        else if (gp.keyH.rPressed) {
+            action = GUARDING;
+            spriteNum = 1;
+            spriteCounter = 0;
         }
     }
 
@@ -574,7 +573,7 @@ public class Player extends Entity {
             // Already locked on
             else {
                 // Moving backwards, turn off lock
-                if (Objects.equals(direction, getOppositeDirection(lockonDirection))) {
+                if (direction == getOppositeDirection(lockonDirection)) {
                     lockedOnTarget = null;
                     lockedOn = false;
                 }
@@ -582,6 +581,7 @@ public class Player extends Entity {
                 else {
                     lockedOnTarget = newTarget;
                     lockedOn = true;
+                    playLockOn();
                 }
             }
         }

@@ -36,6 +36,8 @@ public class OBJ_Door_Boss extends Object {
         if (userFacing && userHasKey) {
             user.setHasBossKey(false);
             opened = true;
+            playUnlock();
+            playOpen();
         }
     }
 
@@ -55,8 +57,10 @@ public class OBJ_Door_Boss extends Object {
         }
     }
 
-    @Override
-    public void rotate() {
-
+    private void playUnlock() {
+        gp.playSE(5, 6);
+    }
+    private void playOpen() {
+        gp.playSE(5, 7);
     }
 }
