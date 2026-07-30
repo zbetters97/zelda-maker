@@ -1,11 +1,11 @@
-# The Legend of Zelda: Link's Reawakening
+# The Legend of Zelda Maker
 
-A simple Java-based Legend of Zelda fan game with a custom-built game-engine.
+A Java-based Legend of Zelda fan-made editor.
 
 ## Description
 
 Welcome to the world of Hyrule!
-This Java-based rpg uses a custom-built engine in IntelliJ learned from [RyiSnow](https://www.youtube.com/@RyiSnow) to showcase many features from the mainline Legend of Zelda video-game series. 
+This Java-based RPG maker uses a custom-built engine in IntelliJ learned from [RyiSnow](https://www.youtube.com/@RyiSnow) to showcase many features from the mainline Legend of Zelda video-game series. 
 
 ## Getting started
 
@@ -30,10 +30,7 @@ This Java-based rpg uses a custom-built engine in IntelliJ learned from [RyiSnow
 |     L      | *W* |
 |     R      | *E* |
 |     Z      | *R* |
-|  D-pad Up  | *1* |
-| D-pad Down | *2* |
 |   Start    | *SPACEBAR* |
-|   Select   | *SHIFT* |
 
 ## Author
 
