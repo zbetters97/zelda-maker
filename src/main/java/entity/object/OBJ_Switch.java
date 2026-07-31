@@ -35,6 +35,7 @@ public class OBJ_Switch extends Object {
             opened = !opened;
             invincible = true;
             flipSwitches();
+            playSwitch();
         }
     }
     
@@ -53,7 +54,7 @@ public class OBJ_Switch extends Object {
 
     @Override
     protected void manageValues() {
-        if (30 < ++invincibleCounter) {
+        if (invincible && 15 < ++invincibleCounter) {
             invincibleCounter = 0;
             invincible = false;
         }
@@ -62,5 +63,9 @@ public class OBJ_Switch extends Object {
     @Override
     protected void getSpriteImage() {
         image = opened ? up2 : up1;
+    }
+
+    private void playSwitch() {
+        gp.playSE(5, 12);
     }
 }

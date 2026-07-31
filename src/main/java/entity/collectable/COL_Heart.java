@@ -21,9 +21,14 @@ public class COL_Heart extends Collectable {
 
     @Override
     public void use(Entity user) {
+        super.add(user);
+        playPickup();
+    }
+
+    @Override
+    public void add(Entity user) {
         user.addHealth(value);
         alive = false;
-        playPickup();
     }
 
     private void playPickup() {

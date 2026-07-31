@@ -20,9 +20,14 @@ public class COL_Key extends Collectable {
 
     @Override
     public void use(Entity user) {
+        super.add(user);
+        playPickup();
+    }
+
+    @Override
+    public void add(Entity user) {
         user.addKeys(1);
         alive = false;
-        playPickup();
     }
 
     private void playPickup() {

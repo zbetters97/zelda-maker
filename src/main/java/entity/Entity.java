@@ -643,10 +643,21 @@ public class Entity {
         gp.collectables.add(loot);
     }
 
-    public void receiveLoot(Entity loot) {
+    public void pickupLoot(Entity loot) {
 
         if (loot instanceof Collectable) {
             ((Collectable) loot).use(this);
+        }
+        else if (loot instanceof Item) {
+            showReward(loot);
+            addItem((Item) loot);
+        }
+    }
+
+    public void receiveLoot(Entity loot) {
+
+        if (loot instanceof Collectable) {
+            ((Collectable) loot).add(this);
         }
         else if (loot instanceof Item) {
             showReward(loot);
@@ -689,6 +700,12 @@ public class Entity {
         }
     }
 
+    public void resetState() {
+        resetCounters();
+        action = IDLE;
+        speed = defaultSpeed;
+        canMove = true; moving = false;
+    }
     public void resetValues() {
 
         alive = true;

@@ -1,32 +1,13 @@
 package entity.collectable;
 
 import application.GamePanel;
-import entity.Entity;
 
-public class COL_Rupee_Purple extends Collectable {
+public class COL_Rupee_Purple extends Rupee {
 
     public static final String colName = "Rupee_Purple";
 
     public COL_Rupee_Purple(GamePanel gp) {
-        super(gp, colName);
+        super(gp, colName, 50, "Wow!");
         formattedName = "a purple rupee";
-        value = 50;
-        description = "That's worth " + value + " rupees! Wow!";
-    }
-
-    @Override
-    protected void getImages() {
-        sprite = setupImage("/collectables/col_rupee_purple", 38, 38);
-    }
-
-    @Override
-    public void use(Entity user) {
-        gp.ui.addRupees(value);
-        alive = false;
-        playPickup();
-    }
-
-    private void playPickup() {
-        gp.playSE(6, 1);
     }
 }

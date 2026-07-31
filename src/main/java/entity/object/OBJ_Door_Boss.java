@@ -57,6 +57,19 @@ public class OBJ_Door_Boss extends Object {
         }
     }
 
+    @Override
+    public String getAvailableAction(Entity user) {
+
+        boolean userFacing = user.getDirection() == getOppositeDirection(direction);
+        boolean userHasKey = user.getHasBossKey();
+
+        if (!userFacing || !userHasKey) {
+            return "";
+        }
+
+        return availableAction;
+    }
+
     private void playUnlock() {
         gp.playSE(5, 6);
     }

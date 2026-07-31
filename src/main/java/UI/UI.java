@@ -2210,6 +2210,7 @@ public class UI {
         }
         // No reward, continue to play state
         else {
+            gp.player.resetState();
             gp.GAME_STATE = gp.PLAY_STATE;
         }
     }

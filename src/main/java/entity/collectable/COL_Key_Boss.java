@@ -20,9 +20,14 @@ public class COL_Key_Boss extends Collectable {
 
     @Override
     public void use(Entity user) {
+        super.add(user);
+        playPickup();
+    }
+
+    @Override
+    public void add(Entity user) {
         user.setHasBossKey(true);
         alive = false;
-        playPickup();
     }
 
     private void playPickup() {

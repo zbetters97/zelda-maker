@@ -919,7 +919,7 @@ public class Player extends Entity {
     private void checkInteractiveCollision() {
 
         Entity loot = gp.cChecker.checkOverlapCollision(this, gp.collectables);
-        if (loot != null) receiveLoot(loot);
+        if (loot != null) pickupLoot(loot);
 
         Projectile projectile = gp.cChecker.checkOverlapCollision(this, gp.projectiles);
         if (projectile != null && projectile.getCanPickup()){
@@ -1475,11 +1475,13 @@ public class Player extends Entity {
         super.resetCounters();
 
         spinCharge = 0;
+        attackNum = 1; attackCounter = 0;
         digNum = 1; digCounter = 0;
         aimNum = 1; aimCounter = 0;
         grabNum = 1; grabCounter = 0;
         throwNum = 1; throwCounter = 0;
         jumpNum = 1; jumpCounter = 0;
+        rodNum = 1; rodCounter = 0;
         damageNum = 1; damageCounter = 0;
     }
 

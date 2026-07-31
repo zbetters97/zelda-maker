@@ -10,6 +10,7 @@ public class OBJ_Door_Locked extends Object {
     public OBJ_Door_Locked(GamePanel gp, int worldX, int worldY) {
         super(gp, worldX, worldY, objName);
         animationSpeed = 10;
+        availableAction = "OPEN";
     }
 
     @Override
@@ -61,6 +62,19 @@ public class OBJ_Door_Locked extends Object {
 
             spriteCounter = 0;
         }
+    }
+
+    @Override
+    public String getAvailableAction(Entity user) {
+
+        boolean userFacing = user.getDirection() == getOppositeDirection(direction);
+        boolean userHasKey = user.getKeys() > 0;
+
+        if (!userFacing || !userHasKey) {
+            return "";
+        }
+
+        return availableAction;
     }
 
     private void playUnlock() {

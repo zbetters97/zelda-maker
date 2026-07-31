@@ -20,6 +20,10 @@ public class Collectable extends Entity {
 
     }
 
+    public void add(Entity user) {
+
+    }
+
     @Override
     protected void getSpriteImage() {
         image = sprite;

@@ -20,10 +20,15 @@ public class COL_Fairy extends Collectable {
 
     @Override
     public void use(Entity user) {
+        super.add(user);
+        playPickup();
+    }
+
+    @Override
+    public void add(Entity user) {
         user.setHealth(user.getMaxHealth());
         user.setAlive(true);
         alive = false;
-        playPickup();
     }
 
     private void playPickup() {
