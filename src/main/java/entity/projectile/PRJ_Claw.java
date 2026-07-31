@@ -94,6 +94,7 @@ public class PRJ_Claw extends Projectile {
                 user.takeDamage(target);
             }
             else {
+                target.setCanMove(false);
                 grabbedEntity = target;
             }
         }
@@ -113,6 +114,7 @@ public class PRJ_Claw extends Projectile {
         Object object = gp.cChecker.checkMovementCollision(this, gp.objects);
         if (object != null && object.isLatchable()) {
             grabbedEntity = object;
+            user.setCanMove(false);
             returning = true;
 
             // Pull Cucco towards self, otherwise pull towards object
@@ -138,12 +140,13 @@ public class PRJ_Claw extends Projectile {
 
         user.setElevated(true);
         
-        Point stopPoint = new Point(grabbedEntity.getWorldPoint().x + gp.tileSize, grabbedEntity.getWorldPoint().y + gp.tileSize);
+        Point stopPoint = new Point(grabbedEntity.getWorldPoint().x, grabbedEntity.getWorldPoint().y);
         Point userPoint = new Point(user.getWorldPoint().x, user.getWorldPoint().y);
 
         // Move user towards latched
         switch (direction) {
             case UP, UPLEFT, UPRIGHT -> {
+                stopPoint.y += gp.tileSize;
                 if (userPoint.y > stopPoint.y) {
                     user.setWorldPointY(userPoint.y - 5);
                 }
@@ -152,6 +155,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case DOWN, DOWNLEFT, DOWNRIGHT -> {
+                stopPoint.y -= gp.tileSize;
                 if (userPoint.y < stopPoint.y) {
                     user.setWorldPointY(userPoint.y + 5);
                 }
@@ -160,6 +164,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case LEFT -> {
+                stopPoint.x += gp.tileSize;
                 if (userPoint.x > stopPoint.x) {
                     user.setWorldPointX(userPoint.x - 5);
                 }
@@ -168,6 +173,7 @@ public class PRJ_Claw extends Projectile {
                 }
             }
             case RIGHT -> {
+                stopPoint.x -= gp.tileSize;
                 if (userPoint.x < stopPoint.x) {
                     user.setWorldPointX(userPoint.x + 5);
                 }
@@ -193,6 +199,7 @@ public class PRJ_Claw extends Projectile {
             resetValues();
         }
         else if (10 < ++soundCounter) {
+            if (user != null) user.setCanMove(false);
             playChain();
             soundCounter = 0;
         }
@@ -206,6 +213,7 @@ public class PRJ_Claw extends Projectile {
         returning = false;
         health = maxHealth;
         user.resetCounters();
+        user.setCanMove(true);
         user.setElevated(false);
         user.setAction(Action.IDLE);
         soundCounter = 0;

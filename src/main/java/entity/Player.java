@@ -363,6 +363,11 @@ public class Player extends Entity {
 
         updateAvailableAction();
 
+        if (!canMove) {
+            manageValues();
+            return;
+        }
+
         if (knockback) {
             checkCollision();
             handleKnockback();

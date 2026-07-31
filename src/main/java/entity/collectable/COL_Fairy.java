@@ -20,7 +20,7 @@ public class COL_Fairy extends Collectable {
 
     @Override
     public void use(Entity user) {
-        super.add(user);
+        add(user);
         playPickup();
     }
 
