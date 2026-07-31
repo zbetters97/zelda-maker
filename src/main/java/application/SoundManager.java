@@ -14,7 +14,7 @@ public class SoundManager {
     public Clip clip;
     private final String[][] sounds = new String[9][];
     private final Map<Integer, String> songs = new HashMap<>();
-    private final int[] loopStarts = {111, 7498, 182, 538, 32332, 7236, 4234};
+    private final int[] loopStarts = {111, 7498, 6360, 538, 1180, 11313, 1185, 32332, 182, 4675, 7236, 4234, 4499};
     public int maxSongs = 0;
 
     /* VOLUME SLIDER */

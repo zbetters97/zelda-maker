@@ -923,7 +923,7 @@ public class UI {
 
         int x = gp.tileSize;
         int y = gp.tileSize;
-        int width = (int) (gp.tileSize * 8.75);
+        int width = gp.tileSize * 9;
         int height = gp.tileSize * 7;
         drawPauseWindow(x, y, width, height);
 
@@ -1176,6 +1176,12 @@ public class UI {
 
         // User didn't press a new key
         if (newKey == -1) return;
+
+        // User must input a letter key
+        if (newKey < 65 || 90 < newKey) {
+            playMenuError();
+            return;
+        }
 
         boolean isExistingControl = gp.keyH.isExistingButton(newKey);
 
