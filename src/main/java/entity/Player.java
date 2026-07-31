@@ -691,17 +691,19 @@ public class Player extends Entity {
         // Item equipped
         if (item != null) {
             switch (item.name) {
+                case ITM_Boots.itmName -> item.use();
                 case ITM_Boomerang.itmName, ITM_Bomb.itmName, ITM_Hookshot.itmName, ITM_Rod.itmName, ITM_Shovel.itmName -> {
                     gp.keyH.xPressed = false;
                     item.use();
                 }
-                case ITM_Boots.itmName -> item.use();
                 case ITM_Bow.itmName -> {
                     lockonDirection = direction;
                     item.use();
                 }
                 case ITM_Cape.itmName, ITM_Feather.itmName -> {
                     gp.keyH.xPressed = false;
+                    if (actionLockCounter != 0) return;
+                    actionLockCounter = 30;
                     lockonDirection = direction;
                     item.use();
                 }

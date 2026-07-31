@@ -1778,6 +1778,11 @@ public class UI {
         int width = gp.tileSize + 30;
         int height = gp.tileSize + 30;
 
+        // User can't use item when not IDLE
+        if (gp.player.getAction() != Entity.Action.IDLE) {
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+        }
+
         // DRAW ITEM CIRCLE
         g2.setColor(itm_brown_1);
         g2.fillOval(x, y, width, height);
@@ -1819,7 +1824,7 @@ public class UI {
         y += 28;
         g2.drawString(text, x, y);
 
-        g2.setStroke(new BasicStroke(1));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
     }
     private void drawItemCount(int x, int y, String text) {
 

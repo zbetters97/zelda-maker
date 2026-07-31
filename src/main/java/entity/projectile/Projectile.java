@@ -170,12 +170,14 @@ public class Projectile extends Entity {
         grabbedEntity.setDirection(getOppositeDirection(direction));
         grabbedEntity.setElevated(true);
 
+        int offset = gp.tileSize / 2;
+
         // Offset X/Y so entity isn't on top of player
         switch (direction) {
-            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y - gp.tileSize);
-            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y + gp.tileSize);
-            case LEFT -> grabbedEntity.setWorldPointX(worldPoint.x - gp.tileSize);
-            case RIGHT -> grabbedEntity.setWorldPointX(worldPoint.x + gp.tileSize);
+            case UP, UPLEFT, UPRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y - offset);
+            case DOWN, DOWNLEFT, DOWNRIGHT -> grabbedEntity.setWorldPointY(worldPoint.y + offset);
+            case LEFT -> grabbedEntity.setWorldPointX(worldPoint.x - offset);
+            case RIGHT -> grabbedEntity.setWorldPointX(worldPoint.x + offset);
         }
     }
 

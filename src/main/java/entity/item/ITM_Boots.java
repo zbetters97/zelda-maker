@@ -19,6 +19,11 @@ public class ITM_Boots extends Item {
     }
 
     @Override
+    public void use() {
+        user.setAction(action);
+    }
+
+    @Override
     public void playSoundEffect() {
         gp.playSE(7, 1);
     }
