@@ -24,7 +24,7 @@ public class Item extends Entity {
         image = sprite;
     }
 
-    protected void playSoundEffect() {
+    public void playSoundEffect() {
 
     }
 

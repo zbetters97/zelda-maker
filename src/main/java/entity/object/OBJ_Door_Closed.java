@@ -56,6 +56,6 @@ public class OBJ_Door_Closed extends Object {
     }
 
     private void playOpen() {
-        gp.playSE(5, 7);
+        gp.playSE(5, 10);
     }
 }

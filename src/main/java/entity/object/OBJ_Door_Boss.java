@@ -71,9 +71,9 @@ public class OBJ_Door_Boss extends Object {
     }
 
     private void playUnlock() {
-        gp.playSE(5, 6);
+        gp.playSE(5, 9);
     }
     private void playOpen() {
-        gp.playSE(5, 7);
+        gp.playSE(5, 10);
     }
 }

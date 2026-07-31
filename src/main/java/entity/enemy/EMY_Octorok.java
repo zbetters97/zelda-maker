@@ -143,9 +143,4 @@ public class EMY_Octorok extends Enemy {
         super.setDirection(direction);
         lockonDirection = direction;
     }
-
-    @Override
-    protected void playProjectile() {
-        gp.playSE(4, 8);
-    }
 }

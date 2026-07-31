@@ -117,7 +117,12 @@ public class PRJ_Orb extends Projectile {
         image = spriteNum == 1 ? up1 : up2;
     }
 
+    @Override
+    protected void playShoot() {
+        gp.playSE(8, 5);
+    }
+
     private void playCapture() {
-        gp.playSE(7, 10);
+        gp.playSE(8, 6);
     }
 }

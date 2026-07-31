@@ -48,6 +48,7 @@ public class OBJ_Chest extends Object {
         if (facingDirection) {
             opened = true;
             availableAction = "";
+            playOpen();
 
             user.showReward(loot);
             user.receiveLoot(loot);
@@ -72,5 +73,9 @@ public class OBJ_Chest extends Object {
         }
 
         return availableAction;
+    }
+
+    private void playOpen() {
+        gp.playSE(5, 9);
     }
 }

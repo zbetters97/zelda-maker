@@ -132,12 +132,12 @@ public class PRJ_Boomerang extends Projectile {
         image = spriteNum == 1 ? up1 : up2;
     }
 
-    @Override
-    protected void playHit() {
-        gp.playSE(7, 3);
+    private void playSpin() {
+        gp.playSE(8, 2);
     }
 
-    private void playSpin() {
-        gp.playSE(7, 2);
+    @Override
+    protected void playHit() {
+        gp.playSE(8, 3);
     }
 }

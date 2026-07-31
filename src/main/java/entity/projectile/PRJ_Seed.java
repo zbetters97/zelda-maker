@@ -34,7 +34,12 @@ public class PRJ_Seed extends Projectile {
     }
 
     @Override
+    protected void playShoot() {
+        gp.playSE(8, 0);
+    }
+
+    @Override
     protected void playHit() {
-        gp.playSE(7, 3);
+        gp.playSE(8, 3);
     }
 }

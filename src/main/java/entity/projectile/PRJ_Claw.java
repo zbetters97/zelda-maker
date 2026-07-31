@@ -264,11 +264,12 @@ public class PRJ_Claw extends Projectile {
         }
     }
 
+    private void playChain() {
+        gp.playSE(8, 4);
+    }
+
     @Override
     protected void playHit() {
-        gp.playSE(7, 3);
-    }
-    private void playChain() {
-        gp.playSE(7, 4);
+        gp.playSE(8, 3);
     }
 }

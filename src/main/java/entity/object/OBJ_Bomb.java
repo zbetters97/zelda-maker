@@ -162,7 +162,7 @@ public class OBJ_Bomb extends Object {
     }
 
     private void playExplode() {
-        gp.playSE(7, 1);
+        gp.playSE(5, 5);
     }
 
     @Override

@@ -95,7 +95,6 @@ public class EMY_Stalfos extends Enemy {
 
         if (action == Action.ATTACKING) {
             useProjectile(projectile);
-            playProjectile();
             action = Action.IDLE;
         }
     }

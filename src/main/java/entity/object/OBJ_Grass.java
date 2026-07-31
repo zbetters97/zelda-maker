@@ -33,7 +33,7 @@ public class OBJ_Grass extends Object {
         alive = false;
         dropLoot();
         createParticles();
-        playShatter();
+        playCut();
     }
 
     @Override
@@ -58,8 +58,8 @@ public class OBJ_Grass extends Object {
         image = sprite;
     }
 
-    private void playShatter() {
-        gp.playSE(5, 10);
+    private void playCut() {
+        gp.playSE(5, 6);
     }
 
     @Override

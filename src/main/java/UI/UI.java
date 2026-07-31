@@ -2342,6 +2342,6 @@ public class UI {
         gp.playSE(1, 6);
     }
     private void playWallet() {
-        gp.playSE(1, 9);
+        gp.playSE(1, 7);
     }
 }

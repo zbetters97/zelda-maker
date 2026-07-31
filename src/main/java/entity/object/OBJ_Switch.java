@@ -66,6 +66,6 @@ public class OBJ_Switch extends Object {
     }
 
     private void playSwitch() {
-        gp.playSE(5, 12);
+        gp.playSE(5, 7);
     }
 }

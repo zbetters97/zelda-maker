@@ -17,4 +17,9 @@ public class ITM_Boots extends Item {
     protected void getImages() {
         sprite = setupImage("/items/itm_boots");
     }
+
+    @Override
+    public void playSoundEffect() {
+        gp.playSE(7, 1);
+    }
 }

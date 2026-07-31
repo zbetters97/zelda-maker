@@ -32,4 +32,9 @@ public class PRJ_Beam extends Projectile {
             case LEFT, RIGHT -> left1;
         };
     }
+
+    @Override
+    protected void playShoot() {
+        gp.playSE(8, 1);
+    }
 }

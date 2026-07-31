@@ -35,4 +35,9 @@ public class PRJ_Magic extends Projectile {
         // Can only be deflected with a sword
         return !usingShield;
     }
+
+    @Override
+    protected void playShoot() {
+        gp.playSE(8, 1);
+    }
 }

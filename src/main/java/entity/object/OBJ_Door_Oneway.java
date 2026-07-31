@@ -45,6 +45,7 @@ public class OBJ_Door_Oneway extends Object {
             user.setDrawing(false);
             this.user = user;
             opened = true;
+            playOpen();
         }
     }
 
@@ -133,5 +134,9 @@ public class OBJ_Door_Oneway extends Object {
                 case RIGHT -> attackRight3;
             };
         }
+    }
+
+    private void playOpen() {
+        gp.playSE(5, 10);
     }
 }

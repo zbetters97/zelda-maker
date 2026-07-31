@@ -48,11 +48,16 @@ public class PRJ_Bone extends Projectile {
     }
 
     @Override
-    protected void playHit() {
-        gp.playSE(7, 3);
+    protected void playShoot() {
+        gp.playSE(8, 0);
     }
 
     private void playSpin() {
-        gp.playSE(7, 2);
+        gp.playSE(8, 2);
+    }
+
+    @Override
+    protected void playHit() {
+        gp.playSE(8, 3);
     }
 }

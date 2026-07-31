@@ -390,7 +390,6 @@ public class Entity {
 
         projectile.set(worldPoint, direction, true, this);
         gp.projectiles.add(projectile);
-        playProjectile();
     }
     protected void useProjectile(Projectile projectile, int seconds) {
 
@@ -401,7 +400,6 @@ public class Entity {
 
             // Force 30 frame delay in between shots
             actionLockCounter = 30;
-            playProjectile();
         }
     }
 
@@ -547,7 +545,7 @@ public class Entity {
                 setKnockback(attacker.getDirection(), attacker.getKnockbackPower());
             }
 
-            playTink();
+            playDink();
             return;
         }
 
@@ -823,13 +821,12 @@ public class Entity {
     }
 
     /** SOUND EFFECTS */
-    private void playTink() {
+    private void playDink() {
         gp.playSE(5, 0);
     }
     private void playItemGet() {
-        gp.playSE(1, 7);
+        gp.playSE(2, 3);
     }
-    protected void playProjectile() {}
 
     /** GETTERS AND SETTERS */
     public Point getScreenPoint() {

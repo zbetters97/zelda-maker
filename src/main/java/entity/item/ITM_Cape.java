@@ -7,6 +7,8 @@ public class ITM_Cape extends Item {
 
     public static final String itmName = "Cape";
 
+    private boolean playSoar;
+
     public ITM_Cape(GamePanel gp, Entity user) {
         super(gp, itmName, user, Action.SOARING);
         formattedName = "the Roc's Cape";
@@ -25,7 +27,15 @@ public class ITM_Cape extends Item {
     }
 
     @Override
-    protected void playSoundEffect() {
-        gp.playSE(7, 7);
+    public void playSoundEffect() {
+
+        if (playSoar) {
+            gp.playSE(7, 3);
+            playSoar = false;
+        }
+        else {
+            gp.playSE(7, 2);
+            playSoar = true;
+        }
     }
 }

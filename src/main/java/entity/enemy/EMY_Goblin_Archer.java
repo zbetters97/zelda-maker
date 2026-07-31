@@ -88,9 +88,4 @@ public class EMY_Goblin_Archer extends Enemy {
 
         super.manageValues();
     }
-
-    @Override
-    protected void playProjectile() {
-        gp.playSE(4, 9);
-    }
 }

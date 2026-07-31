@@ -285,7 +285,7 @@ public class OBJ_Cucco extends Object {
     }
 
     private void playCluck() {
-        gp.playSE(5, 5);
+        gp.playSE(5, 11);
     }
 
     @Override

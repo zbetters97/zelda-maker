@@ -170,9 +170,4 @@ public class EMY_Zora extends Enemy {
             image = spriteNum == 1 ? up1 : up2;
         }
     }
-
-    @Override
-    protected void playProjectile() {
-        gp.playSE(4, 8);
-    }
 }

@@ -12,7 +12,7 @@ public class SoundManager {
 
     // CLIP HOLDERS
     public Clip clip;
-    private final String[][] sounds = new String[8][];
+    private final String[][] sounds = new String[9][];
     private final Map<Integer, String> songs = new HashMap<>();
     private final int[] loopStarts = {111, 7498, 182, 538, 32332, 7236, 4234};
     public int maxSongs = 0;
@@ -40,6 +40,7 @@ public class SoundManager {
         sounds[5] = getSounds("05_objects");
         sounds[6] = getSounds("06_collectables");
         sounds[7] = getSounds("07_items");
+        sounds[8] = getSounds("08_projectiles");
     }
 
     private void fillSongNames(String[] sounds) {

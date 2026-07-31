@@ -710,7 +710,7 @@ public class Player extends Entity {
 
     private void switchItem() {
 
-        if (items.isEmpty()) return;
+        if (items.size() < 2) return;
 
         currentItemSlot++;
         if (items.size() <= currentItemSlot) {
@@ -718,6 +718,7 @@ public class Player extends Entity {
         }
 
         item = items.get(currentItemSlot);
+        playCursor();
     }
 
     /**
@@ -1250,7 +1251,7 @@ public class Player extends Entity {
         if (gp.keyH.xPressed && moving) {
             animationSpeed = 4;
             speed = 7;
-            if (spriteCounter == 0) playRun();
+            if (spriteCounter == 0) item.playSoundEffect();
         }
         else {
             animationSpeed = 10;
@@ -1283,9 +1284,11 @@ public class Player extends Entity {
 
         if (gp.keyH.xPressed) {
             item.use();
+            if (charge == 10) playCharge();
         }
         else {
             item.attack();
+            item.playSoundEffect();
             speed = defaultSpeed;
         }
     }
@@ -1306,9 +1309,9 @@ public class Player extends Entity {
         else if (jumpCounter < 27) {
             jumpNum = 3;
         }
-        else if (28 <= jumpCounter) {
+        else {
             if (action == SOARING) {
-                if (jumpNum == 3) playSoar();
+                if (jumpCounter == 28) item.playSoundEffect();
                 jumpNum = 4;
                 soaring();
             }
@@ -1972,46 +1975,43 @@ public class Player extends Entity {
 
         previousGrunt = grunt;
     }
-    private void playCharge() {
-        gp.playSE(3, 4);
-    }
-    private void playSpinGrunt() {
-        int grunt = 1 + (int) (Math.random() * 2);
-        gp.playSE(3, grunt + 4);
-    }
-    private void playLockOn() {
-        gp.playSE(3, 14);
+    private void playHurtGrunt() {
+        int grunt = 1 + (int) (Math.random() * 3);
+        gp.playSE(3, grunt + 3);
     }
     private void playSwordSwing() {
         gp.playSE(2, 0);
     }
+    private void playCharge() {
+        gp.playSE(3, 7);
+    }
+    private void playSpinGrunt() {
+        int grunt = 1 + (int) (Math.random() * 2);
+        gp.playSE(3, grunt + 7);
+    }
     private void playSwordSpin() {
         gp.playSE(2, 1);
     }
-    private void playHurtGrunt() {
-        int grunt = 1 + (int) (Math.random() * 3);
-        gp.playSE(3, grunt + 6);
-    }
-    private void playFalling() {
+    private void playLockOn() {
         gp.playSE(3, 10);
     }
-    private void playDrowning() {
-        gp.playSE(3, 11);
-    }
     private void playPullGrunt() {
-        gp.playSE(3, 13);
-    }
-    private void playRun() {
-        gp.playSE(7, 6);
-    }
-    private void playSoar() {
-        gp.playSE(7, 8);
+        gp.playSE(3, 12);
     }
     private void playLift() {
-        gp.playSE(5, 11);
+        gp.playSE(3, 13);
+    }
+    private void playDrowning() {
+        gp.playSE(3, 15);
+    }
+    private void playFalling() {
+        gp.playSE(3, 16);
+    }
+    private void playCursor() {
+        gp.playSE(1, 1);
     }
 
-    /** GETTERS */
+    /** GETTERS AND SETTERS */
     public Entity getLockedOnTarget() {
         return lockedOnTarget;
     }

@@ -37,7 +37,12 @@ public class PRJ_Fireball extends Projectile {
     }
 
     @Override
+    protected void playShoot() {
+        gp.playSE(8, 1);
+    }
+
+    @Override
     protected void playHit() {
-        gp.playSE(7, 3);
+        gp.playSE(8, 3);
     }
 }

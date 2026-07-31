@@ -41,6 +41,8 @@ public class Projectile extends Entity {
         this.direction = getCorrectedDirection();
 
         shiftPosition();
+
+        playShoot();
     }
 
     private GamePanel.Direction getCorrectedDirection() {
@@ -226,6 +228,7 @@ public class Projectile extends Entity {
 
     }
 
+    protected void playShoot() {}
     protected void playHit() {}
 
     @Override

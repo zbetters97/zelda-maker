@@ -25,7 +25,7 @@ public class ITM_Feather extends Item {
     }
 
     @Override
-    protected void playSoundEffect() {
-        gp.playSE(7, 7);
+    public void playSoundEffect() {
+        gp.playSE(7, 2);
     }
 }

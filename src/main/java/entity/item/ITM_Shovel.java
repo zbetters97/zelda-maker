@@ -19,7 +19,7 @@ public class ITM_Shovel extends Item {
     }
 
     @Override
-    protected void playSoundEffect() {
-        gp.playSE(7, 5);
+    public void playSoundEffect() {
+        gp.playSE(7, 0);
     }
 }
