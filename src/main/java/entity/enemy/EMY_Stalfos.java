@@ -146,6 +146,6 @@ public class EMY_Stalfos extends Enemy {
     }
 
     private void playJump() {
-        gp.playSE(4, 11);
+        gp.playSE(4, 8);
     }
 }
