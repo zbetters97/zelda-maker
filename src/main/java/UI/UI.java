@@ -61,7 +61,7 @@ public class UI {
     /** EDITING HANDLERS */
     public Cursor cursor;
     private boolean wasYPressed ;
-    private boolean editingTiles;
+    private boolean editingTiles = true;
 
     /** ENTITY EDITING */
     private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
@@ -80,6 +80,7 @@ public class UI {
             {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63} // Dungeon 2
     };
     public Point selectedTile;
+    private final Map<Point, Integer> copiedTiles = new HashMap<>();
 
     /** ITEM COLORS */
     private final Color itm_brown_1 = new Color(168, 127, 89);
@@ -1289,6 +1290,7 @@ public class UI {
             entityListIndex = 0;
             entityIndex = 0;
             selectedTile = null;
+            copiedTiles.clear();
         }
     }
 
@@ -1433,10 +1435,14 @@ public class UI {
     private void drawEditing_Map() {
 
         if (editingTiles) {
+
+            // Unhighlight tiles if not pressing R
             if (!gp.keyH.rPressed) {
                 selectedTile = null;
             }
+
             editing_Map_Tile_Input_A();
+            editing_Map_Tile_Input_B();
         }
         else {
             editing_Map_Entity_Input_A();
@@ -1455,30 +1461,95 @@ public class UI {
         int tileNum = Integer.parseInt(currentTile.getName());
 
         if (gp.keyH.rPressed) {
-            editing_FillTiles(tileNum);
+
+            // Set highlighted start point
+            if (selectedTile == null) {
+                selectedTile = new Point(cursor.getWorldPoint());
+            }
+            else {
+                editing_FillTiles(tileNum);
+            }
+
+            copiedTiles.clear();
         }
         else {
             editing_PlaceTile(tileNum);
         }
     }
-    private void editing_FillTiles(int tileNum) {
+    private void editing_Map_Tile_Input_B() {
+        if (!gp.keyH.uiBPressed) return;
+        gp.keyH.uiBPressed = false;
 
-        if (selectedTile != null) {
+        if (gp.keyH.rPressed) {
 
-            int startCol = Math.min(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
-            int endCol = Math.max(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
-
-            int startRow = Math.min(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
-            int endRow = Math.max(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
-
-            for (int col = startCol; col <= endCol; col++) {
-                for (int row = startRow; row <= endRow; row++) {
-                    gp.tileM.mapTileNum[col][row] = tileNum;
-                }
+            // Must be highlighted to copy
+            if (copiedTiles.isEmpty() && selectedTile != null) {
+                editing_CopyTiles();
+            }
+            // Selected tile not needed for paste
+            else if (!copiedTiles.isEmpty()) {
+                editing_PasteTiles();
             }
         }
-        else {
-            selectedTile = new Point(cursor.getWorldPoint());
+    }
+    private void editing_FillTiles(int tileNum) {
+
+        // Detect start and end point on highlighted square
+        int startCol = Math.min(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+        int endCol = Math.max(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+
+        int startRow = Math.min(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+        int endRow = Math.max(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+
+        // Loop over each tile highlighted
+        for (int col = startCol; col <= endCol; col++) {
+            for (int row = startRow; row <= endRow; row++) {
+
+                // Fill with current tile
+                gp.tileM.mapTileNum[col][row] = tileNum;
+            }
+        }
+    }
+    private void editing_CopyTiles() {
+
+        // Detect start and end point on highlighted square
+        int startCol = Math.min(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+        int endCol = Math.max(selectedTile.x, cursor.getWorldX()) / gp.tileSize;
+
+        int startRow = Math.min(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+        int endRow = Math.max(selectedTile.y, cursor.getWorldY()) / gp.tileSize;
+
+        // Loop over each tile highlighted
+        for (int col = startCol; col <= endCol; col++) {
+            for (int row = startRow; row <= endRow; row++) {
+
+                // Offset tile from cursor's position
+                int dx = col - cursor.getWorldX() / gp.tileSize;
+                int dy = row - cursor.getWorldY() / gp.tileSize;
+
+                // Store in copied tiles
+                copiedTiles.put(new Point(dx, dy), gp.tileM.mapTileNum[col][row]);
+            }
+        }
+    }
+    private void editing_PasteTiles() {
+
+        int startCol = cursor.getWorldX() / gp.tileSize;
+        int startRow = cursor.getWorldY() / gp.tileSize;
+
+        // Loop over stored tile copies
+        for (Map.Entry<Point, Integer> entry : copiedTiles.entrySet()) {
+
+            int col = startCol + entry.getKey().x;
+            int row = startRow + entry.getKey().y;
+            if (col < 0 || gp.maxWorldCol < col || row < 0 || gp.maxWorldRow < row) {
+                continue;
+            }
+
+            int tileNum = entry.getValue();
+
+            // Paste copied area onto map
+            gp.tileM.mapTileNum[col][row] = tileNum;
         }
     }
     private void editing_PlaceTile(int tileNum) {

@@ -125,7 +125,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     protected void setupGame() {
 
-        GAME_STATE = PAUSE_STATE;
+        GAME_STATE = EDIT_STATE;
 
         // Temp game window (before drawing to window)
         tempScreen = new BufferedImage(screenWidth, screenHeight, BufferedImage.TYPE_INT_ARGB);
