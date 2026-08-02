@@ -67,6 +67,8 @@ public class UI {
     private final ArrayList<ArrayList<UIEntity>> entityLibrary = new ArrayList<>();
     private int entityListIndex = 0;
     private int entityIndex = 0;
+    private int tileListIndex = 0;
+    private int tileIndex = 0;
 
     /** TILE EDITING */
     private final ArrayList<ArrayList<UIEntity>> tileLibrary = new ArrayList<>();
@@ -1277,8 +1279,8 @@ public class UI {
         wasYPressed = gp.keyH.yPressed;
 
         // Switch tile editing on/off (prevent when grabbing entity)
-        if (gp.keyH.lPressed) {
-            gp.keyH.lPressed = false;
+        if (gp.keyH.rPressed) {
+            gp.keyH.rPressed = false;
 
             if (cursor.hasSelectedEntity()) {
                 playMenuError();
@@ -1287,8 +1289,6 @@ public class UI {
 
             editingTiles = !editingTiles;
 
-            entityListIndex = 0;
-            entityIndex = 0;
             selectedTile = null;
             copiedTiles.clear();
         }
@@ -1305,12 +1305,12 @@ public class UI {
             g2.drawImage(cursor.getSelect(), screenPoint.x - 6, screenPoint.y - 6, gp.tileSize + 13, gp.tileSize + 13,null);
         }
         else {
-            BufferedImage sprite = editingTiles && gp.keyH.rPressed ?
+            BufferedImage sprite = editingTiles && gp.keyH.lPressed ?
                     cursor.getSelect() :
                     cursor.getCursor();
 
             UIEntity uiEntity = editingTiles ?
-                    tileLibrary.get(entityListIndex).get(entityIndex) :
+                    tileLibrary.get(tileListIndex).get(tileIndex) :
                     entityLibrary.get(entityListIndex).get(entityIndex);
 
             float alpha = editingTiles ? 0.9f : 0.4f;
@@ -1329,15 +1329,15 @@ public class UI {
     private void drawEditing_Menu() {
 
         if (editingTiles) {
-            editing_Entity_Menu(tileLibrary);
-            editing_Menu_Input_Dir(tileLibrary);
+            editing_Entity_Menu(tileIndex, tileListIndex, tileLibrary);
+            editing_Menu_Input_Dir(tileIndex, tileListIndex, tileLibrary);
         }
         else {
-            editing_Entity_Menu(entityLibrary);
-            editing_Menu_Input_Dir(entityLibrary);
+            editing_Entity_Menu(entityIndex, entityListIndex, entityLibrary);
+            editing_Menu_Input_Dir(entityIndex, entityListIndex, entityLibrary);
         }
     }
-    private void editing_Entity_Menu(ArrayList<ArrayList<UIEntity>> library) {
+    private void editing_Entity_Menu(int index, int listIndex, ArrayList<ArrayList<UIEntity>> library) {
 
         int listSpacingX = (int) (gp.tileSize * 1.50);
         int padding = 25;
@@ -1349,22 +1349,22 @@ public class UI {
         g2.setColor(pause_brown_1);
         g2.fillRoundRect(baseX, baseY, width, height, 0, 0);
 
-        int cursorX = baseX + (entityListIndex * listSpacingX + padding);
+        int cursorX = baseX + (listIndex * listSpacingX + padding);
         int cursorY = (gp.screenHeight / 2) - gp.tileSize;
 
-        int entitySpacingY = (int) (gp.tileSize * 1.75);
-        int scrollOffsetY = cursorY - (entityIndex * entitySpacingY);
+        int spacingY = (int) (gp.tileSize * 1.75);
+        int scrollOffsetY = cursorY - (index * spacingY);
 
         for (int i = 0; i < library.size(); i++) {
 
             int x = baseX + (i * listSpacingX + padding);
-            int y = (i == entityListIndex) ? scrollOffsetY : cursorY;
+            int y = (i == listIndex) ? scrollOffsetY : cursorY;
 
             for (int c = 0; c < library.get(i).size(); c++) {
 
-                if (i == entityListIndex) {
-                    if (Math.abs(c - entityIndex) > 2) {
-                        y += entitySpacingY;
+                if (i == listIndex) {
+                    if (Math.abs(c - index) > 2) {
+                        y += spacingY;
                         continue;
                     }
                 }
@@ -1372,63 +1372,72 @@ public class UI {
                     continue;
                 }
 
-                if (i == entityListIndex && c == entityIndex) {
+                if (i == listIndex && c == index) {
                     g2.drawImage(cursor.getCursor(),cursorX - 10, cursorY - 10,gp.tileSize + 20, gp.tileSize + 20,null);
                 }
 
-                if (i == entityListIndex && c != entityIndex) {
+                if (i == listIndex && c != index) {
                     g2.setColor(pause_brown_2);
                     g2.fillRoundRect(x - 10, y - 10,gp.tileSize + 20, gp.tileSize + 20,0, 0);
                 }
 
-                if (i != entityListIndex || c != entityIndex) {
+                if (i != listIndex || c != index) {
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75f));
                 }
                 g2.drawImage(library.get(i).get(c).getSprite(), x, y, gp.tileSize, gp.tileSize,null);
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 
-                y += entitySpacingY;
+                y += spacingY;
             }
         }
     }
-    private void editing_Menu_Input_Dir(ArrayList<ArrayList<UIEntity>> library) {
+    private void editing_Menu_Input_Dir(int index, int listIndex, ArrayList<ArrayList<UIEntity>> library) {
         if (gp.keyH.upPressed) {
             gp.keyH.upPressed = false;
 
-            entityIndex--;
-            if (entityIndex < 0) {
-                entityIndex = library.get(entityListIndex).size() - 1;
+            index--;
+            if (index < 0) {
+                index = library.get(listIndex).size() - 1;
             }
             playMenuCursor();
         }
         else if (gp.keyH.downPressed) {
             gp.keyH.downPressed = false;
 
-            entityIndex++;
-            if (entityIndex > library.get(entityListIndex).size() - 1) {
-                entityIndex = 0;
+            index++;
+            if (index > library.get(listIndex).size() - 1) {
+                index = 0;
             }
             playMenuCursor();
         }
         else if (gp.keyH.leftPressed) {
             gp.keyH.leftPressed = false;
 
-            entityListIndex--;
-            entityIndex = 0;
-            if (entityListIndex < 0) {
-                entityListIndex = library.size() - 1;
+            listIndex--;
+            index = 0;
+            if (listIndex < 0) {
+                listIndex = library.size() - 1;
             }
             playMenuCursor();
         }
         else if (gp.keyH.rightPressed) {
             gp.keyH.rightPressed = false;
 
-            entityListIndex++;
-            entityIndex = 0;
-            if (entityListIndex > library.size() - 1) {
-                entityListIndex = 0;
+            listIndex++;
+            index = 0;
+            if (listIndex > library.size() - 1) {
+                listIndex = 0;
             }
             playMenuCursor();
+        }
+
+        if (editingTiles) {
+            tileIndex = index;
+            tileListIndex = listIndex;
+        }
+        else {
+            entityIndex = index;
+            entityListIndex = listIndex;
         }
     }
 
@@ -1436,13 +1445,13 @@ public class UI {
 
         if (editingTiles) {
 
-            // Unhighlight tiles if not pressing R
-            if (!gp.keyH.rPressed) {
+            // Unhighlight tiles if not pressing L
+            if (!gp.keyH.lPressed) {
                 selectedTile = null;
             }
 
             editing_Map_Tile_Input_A();
-            editing_Map_Tile_Input_B();
+            editing_Map_Tile_Input_X();
         }
         else {
             editing_Map_Entity_Input_A();
@@ -1457,10 +1466,10 @@ public class UI {
         if (!gp.keyH.uiAPressed) return;
         gp.keyH.uiAPressed = false;
 
-        UIEntity currentTile = tileLibrary.get(entityListIndex).get(entityIndex);
+        UIEntity currentTile = tileLibrary.get(tileListIndex).get(tileIndex);
         int tileNum = Integer.parseInt(currentTile.getName());
 
-        if (gp.keyH.rPressed) {
+        if (gp.keyH.lPressed) {
 
             // Set highlighted start point
             if (selectedTile == null) {
@@ -1476,20 +1485,17 @@ public class UI {
             editing_PlaceTile(tileNum);
         }
     }
-    private void editing_Map_Tile_Input_B() {
-        if (!gp.keyH.uiBPressed) return;
-        gp.keyH.uiBPressed = false;
+    private void editing_Map_Tile_Input_X() {
+        if (!gp.keyH.xPressed || !gp.keyH.lPressed) return;
+        gp.keyH.xPressed = false;
 
-        if (gp.keyH.rPressed) {
-
-            // Must be highlighted to copy
-            if (copiedTiles.isEmpty() && selectedTile != null) {
-                editing_CopyTiles();
-            }
-            // Selected tile not needed for paste
-            else if (!copiedTiles.isEmpty()) {
-                editing_PasteTiles();
-            }
+        // Must be highlighted to copy
+        if (copiedTiles.isEmpty() && selectedTile != null) {
+            editing_CopyTiles();
+        }
+        // Selected tile not needed for paste
+        else if (!copiedTiles.isEmpty()) {
+            editing_PasteTiles();
         }
     }
     private void editing_FillTiles(int tileNum) {
