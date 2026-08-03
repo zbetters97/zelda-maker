@@ -1539,9 +1539,9 @@ public class UI {
         for (int col = startCol; col <= endCol; col++) {
             for (int row = startRow; row <= endRow; row++) {
 
-                // Offset tile from cursor's position
-                int dx = col - cursor.getWorldX() / gp.tileSize;
-                int dy = row - cursor.getWorldY() / gp.tileSize;
+                // Offset tile from top-left corner of selection
+                int dx = col - startCol;
+                int dy = row - startRow;
 
                 // Store in copied tiles
                 copiedTiles.put(new Point(dx, dy), gp.tileM.mapTileNum[col][row]);

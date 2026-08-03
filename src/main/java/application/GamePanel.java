@@ -412,7 +412,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         while (true) {
             try {
-                // Open browser to login to Google account, timeout every 100ms
+                // Open browser to log into Google account, timeout every 100ms
                 String idToken = future.get(100, TimeUnit.MILLISECONDS);
                 auth.login(idToken);
 
