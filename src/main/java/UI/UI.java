@@ -1444,12 +1444,7 @@ public class UI {
     private void drawEditing_Map() {
 
         if (editingTiles) {
-
-            // Unhighlight tiles if not pressing L
-            if (!gp.keyH.lPressed) {
-                selectedTile = null;
-            }
-
+            editing_Map_Tile_Input_L();
             editing_Map_Tile_Input_A();
             editing_Map_Tile_Input_X();
         }
@@ -1462,40 +1457,35 @@ public class UI {
         editing_Map_Input_Dir();
     }
 
+    private void editing_Map_Tile_Input_L() {
+
+        // Unhighlight if L button is released
+        if (!gp.keyH.lPressed) {
+            selectedTile = null;
+            return;
+        }
+
+        // Store current tile if L button is pressed
+        if (selectedTile == null) {
+            selectedTile = new Point(cursor.getWorldPoint());
+            copiedTiles.clear();
+        }
+    }
     private void editing_Map_Tile_Input_A() {
         if (!gp.keyH.uiAPressed) return;
         gp.keyH.uiAPressed = false;
 
+        // Get cursor tile
         UIEntity currentTile = tileLibrary.get(tileListIndex).get(tileIndex);
         int tileNum = Integer.parseInt(currentTile.getName());
 
-        if (gp.keyH.lPressed) {
-
-            // Set highlighted start point
-            if (selectedTile == null) {
-                selectedTile = new Point(cursor.getWorldPoint());
-            }
-            else {
-                editing_FillTiles(tileNum);
-            }
-
-            copiedTiles.clear();
+        // If holding L button, fill highlighted selection with cursor tile
+        if (gp.keyH.lPressed && selectedTile != null) {
+            editing_FillTiles(tileNum);
         }
+        // Place down a tile
         else {
             editing_PlaceTile(tileNum);
-        }
-    }
-    private void editing_Map_Tile_Input_X() {
-        if (!gp.keyH.xPressed || !gp.keyH.lPressed) return;
-        gp.keyH.xPressed = false;
-
-        // Must be highlighted to copy
-        if (copiedTiles.isEmpty() && selectedTile != null) {
-            editing_CopyTiles();
-        }
-        // Selected tile not needed for paste
-        else if (!copiedTiles.isEmpty()) {
-            editing_PasteTiles();
         }
     }
     private void editing_FillTiles(int tileNum) {
@@ -1514,6 +1504,26 @@ public class UI {
                 // Fill with current tile
                 gp.tileM.mapTileNum[col][row] = tileNum;
             }
+        }
+    }
+    private void editing_PlaceTile(int tileNum) {
+
+        int col = cursor.getWorldX() / gp.tileSize;
+        int row = cursor.getWorldY() / gp.tileSize;
+
+        gp.tileM.mapTileNum[col][row] = tileNum;
+    }
+    private void editing_Map_Tile_Input_X() {
+        if (!gp.keyH.xPressed) return;
+        gp.keyH.xPressed = false;
+
+        // Must be highlighted to copy
+        if (copiedTiles.isEmpty() && selectedTile != null) {
+            editing_CopyTiles();
+        }
+        // Selected tile not needed for paste
+        else if (!copiedTiles.isEmpty()) {
+            editing_PasteTiles();
         }
     }
     private void editing_CopyTiles() {
@@ -1557,13 +1567,6 @@ public class UI {
             // Paste copied area onto map
             gp.tileM.mapTileNum[col][row] = tileNum;
         }
-    }
-    private void editing_PlaceTile(int tileNum) {
-
-        int col = cursor.getWorldX() / gp.tileSize;
-        int row = cursor.getWorldY() / gp.tileSize;
-
-        gp.tileM.mapTileNum[col][row] = tileNum;
     }
 
     private void editing_Map_Entity_Input_A() {
