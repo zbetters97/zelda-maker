@@ -40,6 +40,8 @@ public class Entity {
         JUMPING(true, true, false),
         SWINGING(false, false, false),
         SOARING(true, true, false),
+        SWIMMING(true, true, false),
+        DIVING(true, true, false),
         FALLING(false, false, false),
         DROWNING(false, false, false);
 
@@ -962,6 +964,9 @@ public class Entity {
     }
     public boolean isOnSameElevation(Entity target) {
         return target.getElevated() == elevated;
+    }
+    public boolean isInWater() {
+        return action == SWIMMING || action == DIVING;
     }
     public boolean getCanSwim() {
         return canSwim;

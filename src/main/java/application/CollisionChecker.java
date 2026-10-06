@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import static application.GamePanel.Direction;
+import static entity.Entity.Action.*;
 
 public record CollisionChecker(GamePanel gp) {
 
@@ -184,6 +185,10 @@ public record CollisionChecker(GamePanel gp) {
         }
         // Player is on ground, set safe X/Y
         else if (entity == gp.player && !gp.player.getElevated()) {
+            if (gp.player.isInWater()) {
+                gp.player.setAction(IDLE);
+            }
+
             setSafePoint();
         }
     }
@@ -212,6 +217,13 @@ public record CollisionChecker(GamePanel gp) {
         }
     }
     private void handleWater(Entity entity) {
+
+        // Player can swim and is not currently diving, set to swimming
+        if (entity == gp.player && !gp.player.isInWater()) {
+            gp.player.setAction(Entity.Action.SWIMMING);
+            gp.player.resetCounters();
+            return;
+        }
 
         if (entity.getElevated() || entity.getCanSwim()) return;
 

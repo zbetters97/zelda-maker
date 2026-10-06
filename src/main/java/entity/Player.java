@@ -43,6 +43,7 @@ public class Player extends Entity {
             throwNum = 1, throwCounter = 0,
             jumpNum = 1, jumpCounter = 0,
             rodNum = 1, rodCounter = 0,
+            swimNum = 1, swimCounter = 0,
             damageNum = 1, damageCounter = 0;
 
     /** SPRITE IMAGES */
@@ -76,6 +77,9 @@ public class Player extends Entity {
 
             rodUp1, rodUp2, rodUp3, rodDown1, rodDown2, rodDown3,
             rodLeft1, rodLeft2, rodLeft3, rodRight1, rodRight2, rodRight3,
+
+            swimUp1, swimUp2, swimDown1, swimDown2, swimLeft1,
+            swimLeft2, swimRight1, swimRight2,
 
             soarUp1, soarDown1, soarLeft1, soarRight1,
 
@@ -131,6 +135,7 @@ public class Player extends Entity {
         getJumpImages();
         getRodImages();
         getSoarImages();
+        getSwimImages();
         getFallImages();
         getDrownImages();
         getItemImages();
@@ -289,6 +294,16 @@ public class Player extends Entity {
         soarLeft1 = setupImage("/player/boy_soar_left_1");
         soarRight1 = setupImage("/player/boy_soar_right_1");
     }
+    private void getSwimImages() {
+        swimUp1 = setupImage("/player/boy_swim_up_1");
+        swimUp2 = setupImage("/player/boy_swim_up_2");
+        swimDown1 = setupImage("/player/boy_swim_down_1");
+        swimDown2 = setupImage("/player/boy_swim_down_2");
+        swimLeft1 = setupImage("/player/boy_swim_left_1");
+        swimLeft2 = setupImage("/player/boy_swim_left_2");
+        swimRight1 = setupImage("/player/boy_swim_right_1");
+        swimRight2 = setupImage("/player/boy_swim_right_2");
+    }
     private void getFallImages() {
         fall1 = setupImage("/player/boy_fall_1");
         fall2 = setupImage("/player/boy_fall_2");
@@ -332,6 +347,8 @@ public class Player extends Entity {
     }
 
     private void setDefaultRPGValues() {
+
+        canSwim = true;
 
         maxHealth = 16;
         health = maxHealth;
@@ -423,6 +440,9 @@ public class Player extends Entity {
         else if (action == CARRYING) {
             availableAction = moving ? "THROW" : "PLACE";
         }
+        else if (action == SWIMMING) {
+            availableAction = "DIVE";
+        }
     }
 
     private void handleInput() {
@@ -438,6 +458,11 @@ public class Player extends Entity {
                     if (holdingBomb) {
                         startAction();
                     }
+                }
+            }
+            case SWIMMING ->  {
+                if (gp.keyH.aPressed) {
+                    startDive();
                 }
             }
         }
@@ -558,6 +583,14 @@ public class Player extends Entity {
         }
 
         grabbedObject.toss(this);
+    }
+
+    private void startDive() {
+        gp.keyH.aPressed = false;
+        swimCounter = 0;
+        swimNum = 1;
+        action = DIVING;
+        interactable = false;
     }
 
     /** Z-TARGETING */
@@ -748,6 +781,8 @@ public class Player extends Entity {
             case AIMING -> aiming();
             case JUMPING, SOARING -> jumping();
             case SWINGING -> swinging();
+            case SWIMMING -> swimming();
+            case DIVING -> diving();
             case FALLING, DROWNING -> takingDamage();
         }
     }
@@ -1388,6 +1423,28 @@ public class Player extends Entity {
         }
     }
 
+    private void swimming() {
+        if (++swimCounter <= 12) {
+            swimNum = 1;
+        }
+        else if (swimCounter <= 24){
+            swimNum = 2;
+        }
+        else if (swimCounter <= 36) {
+            swimCounter = 0;
+            swimNum = 1;
+        }
+    }
+
+    private void diving() {
+        if (75 <= ++swimCounter) {
+            swimCounter = 0;
+            swimNum = 1;
+            action = SWIMMING;
+            interactable = true;
+        }
+    }
+
     public void startFall() {
         action = FALLING;
         shiftToCenter();
@@ -1484,6 +1541,9 @@ public class Player extends Entity {
     public void resetCounters() {
         super.resetCounters();
 
+        interactable = true;
+        speed = defaultSpeed;
+
         spinCharge = 0;
         attackNum = 1; attackCounter = 0;
         digNum = 1; digCounter = 0;
@@ -1492,6 +1552,7 @@ public class Player extends Entity {
         throwNum = 1; throwCounter = 0;
         jumpNum = 1; jumpCounter = 0;
         rodNum = 1; rodCounter = 0;
+        swimNum = 1; swimCounter = 0;
         damageNum = 1; damageCounter = 0;
     }
 
@@ -1548,8 +1609,9 @@ public class Player extends Entity {
             case AIMING -> getAimSprite();
             case JUMPING, SOARING -> getJumpSprite();
             case SWINGING -> getRodSprite();
+            case SWIMMING -> getSwimSprite();
             case FALLING -> getFallSprite();
-            case DROWNING -> getDrownSprite();
+            case DIVING, DROWNING -> getDrownSprite();
         };
     }
     private BufferedImage getIdleSprite() {
@@ -1943,6 +2005,28 @@ public class Player extends Entity {
         }
 
         return rodSprite;
+    }
+    private BufferedImage getSwimSprite() {
+        BufferedImage swimSprite;
+
+        if (swimNum == 1) {
+            swimSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> swimUp1;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> swimDown1;
+                case LEFT -> swimLeft1;
+                case RIGHT -> swimRight1;
+            };
+        }
+        else {
+            swimSprite = switch (direction) {
+                case UP, UPLEFT, UPRIGHT -> swimUp2;
+                case DOWN, DOWNLEFT, DOWNRIGHT -> swimDown2;
+                case LEFT -> swimLeft2;
+                case RIGHT -> swimRight2;
+            };
+        }
+
+        return swimSprite;
     }
     private BufferedImage getFallSprite() {
         BufferedImage fallSprite;
