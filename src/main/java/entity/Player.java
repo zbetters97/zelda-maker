@@ -348,8 +348,6 @@ public class Player extends Entity {
 
     private void setDefaultRPGValues() {
 
-        canSwim = true;
-
         maxHealth = 16;
         health = maxHealth;
 

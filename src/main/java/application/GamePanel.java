@@ -8,6 +8,7 @@ import entity.Entity;
 import entity.Player;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
+import entity.equipment.Equipment;
 import entity.item.Item;
 import entity.npc.NPC;
 import entity.object.Object;
@@ -372,6 +373,7 @@ public class GamePanel extends JPanel implements Runnable {
             case Object object -> objects.add(object);
             case Collectable collectable -> collectables.add(collectable);
             case Item item -> collectables.add(item);
+            case Equipment equipment -> collectables.add(equipment);
             case Projectile projectile -> projectiles.add(projectile);
             default -> { }
         }
@@ -384,6 +386,8 @@ public class GamePanel extends JPanel implements Runnable {
             case Particle particle -> particles.remove(particle);
             case Object object -> objects.remove(object);
             case Collectable collectable -> collectables.remove(collectable);
+            case Item item -> collectables.remove(item);
+            case Equipment equipment -> collectables.remove(equipment);
             case Projectile projectile -> projectiles.remove(projectile);
             default -> { }
         }

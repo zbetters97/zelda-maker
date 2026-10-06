@@ -5,6 +5,7 @@ import application.GamePanel;
 import application.GamePanel.Direction;
 import entity.collectable.Collectable;
 import entity.enemy.Enemy;
+import entity.equipment.Equipment;
 import entity.item.Item;
 import entity.object.Object;
 import entity.projectile.Projectile;
@@ -652,6 +653,10 @@ public class Entity {
             showReward(loot);
             addItem((Item) loot);
         }
+        else if (loot instanceof Equipment) {
+            ((Equipment) loot).use(this);
+            showReward(loot);
+        }
     }
 
     public void receiveLoot(Entity loot) {
@@ -662,6 +667,10 @@ public class Entity {
         else if (loot instanceof Item) {
             showReward(loot);
             addItem((Item) loot);
+        }
+        else if (loot instanceof Equipment) {
+            ((Equipment) loot).use(this);
+            showReward(loot);
         }
     }
     public void addItem(Item item) {
@@ -970,6 +979,9 @@ public class Entity {
     }
     public boolean getCanSwim() {
         return canSwim;
+    }
+    public void setCanSwim(boolean canSwim) {
+        this.canSwim = canSwim;
     }
     public boolean getNeedsWater() {
         return needsWater;

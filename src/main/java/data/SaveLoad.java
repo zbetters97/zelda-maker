@@ -54,6 +54,7 @@ public class SaveLoad {
         ds.maxBombs = gp.player.getMaxBombs();
         ds.bombs = gp.player.getBombs();
         ds.keys = gp.player.getKeys();
+        ds.canSwim = gp.player.getCanSwim();
         ds.hasBossKey = gp.player.getHasBossKey();
 
         ds.currentItemSlot = gp.player.getCurrentItemSlot();
@@ -211,6 +212,7 @@ public class SaveLoad {
         gp.player.setMaxBombs(ds.maxBombs);
         gp.player.setBombs(ds.bombs);
         gp.player.setKeys(ds.keys);
+        gp.player.setCanSwim(ds.canSwim);
         gp.player.setHasBossKey(ds.hasBossKey);
 
         gp.player.setCurrentItemSlot(ds.currentItemSlot);

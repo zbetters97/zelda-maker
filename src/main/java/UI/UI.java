@@ -4,6 +4,7 @@ import application.GamePanel;
 import application.UtilityTool;
 import entity.Entity;
 import entity.collectable.Collectable;
+import entity.equipment.Equipment;
 import entity.item.ITM_Bomb;
 import entity.item.ITM_Bow;
 import entity.item.Item;
@@ -184,7 +185,8 @@ public class UI {
                 buildFromFactory("enemy", gp.eGenerator.enemyFactory),
                 buildFromFactory("object", gp.eGenerator.objectFactory),
                 buildFromFactory("collectable", gp.eGenerator.collectableFactory),
-                buildFromFactory("item", gp.eGenerator.itemFactory)
+                buildFromFactory("item", gp.eGenerator.itemFactory),
+                buildFromFactory("equipment", gp.eGenerator.equipFactory)
         ));
     }
     private ArrayList<UIEntity> buildFromFactory(String path, Map<String, ? extends Supplier<Entity>> factory) {
@@ -1660,7 +1662,7 @@ public class UI {
         // Not valid
         if (target == null || !target.canHoldLoot(loot) || loot == null || target == gp.player) return false;
 
-        if (loot instanceof Collectable || loot instanceof Item) {
+        if (loot instanceof Collectable || loot instanceof Item || loot instanceof Equipment) {
             target.setLoot(loot);
             return true;
         }

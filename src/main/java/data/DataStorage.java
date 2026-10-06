@@ -16,7 +16,7 @@ public class DataStorage implements Serializable {
     public int pWorldX, pWorldY;
     public String direction;
     public int maxHealth, health, maxRupees, rupees, maxArrows, arrows, maxBombs, bombs, keys;
-    public boolean hasBossKey;
+    public boolean canSwim, hasBossKey;
     public String[] items;
     public int currentItemSlot;
 

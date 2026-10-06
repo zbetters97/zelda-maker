@@ -4,6 +4,7 @@ import application.GamePanel;
 import entity.Entity;
 import entity.collectable.*;
 import entity.enemy.*;
+import entity.equipment.EQP_Flippers;
 import entity.item.*;
 import entity.npc.*;
 import entity.object.*;
@@ -19,6 +20,7 @@ public class EntityGenerator {
     public final Map<String, Supplier<Entity>> objectFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> collectableFactory = new LinkedHashMap<>();
     public final Map<String, Supplier<Entity>> itemFactory = new LinkedHashMap<>();
+    public final Map<String, Supplier<Entity>> equipFactory = new LinkedHashMap<>();
 
     public EntityGenerator(GamePanel gp) {
 
@@ -84,6 +86,9 @@ public class EntityGenerator {
         itemFactory.put(ITM_Hookshot.itmName, () -> new ITM_Hookshot(gp, null));
         itemFactory.put(ITM_Cape.itmName, () -> new ITM_Cape(gp, null));
         itemFactory.put(ITM_Rod.itmName, () -> new ITM_Rod(gp, null));
+
+        // Equipment
+        equipFactory.put(EQP_Flippers.eqpName, () -> new EQP_Flippers(gp));
     }
 
     public Entity getEntity(String eName) {
@@ -101,6 +106,9 @@ public class EntityGenerator {
         if (entity != null) return entity;
 
         entity = getFromFactory(itemFactory, eName);
+        if (entity != null) return entity;
+
+        entity = getFromFactory(equipFactory, eName);
         return entity;
     }
 
